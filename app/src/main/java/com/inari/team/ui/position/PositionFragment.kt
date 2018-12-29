@@ -2,6 +2,7 @@ package com.inari.team.ui.position
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.inari.team.R
+import kotlinx.android.synthetic.main.fragment_position.*
 
 
 class PositionFragment : Fragment(), OnMapReadyCallback {
@@ -41,7 +43,20 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
         setHasOptionsMenu(true)
 
-        initMap()
+        fabOptions.setOnClickListener {
+            clBottomSheet.visibility = View.VISIBLE
+        }
+
+        fabClose.setOnClickListener {
+            if (clBottomSheet.visibility == View.VISIBLE){
+                clBottomSheet.visibility = View.GONE
+            }
+        }
+
+        Handler().postDelayed({
+            initMap()
+        },10000)
+
     }
 
     private fun initMap() {
@@ -80,6 +95,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(map: GoogleMap?) {
+        hideMapLoading()
         setMap(map)
     }
 
@@ -116,6 +132,14 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
         markerOptions.position(latLng)
         markerOptions.title(title)
         return mMap?.addMarker(markerOptions)
+    }
+
+    fun showMapLoading() {
+        pbMap?.visibility = View.VISIBLE
+    }
+
+    fun hideMapLoading() {
+        pbMap?.visibility = View.GONE
     }
 
 }
