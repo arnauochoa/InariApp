@@ -36,9 +36,9 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.inari.team.ui.MainActivity"
-            android:screenOrientation="portrait" />
+        <activity android:name=".ui.MainActivity"
+            android:screenOrientation="portrait"/>
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
     </application>
 
 </manifest>
