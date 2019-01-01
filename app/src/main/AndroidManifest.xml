@@ -32,6 +32,7 @@
                 android:name=".ui.SplashActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/SplashTheme">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -54,6 +55,8 @@
         <activity android:name=".ui.logs.LogsDetailActivity"></activity>
         <activity android:name=".ui.logs.LogsActivity"></activity>
 
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
     </application>
 
 </manifest>
