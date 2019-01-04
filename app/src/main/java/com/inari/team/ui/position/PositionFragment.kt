@@ -18,11 +18,14 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+<<<<<<< HEAD
 import com.inari.team.R
 import com.inari.team.ui.logs.LogsActivity
 import com.inari.team.utils.saveFile
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
+=======
+>>>>>>> f69f812... add statistics activity
 import kotlinx.android.synthetic.main.fragment_position.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -69,7 +72,11 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
         super.onResume()
         Handler().postDelayed({
             initMap()
+<<<<<<< HEAD
         }, 1000)
+=======
+        },1000)
+>>>>>>> f69f812... add statistics activity
     }
 
     private fun initMap() {

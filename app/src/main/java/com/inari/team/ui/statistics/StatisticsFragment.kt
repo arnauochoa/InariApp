@@ -7,16 +7,19 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+<<<<<<< HEAD
 import com.inari.team.R
+=======
+>>>>>>> f69f812... add statistics activity
 import com.inari.team.ui.MainActivity
 import kotlinx.android.synthetic.main.fragment_statistics.*
 
 
 class StatisticsFragment : Fragment(), View.OnClickListener {
     companion object {
+
         const val FRAG_TAG = "statistics_fragment"
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,11 +32,16 @@ class StatisticsFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         cardRMS.setOnClickListener(this)
+<<<<<<< HEAD
         cardCNO.setOnClickListener(this)
         cardMap.setOnClickListener(this)
         cardGraph4.setOnClickListener(this)
         cardGraph5.setOnClickListener(this)
         cardGraph6.setOnClickListener(this)
+=======
+        //...
+
+>>>>>>> f69f812... add statistics activity
     }
 
     override fun onClick(v: View?) {
@@ -41,6 +49,7 @@ class StatisticsFragment : Fragment(), View.OnClickListener {
             val i = Intent(view.context, StatisticsActivity::class.java)
 
             when(view.id){
+<<<<<<< HEAD
                 R.id.cardRMS ->{
                     i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.RMS)
                 }
@@ -59,6 +68,21 @@ class StatisticsFragment : Fragment(), View.OnClickListener {
                 R.id.cardGraph6 ->{
                     i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.GRAPH6)
                 }
+=======
+                R.id.cardCN0 ->{
+                    i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.CNO)
+                }
+                R.id.cardCN0 ->{
+
+                }
+                R.id.cardCN0 ->{
+
+                }
+                R.id.cardCN0 ->{
+
+                }
+                R.id.cardCN0 ->{}
+>>>>>>> f69f812... add statistics activity
             }
 
             startActivity(i)

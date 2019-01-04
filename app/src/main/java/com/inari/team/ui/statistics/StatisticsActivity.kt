@@ -2,6 +2,7 @@ package com.inari.team.ui.statistics
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+<<<<<<< HEAD
 import android.view.MotionEvent
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -10,6 +11,8 @@ import com.inari.team.R
 import com.inari.team.utils.AppSharedPreferences
 import kotlinx.android.synthetic.main.activity_statistics.*
 
+=======
+>>>>>>> f69f812... add statistics activity
 
 class StatisticsActivity : AppCompatActivity() {
 
@@ -17,6 +20,7 @@ class StatisticsActivity : AppCompatActivity() {
         const val GRAPH_TYPE: String = "graph_type"
         const val RMS: String = "RMS"
         const val CNO: String = "CNO"
+<<<<<<< HEAD
         const val MAP: String = "MAP"
         const val GRAPH4: String = "GRAPH4"
         const val GRAPH5: String = "GRAPH5"
@@ -71,4 +75,23 @@ class StatisticsActivity : AppCompatActivity() {
         return true
     }
 
+=======
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_statistics)
+
+        val type = intent?.getStringExtra(GRAPH_TYPE)
+
+        when (type) {
+            RMS -> {
+                //crides al nom de la funcio de RMS
+            }
+            CNO -> {
+            }
+        }
+
+    }
+>>>>>>> f69f812... add statistics activity
 }
