@@ -14,7 +14,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.inari.team.R
 import kotlinx.android.synthetic.main.fragment_position.*
 
 
@@ -53,10 +52,13 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
         Handler().postDelayed({
             initMap()
-        },10000)
-
+        },1000)
     }
 
     private fun initMap() {
