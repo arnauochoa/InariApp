@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9f9532e... modes spinner added
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
@@ -108,6 +111,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
+<<<<<<< HEAD
 =======
 <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -117,5 +121,7 @@
         android:layout_height="match_parent"
         tools:context=".ui.statistics.StatisticsActivity">
 >>>>>>> f69f812... add statistics activity
+=======
+>>>>>>> 9f9532e... modes spinner added
 
 </android.support.constraint.ConstraintLayout>

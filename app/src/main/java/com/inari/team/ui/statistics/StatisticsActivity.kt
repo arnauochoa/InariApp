@@ -3,6 +3,9 @@ package com.inari.team.ui.statistics
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9f9532e... modes spinner added
 import android.view.MotionEvent
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -11,8 +14,11 @@ import com.inari.team.R
 import com.inari.team.utils.AppSharedPreferences
 import kotlinx.android.synthetic.main.activity_statistics.*
 
+<<<<<<< HEAD
 =======
 >>>>>>> f69f812... add statistics activity
+=======
+>>>>>>> 9f9532e... modes spinner added
 
 class StatisticsActivity : AppCompatActivity() {
 
@@ -21,10 +27,14 @@ class StatisticsActivity : AppCompatActivity() {
         const val RMS: String = "RMS"
         const val CNO: String = "CNO"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9f9532e... modes spinner added
         const val MAP: String = "MAP"
         const val GRAPH4: String = "GRAPH4"
         const val GRAPH5: String = "GRAPH5"
         const val GRAPH6: String = "GRAPH6"
+<<<<<<< HEAD
     }
 
     private val mPrefs = AppSharedPreferences.getInstance()
@@ -76,22 +86,60 @@ class StatisticsActivity : AppCompatActivity() {
     }
 
 =======
+=======
+>>>>>>> 9f9532e... modes spinner added
     }
+
+    private val mPrefs = AppSharedPreferences.getInstance()
+    private val hasCompared = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_statistics)
+        setContentView(com.inari.team.R.layout.activity_statistics)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val type = intent?.getStringExtra(GRAPH_TYPE)
 
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mPrefs.getModesNames())
+        spinnerModeA.adapter = adapter
+        spinnerModeB.adapter = adapter
+
         when (type) {
             RMS -> {
+                supportActionBar?.setTitle(getString(R.string.stats_card_1))
                 //crides al nom de la funcio de RMS
             }
             CNO -> {
+                supportActionBar?.setTitle(getString(R.string.stats_card_2))
+                //crides al nom de la funcio de CN0
+            }
+            MAP -> {
+                supportActionBar?.setTitle(getString(R.string.stats_card_3))
+                //crides al nom de la funcio de MAP
+            }
+            GRAPH4 -> {
+                supportActionBar?.setTitle(getString(R.string.stats_card_4))
+                //crides al nom de la funcio de GRAPH4
+            }
+            GRAPH5 -> {
+                supportActionBar?.setTitle(getString(R.string.stats_card_5))
+                //crides al nom de la funcio de GRAPH5
+            }
+            GRAPH6 -> {
+                supportActionBar?.setTitle(getString(R.string.stats_card_6))
+                //crides al nom de la funcio de GRAPH6
             }
         }
-
     }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+<<<<<<< HEAD
 >>>>>>> f69f812... add statistics activity
+=======
+
+>>>>>>> 9f9532e... modes spinner added
 }
