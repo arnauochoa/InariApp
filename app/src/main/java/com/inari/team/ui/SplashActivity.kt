@@ -9,6 +9,8 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import com.inari.team.R
+import com.inari.team.data.Mode
+import com.inari.team.utils.AppSharedPreferences
 
 class SplashActivity : AppCompatActivity() {
 
@@ -27,9 +29,43 @@ class SplashActivity : AppCompatActivity() {
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                         0)
             } else {
+
+                if (AppSharedPreferences.getInstance().getModesList().isEmpty()){
+                    addDefaultModes()
+                }
+
                 goToMainActivity()
             }
         }, TIME_OUT)
+    }
+
+    private fun addDefaultModes() {
+
+        val mode = Mode(
+            "GPS LS",
+            arrayListOf(Mode.CONST_GPS),
+            arrayListOf(Mode.BAND_L1),
+            arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
+            Mode.ALG_LS
+        )
+        val mode2 = Mode(
+            "Galileo WLS",
+            arrayListOf(Mode.CONST_GAL),
+            arrayListOf(Mode.BAND_L1),
+            arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
+            Mode.ALG_WLS
+        )
+        val mode3 = Mode(
+            "Multiconstellation Kalman",
+            arrayListOf(Mode.CONST_GPS, Mode.CONST_GAL),
+            arrayListOf(Mode.BAND_L1, Mode.BAND_L5),
+            arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE, Mode.CORR_MULTIPATH),
+            Mode.ALG_KALMAN
+        )
+
+        val list = arrayListOf<Mode>(mode, mode2, mode3)
+
+        AppSharedPreferences.getInstance().saveModes(list)
     }
 
     private fun goToMainActivity() {

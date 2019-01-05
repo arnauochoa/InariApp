@@ -44,7 +44,8 @@
                 android:name="org.apache.http.legacy"
                 android:required="false"/>
 
-        <activity android:name=".ui.statistics.StatisticsActivity">
+        <activity android:name=".ui.statistics.StatisticsActivity"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 
