@@ -10,24 +10,28 @@ import com.inari.team.data.Mode
 import kotlinx.android.synthetic.main.item_mode.view.*
 
 class ModesAdapter(val ctx: Context, val modes: ArrayList<Mode>, selectedModeId: Int, modeToRemoveId: Int) :
-        ArrayAdapter<Mode>(ctx, R.layout.item_mode, modes) {
+    ArrayAdapter<Mode>(ctx, R.layout.item_mode, modes) {
 
     val items = arrayListOf<Mode>()
     val firstTime = true
 
-    var selectedMode: Mode
+    var selectedMode: Mode?
 
     init {
         val modeToRemove = modes.find { mode -> mode.id == modeToRemoveId }
-        selectedMode = modes.find { mode -> mode.id == selectedModeId }!!
-        updateList(selectedMode!!, modeToRemove!!) //TODO: check !!
+        selectedMode = modes.find { mode -> mode.id == selectedModeId }
+        selectedMode?.let {
+            modeToRemove?.let { remove ->
+                updateList(it, remove)
+            }
+        }
     }
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View =
-            createItemView(position, parent)
+        createItemView(position, parent)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
-            createItemView(position, parent)
+        createItemView(position, parent)
 
 
     override fun getCount(): Int = items.size

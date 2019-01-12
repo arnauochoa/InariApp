@@ -3,30 +3,13 @@ package com.inari.team.ui.statistics
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 9f9532e... modes spinner added
-=======
-import android.view.Display
->>>>>>> a9192e2... spinners exclusion done, selected option does not work properly
-import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Toast
 import com.inari.team.R
 import com.inari.team.data.Mode
 import com.inari.team.utils.AppSharedPreferences
 import kotlinx.android.synthetic.main.activity_statistics.*
 
-<<<<<<< HEAD
-=======
->>>>>>> f69f812... add statistics activity
-=======
->>>>>>> 9f9532e... modes spinner added
 
 class StatisticsActivity : AppCompatActivity() {
 
@@ -34,15 +17,11 @@ class StatisticsActivity : AppCompatActivity() {
         const val GRAPH_TYPE: String = "graph_type"
         const val RMS: String = "RMS"
         const val CNO: String = "CNO"
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 9f9532e... modes spinner added
+
         const val MAP: String = "MAP"
         const val GRAPH4: String = "GRAPH4"
         const val GRAPH5: String = "GRAPH5"
         const val GRAPH6: String = "GRAPH6"
-<<<<<<< HEAD
     }
 
     private val mPrefs = AppSharedPreferences.getInstance()
@@ -65,17 +44,17 @@ class StatisticsActivity : AppCompatActivity() {
 
         setAdapters()
 
-        buttonCompareSave.setOnClickListener{
+        buttonCompareSave.setOnClickListener {
             changeButton()
         }
     }
 
-    private fun changeButton(){
-        if (!hasCompared){
+    private fun changeButton() {
+        if (!hasCompared) {
             buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.saveButton))
             //buttonCompareSave.text = "save"
             hasCompared = true
-        }else{
+        } else {
             buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.compareButton))
             //buttonCompareSave.text = "compare"
         }
@@ -126,8 +105,13 @@ class StatisticsActivity : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 adapterA.selectedMode = adapterA.getItems()[position]
-                adapterA.updateList(adapterA.selectedMode, adapterB.selectedMode)
-                adapterB.updateList(adapterB.selectedMode, adapterA.selectedMode)
+                adapterA.selectedMode?.let { selectedA ->
+                    adapterB.selectedMode?.let {selectedB->
+                        adapterA.updateList(selectedA, selectedB)
+                        adapterB.updateList(selectedB, selectedA)
+                    }
+                }
+
                 hasCompared = false
                 changeButton()
             }
@@ -140,8 +124,12 @@ class StatisticsActivity : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 adapterB.selectedMode = adapterB.getItems()[position]
-                adapterB.updateList(adapterB.selectedMode, adapterA.selectedMode)
-                adapterA.updateList(adapterA.selectedMode, adapterB.selectedMode)
+                adapterB.selectedMode?.let { selectedB ->
+                    adapterA.selectedMode?.let {selectedA->
+                        adapterB.updateList(selectedB, selectedA)
+                        adapterB.updateList(selectedA, selectedB)
+                    }
+                }
                 hasCompared = false
                 changeButton()
             }
@@ -154,61 +142,6 @@ class StatisticsActivity : AppCompatActivity() {
         return true
     }
 
-=======
-=======
->>>>>>> 9f9532e... modes spinner added
-    }
 
-    private val mPrefs = AppSharedPreferences.getInstance()
-    private val hasCompared = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(com.inari.team.R.layout.activity_statistics)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        val type = intent?.getStringExtra(GRAPH_TYPE)
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mPrefs.getModesNames())
-        spinnerModeA.adapter = adapter
-        spinnerModeB.adapter = adapter
-
-        when (type) {
-            RMS -> {
-                supportActionBar?.setTitle(getString(R.string.stats_card_1))
-                //crides al nom de la funcio de RMS
-            }
-            CNO -> {
-                supportActionBar?.setTitle(getString(R.string.stats_card_2))
-                //crides al nom de la funcio de CN0
-            }
-            MAP -> {
-                supportActionBar?.setTitle(getString(R.string.stats_card_3))
-                //crides al nom de la funcio de MAP
-            }
-            GRAPH4 -> {
-                supportActionBar?.setTitle(getString(R.string.stats_card_4))
-                //crides al nom de la funcio de GRAPH4
-            }
-            GRAPH5 -> {
-                supportActionBar?.setTitle(getString(R.string.stats_card_5))
-                //crides al nom de la funcio de GRAPH5
-            }
-            GRAPH6 -> {
-                supportActionBar?.setTitle(getString(R.string.stats_card_6))
-                //crides al nom de la funcio de GRAPH6
-            }
-        }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
-    }
-<<<<<<< HEAD
->>>>>>> f69f812... add statistics activity
-=======
-
->>>>>>> 9f9532e... modes spinner added
 }
+
