@@ -1,15 +1,9 @@
 <component name="ProjectCodeStyleConfiguration">
-  <state>
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
-=======
->>>>>>> e662c9c... logs implemented
-=======
->>>>>>> 1c72dc0... execution crash solved
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default" />
-=======
-    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
->>>>>>> 9d1df48... execution crash solved
-  </state>
+    <state>
+
+        <option name="USE_PER_PROJECT_SETTINGS" value="true"/>
+
+        <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default"/>
+
+    </state>
 </component>

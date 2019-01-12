@@ -66,6 +66,7 @@ class StatisticsFragment : Fragment(), View.OnClickListener {
                 R.id.cardRMS ->{
                     i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.RMS)
                 }
+<<<<<<< HEAD
                 R.id.cardCNO ->{
 <<<<<<< HEAD
                     i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.CNO)
@@ -86,6 +87,9 @@ class StatisticsFragment : Fragment(), View.OnClickListener {
                 R.id.cardCN0 ->{
 =======
 >>>>>>> 9f9532e... modes spinner added
+=======
+                R.id.cardGraph5 ->{
+>>>>>>> a9192e2... spinners exclusion done, selected option does not work properly
                     i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.CNO)
                 }
                 R.id.cardMap ->{

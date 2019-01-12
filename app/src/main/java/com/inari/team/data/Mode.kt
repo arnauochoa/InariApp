@@ -1,6 +1,7 @@
 package com.inari.team.data
 
 data class Mode(
+    val id:Int,
     val name: String = "",
     val constellations: ArrayList<Int>,
     val bands: ArrayList<Int>,

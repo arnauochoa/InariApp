@@ -42,6 +42,7 @@ class SplashActivity : AppCompatActivity() {
     private fun addDefaultModes() {
 
         val mode = Mode(
+            0,
             "GPS LS",
             arrayListOf(Mode.CONST_GPS),
             arrayListOf(Mode.BAND_L1),
@@ -49,6 +50,7 @@ class SplashActivity : AppCompatActivity() {
             Mode.ALG_LS
         )
         val mode2 = Mode(
+            1,
             "Galileo WLS",
             arrayListOf(Mode.CONST_GAL),
             arrayListOf(Mode.BAND_L1),
@@ -56,6 +58,7 @@ class SplashActivity : AppCompatActivity() {
             Mode.ALG_WLS
         )
         val mode3 = Mode(
+            2,
             "Multiconstellation Kalman",
             arrayListOf(Mode.CONST_GPS, Mode.CONST_GAL),
             arrayListOf(Mode.BAND_L1, Mode.BAND_L5),
