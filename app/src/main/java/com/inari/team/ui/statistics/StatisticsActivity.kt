@@ -52,11 +52,11 @@ class StatisticsActivity : AppCompatActivity() {
     private fun changeButton() {
         if (!hasCompared) {
             buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.saveButton))
-            //buttonCompareSave.text = "save"
+            buttonCompareSave.text = "compare"
             hasCompared = true
         } else {
             buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.compareButton))
-            //buttonCompareSave.text = "compare"
+            buttonCompareSave.text = "save"
         }
     }
 
@@ -111,7 +111,7 @@ class StatisticsActivity : AppCompatActivity() {
                         adapterB.updateList(selectedB, selectedA)
                     }
                 }
-
+                spinnerModeA.setSelection(0)
                 hasCompared = false
                 changeButton()
             }
@@ -127,9 +127,10 @@ class StatisticsActivity : AppCompatActivity() {
                 adapterB.selectedMode?.let { selectedB ->
                     adapterA.selectedMode?.let {selectedA->
                         adapterB.updateList(selectedB, selectedA)
-                        adapterB.updateList(selectedA, selectedB)
+                        adapterA.updateList(selectedA, selectedB)
                     }
                 }
+                spinnerModeB.setSelection(0)
                 hasCompared = false
                 changeButton()
             }
