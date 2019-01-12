@@ -1,6 +1,10 @@
 package com.inari.team.ui.position
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.Fragment
@@ -14,8 +18,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+
 import com.inari.team.R
+import com.inari.team.ui.logs.LogsActivity
+import com.inari.team.utils.saveFile
+import com.inari.team.utils.toast
+import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
+import okhttp3.MediaType
+import okhttp3.ResponseBody
 
 
 class PositionFragment : Fragment(), OnMapReadyCallback {
@@ -31,8 +42,8 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
 
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_position, container, false)
     }
@@ -48,15 +59,18 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
         }
 
         fabClose.setOnClickListener {
-            if (clBottomSheet.visibility == View.VISIBLE){
+            if (clBottomSheet.visibility == View.VISIBLE) {
                 clBottomSheet.visibility = View.GONE
             }
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
         Handler().postDelayed({
             initMap()
-        },10000)
-
+        }, 1000)
     }
 
     private fun initMap() {
@@ -64,12 +78,12 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
             mapFragment = (it.findFragmentByTag(FRAG_TAG) as? SupportMapFragment) ?: SupportMapFragment()
             mapFragment?.let { map ->
                 it.beginTransaction()
-                        .replace(
-                                R.id.mapFragmentContainer,
-                                map,
-                                FRAG_TAG
-                        )
-                        .commit()
+                    .replace(
+                        R.id.mapFragmentContainer,
+                        map,
+                        FRAG_TAG
+                    )
+                    .commit()
                 it.executePendingTransactions()
 
                 map.getMapAsync(this@PositionFragment)
@@ -85,14 +99,43 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.save_log -> {
+                showSaveDialog()
             }
             R.id.see_log -> {
+//                retrieveFile("abc")
+                context?.let {
+                    startActivity(Intent(it, LogsActivity::class.java))
+                }
             }
             else -> {
             }
         }
         return super.onOptionsItemSelected(item)
     }
+
+    private fun showSaveDialog() {
+        context?.let {
+            val dialog = AlertDialog.Builder(it).create()
+            val layout = View.inflate(it, R.layout.dialog_save_log, null)
+            dialog.window?.let { wind ->
+                wind.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
+            dialog.setView(layout)
+            layout.save.setOnClickListener {
+                val fileName = layout.fileName.text.toString()
+                if (fileName.isNotBlank()) {
+                    saveLog(fileName)
+                    dialog.dismiss()
+                } else toast("empty filename")
+            }
+            dialog.show()
+        }
+    }
+
+    fun saveLog(fileName: String) {
+        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), "abcscnvoiernavodsnvo"))
+    }
+
 
     override fun onMapReady(map: GoogleMap?) {
         hideMapLoading()
