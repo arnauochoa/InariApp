@@ -50,7 +50,6 @@
 
                 android:name=".ui.statistics.StatisticsActivity"
                 android:screenOrientation="portrait"></activity>
-
         <activity android:name=".ui.logs.LogsDetailActivity"></activity>
         <activity android:name=".ui.logs.LogsActivity"></activity>
 

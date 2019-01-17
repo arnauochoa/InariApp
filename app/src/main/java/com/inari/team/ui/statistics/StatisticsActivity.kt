@@ -34,6 +34,8 @@ class StatisticsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(com.inari.team.R.layout.activity_statistics)
 
+        this.setSupportActionBar(statisticsToolbar)
+        //setSupportActionBar(statisticsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val type = intent?.getStringExtra(GRAPH_TYPE)
