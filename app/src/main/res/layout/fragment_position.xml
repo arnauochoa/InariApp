@@ -52,7 +52,7 @@
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@android:color/white"
+                android:backgroundTint="@color/colorAccent"
                 android:background="@android:drawable/ic_menu_close_clear_cancel"
                 android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -89,24 +89,24 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/constOption1"
-                        app:layout_constraintStart_toEndOf="@+id/constellationsTextView"
                         android:layout_marginBottom="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:layout_marginTop="8dp"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/constOption2"
-                        android:layout_marginEnd="8dp"/>
+                        android:layout_marginEnd="8dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/marginFirstColumn"/>
                 <CheckBox
                         android:id="@+id/constOption2"
                         android:text="Galileo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginEnd="20dp"
                         android:layout_marginTop="8dp"
                         app:layout_constraintTop_toTopOf="parent"
                         android:layout_marginBottom="8dp"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/marginSecondColumn"/>
 
 
             </android.support.constraint.ConstraintLayout>
@@ -136,19 +136,19 @@
                         android:layout_marginBottom="8dp"
                         app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/bandsOption2"
-                        android:layout_marginEnd="8dp"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/marginFirstColumn"/>
                 <CheckBox
                         android:id="@+id/bandsOption2"
                         android:text="L5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        android:layout_marginEnd="20dp"
                         android:layout_marginTop="8dp"
                         app:layout_constraintTop_toTopOf="parent"
                         android:layout_marginBottom="8dp"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/marginSecondColumn"/>
             </android.support.constraint.ConstraintLayout>
 
             <android.support.constraint.ConstraintLayout
@@ -172,18 +172,18 @@
                         android:text="Ionosphere"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintStart_toEndOf="@id/correctionsTextView"
-                        app:layout_constraintBottom_toTopOf="@id/correctionsOption3"
                         app:layout_constraintTop_toTopOf="@+id/correctionsTextView"
-                        app:layout_constraintEnd_toStartOf="@id/correctionsOption2"
-                        android:layout_marginEnd="8dp"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/marginFirstColumn"
+                        app:layout_constraintBottom_toBottomOf="@+id/correctionsTextView"/>
                 <CheckBox
                         android:id="@+id/correctionsOption2"
                         android:text="Troposphere"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toTopOf="@+id/correctionsOption1"
-                        app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/marginSecondColumn"/>
                 <CheckBox
                         android:id="@+id/correctionsOption3"
                         android:text="Multipath"
@@ -192,15 +192,17 @@
                         android:layout_marginBottom="8dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/correctionsOption1"
-                        app:layout_constraintStart_toStartOf="@+id/correctionsOption1"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/marginFirstColumn"/>
                 <CheckBox
                         android:id="@+id/correctionsOption4"
-                        android:text="[Others]"
+                        android:text="Camera"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:layout_constraintTop_toBottomOf="@id/correctionsOption2"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="@+id/correctionsOption2"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/marginSecondColumn"/>
             </android.support.constraint.ConstraintLayout>
 
             <android.support.constraint.ConstraintLayout
@@ -224,6 +226,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
+                        android:orientation="horizontal"
                         android:layout_marginEnd="8dp"
                         app:layout_constraintStart_toEndOf="@+id/appCompatTextView"
                         android:layout_marginStart="8dp"
@@ -234,19 +237,19 @@
                     <RadioButton
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
                             android:text="LS"/>
                     <RadioButton
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="32dp"
                             android:text="WLS"/>
                     <RadioButton
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="32dp"
+                            android:layout_marginEnd="@dimen/default_gap"
                             android:text="Kalman"/>
-                    <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="[Others]"/>
                 </RadioGroup>
 
 

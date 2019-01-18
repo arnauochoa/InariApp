@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="marginFirstColumn">130dp</dimen>
+    <dimen name="marginSecondColumn">280dp</dimen>
+</resources>
