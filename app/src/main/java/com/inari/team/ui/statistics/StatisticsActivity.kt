@@ -82,20 +82,16 @@ class StatisticsActivity : AppCompatActivity() {
         var algorithm = 0
 
         layout?.let {
-            name = it.modeNameTextEdit.text.toString()
-            // set selected constellations
-            if (it.constOption1.isChecked) constellations.add(Mode.CONST_GPS)
+            name = it.modeNameTextEdit.text.toString() // set the name
+            if (it.constOption1.isChecked) constellations.add(Mode.CONST_GPS) // set selected constellations
             if (it.constOption2.isChecked) constellations.add(Mode.CONST_GAL)
-            // set selected bands
-            if (it.bandsOption1.isChecked) bands.add(Mode.BAND_L1)
+            if (it.bandsOption1.isChecked) bands.add(Mode.BAND_L1) // set selected bands
             if (it.bandsOption2.isChecked) bands.add(Mode.BAND_L5)
-            // set selected corrections
-            if (it.correctionsOption1.isChecked) corrections.add(Mode.CORR_IONOSPHERE)
+            if (it.correctionsOption1.isChecked) corrections.add(Mode.CORR_IONOSPHERE)  // set selected corrections
             if (it.correctionsOption2.isChecked) corrections.add(Mode.CORR_TROPOSPHERE)
             if (it.correctionsOption3.isChecked) corrections.add(Mode.CORR_MULTIPATH)
             if (it.correctionsOption4.isChecked) corrections.add(Mode.CORR_CAMERA)
-            // set selected algorithm
-            if (it.algorithm1.isChecked) algorithm = Mode.ALG_LS
+            if (it.algorithm1.isChecked) algorithm = Mode.ALG_LS  // set selected algorithm
             if (it.algorithm2.isChecked) algorithm = Mode.ALG_WLS
             if (it.algorithm3.isChecked) algorithm = Mode.ALG_KALMAN
         }
