@@ -18,6 +18,7 @@ data class Mode(
         const val CORR_IONOSPHERE: Int = 1
         const val CORR_TROPOSPHERE: Int = 2
         const val CORR_MULTIPATH: Int = 3
+        const val CORR_CAMERA: Int = 4
 
         const val ALG_LS: Int = 1
         const val ALG_WLS: Int = 2

@@ -8,12 +8,28 @@
 
     <android.support.v7.widget.Toolbar
             android:id="@+id/statisticsToolbar"
+            android:theme="@style/ToolbarTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:background="@color/colorPrimary">
+
+        <Button android:id="@+id/newModeButton"
+                android:layout_gravity="center_vertical|end"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/new_mode_button"
+                android:background="@color/colorAccentLight"
+                android:textColor="@android:color/white"/>
 
     </android.support.v7.widget.Toolbar>
 

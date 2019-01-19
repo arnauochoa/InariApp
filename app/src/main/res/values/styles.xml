@@ -10,6 +10,10 @@
 
     <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
 
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@android:color/white</item>
+    </style>
+
     <style name="AppTheme.ProgressBarHorizontal" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
