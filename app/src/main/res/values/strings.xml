@@ -15,4 +15,9 @@
     <string name="rinex">RINEX</string>
     <string name="nma">NMA</string>
     <string name="save">save</string>
+    <string name="new_mode">New mode</string>
+    <string name="mode_name">Mode name</string>
+    <string name="compare_button">compare</string>
+    <string name="save_button">save</string>
+    <string name="new_mode_button">new mode</string>
 </resources>

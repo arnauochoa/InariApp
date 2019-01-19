@@ -49,8 +49,8 @@
         <activity
 
                 android:name=".ui.statistics.StatisticsActivity"
-                android:screenOrientation="portrait"></activity>
-
+                android:screenOrientation="portrait"
+                android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
         <activity android:name=".ui.logs.LogsDetailActivity"></activity>
         <activity android:name=".ui.logs.LogsActivity"></activity>
 
