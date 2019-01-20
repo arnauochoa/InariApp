@@ -51,8 +51,10 @@
                 android:name=".ui.statistics.StatisticsActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
-        <activity android:name=".ui.logs.LogsDetailActivity"></activity>
-        <activity android:name=".ui.logs.LogsActivity"></activity>
+        <activity android:name=".ui.logs.LogsDetailActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".ui.logs.LogsActivity"
+            android:screenOrientation="portrait"></activity>
 
 
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>

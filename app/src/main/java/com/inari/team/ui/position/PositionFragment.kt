@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -18,13 +19,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-
 import com.inari.team.R
 import com.inari.team.ui.logs.LogsActivity
 import com.inari.team.utils.saveFile
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
+import kotlinx.android.synthetic.main.view_bottom_sheet.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 
@@ -42,8 +43,8 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_position, container, false)
     }
@@ -78,12 +79,12 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
             mapFragment = (it.findFragmentByTag(FRAG_TAG) as? SupportMapFragment) ?: SupportMapFragment()
             mapFragment?.let { map ->
                 it.beginTransaction()
-                    .replace(
-                        R.id.mapFragmentContainer,
-                        map,
-                        FRAG_TAG
-                    )
-                    .commit()
+                        .replace(
+                                R.id.mapFragmentContainer,
+                                map,
+                                FRAG_TAG
+                        )
+                        .commit()
                 it.executePendingTransactions()
 
                 map.getMapAsync(this@PositionFragment)
@@ -102,7 +103,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
                 showSaveDialog()
             }
             R.id.see_log -> {
-//                retrieveFile("abc")
                 context?.let {
                     startActivity(Intent(it, LogsActivity::class.java))
                 }
@@ -124,7 +124,11 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
             layout.save.setOnClickListener {
                 val fileName = layout.fileName.text.toString()
                 if (fileName.isNotBlank()) {
-                    saveLog(fileName)
+                    var format = ".rinex"
+                    if (layout.radioGroupFormat.checkedRadioButtonId != R.id.rinex) {
+                        format = ".nma"
+                    }
+                    saveLog(fileName + format)
                     dialog.dismiss()
                 } else toast("empty filename")
             }
@@ -132,8 +136,9 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun saveLog(fileName: String) {
+    private fun saveLog(fileName: String) {
         saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), "abcscnvoiernavodsnvo"))
+        showSavedSnackBar()
     }
 
 
@@ -183,6 +188,17 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
 
     fun hideMapLoading() {
         pbMap?.visibility = View.GONE
+    }
+
+    private fun showSavedSnackBar() {
+        val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
+        snackbar.setAction("OPEN") {
+            context?.let {
+                startActivity(Intent(it, LogsActivity::class.java))
+            }
+        }
+
+        snackbar.show()
     }
 
 }

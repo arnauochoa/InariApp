@@ -67,7 +67,6 @@ fun retrieveFile(url: String): String {
                 MediaType.parse("text/plain"),
                 getStringFromFile("${root.absolutePath}$APP_ROOT$url")
         ).string()
-        toast(file)
         file
 
     } catch (e: Exception) {
