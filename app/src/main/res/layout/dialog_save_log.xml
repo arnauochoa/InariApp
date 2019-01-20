@@ -47,7 +47,7 @@
             app:layout_constraintTop_toBottomOf="@+id/fileName" />
 
         <RadioGroup
-            android:id="@+id/radioGroup"
+            android:id="@+id/radioGroupFormat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -57,11 +57,14 @@
             app:layout_constraintTop_toTopOf="@+id/fileFormatName">
 
             <RadioButton
+                android:id="@+id/rinex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checked="true"
                 android:text="@string/rinex" />
 
             <RadioButton
+                android:id="@+id/nma"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -73,10 +76,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/save"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+            app:layout_constraintTop_toBottomOf="@+id/radioGroupFormat" />
 
     </android.support.constraint.ConstraintLayout>
 </android.support.design.card.MaterialCardView>
