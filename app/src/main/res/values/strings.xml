@@ -19,5 +19,5 @@
     <string name="mode_name">Mode name</string>
     <string name="compare_button">compare</string>
     <string name="save_button">save</string>
-    <string name="new_mode_button">new mode</string>
+    <string name="see_modes_button">see modes</string>
 </resources>

@@ -7,4 +7,7 @@
 
     <color name="compareButton">#FF9800</color>
     <color name="saveButton">#00BCD4</color>
+
+    <color name="colorLightGrayBackground">#BBBBBB</color>
+    <color name="colorDarkGrayBackground">#777777</color>
 </resources>
