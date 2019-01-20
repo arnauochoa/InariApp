@@ -102,14 +102,13 @@ class ModesActivity : AppCompatActivity() {
         }
         dialog.setView(layout)
         layout.createButton.setOnClickListener {
-            createMode(layout)
-            dialog.dismiss()
+            createMode(layout, dialog)
         }
         dialog.show()
 
     }
 
-    private fun createMode(layout: View?) {
+    private fun createMode(layout: View?, dialog: AlertDialog) {
         var name = ""
         val constellations = arrayListOf<Int>()
         val bands = arrayListOf<Int>()
@@ -143,6 +142,7 @@ class ModesActivity : AppCompatActivity() {
             )
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")
+            dialog.dismiss()
             setModesListView()
         }
 
