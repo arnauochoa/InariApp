@@ -8,7 +8,9 @@ data class Mode(
     val corrections: ArrayList<Int>,
     val algorithm: Int
 ){
+
     companion object {
+
         const val CONST_GPS: Int = 1
         const val CONST_GAL: Int = 2
 
@@ -25,4 +27,31 @@ data class Mode(
         const val ALG_KALMAN: Int = 3
 
     }
+
+    fun constellationsAsString(): CharSequence? {
+        var constellationsString = ""
+
+        if (constellations.contains(CONST_GPS)){
+            constellationsString = "GPS"
+        }
+        if (constellations.contains(CONST_GAL)){
+            if (constellationsString.isNotBlank()) constellationsString += ", "
+            constellationsString += "Galileo"
+        }
+        return constellationsString
+    }
+
+    fun bandsAsString(): CharSequence? {
+        var bandsString = ""
+
+        if (bands.contains(BAND_L1)) {
+            bandsString = "L1"
+        }
+        if (bands.contains(BAND_L5)) {
+            if (bandsString.isNotBlank()) bandsString += ", "
+            bandsString += "L5"
+        }
+        return bandsString
+    }
+
 }

@@ -4,38 +4,43 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import android.widget.ExpandableListView
-import android.widget.ImageView
-import android.widget.Toast
 import com.inari.team.R
 import com.inari.team.data.Mode
 import com.inari.team.utils.AppSharedPreferences
-import com.inari.team.utils.context
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.activity_modes.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
+import kotlinx.android.synthetic.main.mode_list_item.*
 
 class ModesActivity : AppCompatActivity() {
 
-    lateinit var modes: ArrayList<Mode>
-    internal var modesListView: ExpandableListView? = null
+    private val mPrefs = AppSharedPreferences.getInstance()
+    private var modes: ArrayList<Mode> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modes)
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Modes"
+        setToolbar()
 
-        setModesListView()
+        modesRVList.layoutManager = LinearLayoutManager(this)
 
-        fabNewMode.setOnClickListener{
+        modes = mPrefs.getModesList()
+
+        modesRVList.adapter = ModesListAdapter(modes, this)
+
+        fabNewMode.setOnClickListener {
             showNewModeDialog()
         }
 
+    }
+
+    private fun setToolbar() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "Modes"
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -43,55 +48,6 @@ class ModesActivity : AppCompatActivity() {
         return true
     }
 
-    private fun setModesListView() {
-        modesListView = findViewById(R.id.modesListView)
-
-        if (modesListView != null) {
-            modes = AppSharedPreferences.getInstance().getModesList()
-
-            val listAdapter = ExpandableModesListAdapter(this, modes, emptyList())
-            modesListView!!.setAdapter(listAdapter)
-
-            modesListView!!.setOnGroupExpandListener { groupPosition ->
-                Toast.makeText(
-                    context,
-                    modes[groupPosition].name + "List expanded",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            modesListView!!.setOnGroupCollapseListener { groupPosition ->
-                Toast.makeText(
-                    context,
-                    modes[groupPosition].name + "List collapsed",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            modesListView!!.setOnGroupClickListener { expandableListView, view, groupPosition, id ->
-                Toast.makeText(context, "Clicked: " + modes[groupPosition].name, Toast.LENGTH_SHORT).show()
-                if (expandableListView.isGroupExpanded(groupPosition)) {
-                    var imgView = view.findViewById<ImageView>(R.id.expandIndicatorImage)
-                    imgView.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            this@ModesActivity,
-                            R.drawable.ic_arrow_down_grey
-                        )
-                    )
-                } else {
-                    var imgView = view.findViewById<ImageView>(R.id.expandIndicatorImage)
-                    imgView.setImageDrawable(ContextCompat.getDrawable(this@ModesActivity, R.drawable.ic_arrow_up_grey))
-                }
-                return@setOnGroupClickListener false
-            }
-
-            modesListView!!.setOnChildClickListener { parent, v, groupPosition, childPosition, id ->
-                Toast.makeText(context, "Clicked: " + modes[groupPosition].name, Toast.LENGTH_SHORT).show()
-                false
-            }
-
-        }
-    }
 
     private fun showNewModeDialog() {
 
@@ -143,7 +99,7 @@ class ModesActivity : AppCompatActivity() {
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")
             dialog.dismiss()
-            setModesListView()
+            TODO("Reload list after adding mode")
         }
 
     }

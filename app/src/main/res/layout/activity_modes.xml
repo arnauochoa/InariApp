@@ -7,15 +7,10 @@
         android:layout_height="match_parent"
         tools:context=".ui.modes.ModesActivity">
 
-    <ExpandableListView
-            android:id="@+id/modesListView"
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/modesRVList"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:groupIndicator="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            android:layout_height="match_parent"/>
 
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabNewMode"

@@ -1,9 +1,6 @@
 package com.inari.team.ui.statistics
 
-import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -13,9 +10,7 @@ import com.inari.team.R
 import com.inari.team.data.Mode
 import com.inari.team.ui.modes.ModesActivity
 import com.inari.team.utils.AppSharedPreferences
-import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.activity_statistics.*
-import kotlinx.android.synthetic.main.dialog_new_mode.view.*
 
 
 class StatisticsActivity : AppCompatActivity() {
