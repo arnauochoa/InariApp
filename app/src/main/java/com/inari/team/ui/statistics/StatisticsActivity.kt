@@ -55,6 +55,18 @@ class StatisticsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        modes = mPrefs.getModesList()
+        modesNames = mPrefs.getModesNames()
+        setAdapters()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
     private fun changeButton() {
         if (!hasCompared) {
             buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.saveButton))
@@ -142,11 +154,6 @@ class StatisticsActivity : AppCompatActivity() {
             }
 
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
     }
 
 }
