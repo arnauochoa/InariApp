@@ -124,7 +124,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
             layout.save.setOnClickListener {
                 val fileName = layout.fileName.text.toString()
                 if (fileName.isNotBlank()) {
-                    var format = ".rinex"
+                    var format = ".rnx"
                     if (layout.radioGroupFormat.checkedRadioButtonId != R.id.rinex) {
                         format = ".nma"
                     }

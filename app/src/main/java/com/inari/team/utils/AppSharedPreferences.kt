@@ -81,4 +81,21 @@ class AppSharedPreferences {
             .apply()
     }
 
+    fun deleteMode(mode: Mode): ArrayList<Mode> {
+        val gson = Gson()
+        val modesList = getModesList()
+        modesList.remove(mode)
+
+        val json = gson.toJson(modesList)
+        mPrefs.edit()
+            .remove(MODES)
+            .apply()
+
+        mPrefs.edit()
+            .putString(MODES, json)
+            .apply()
+
+        return modesList
+    }
+
 }
