@@ -28,7 +28,7 @@
     <string name="num_sats_title">Number of satellites:</string>
     <string name="pdop_title">PDOP:</string>
     <string name="cn0_title">C/N0:</string>
-    <string name="hvdop_title">H/V DOP</string>
+    <string name="hvdop_title">H/V DOP:</string>
     <string name="save_results">Save results</string>
     <string name="see_results">See results</string>
 </resources>
