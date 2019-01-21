@@ -3,10 +3,10 @@
 
     <item
         android:id="@+id/save_log"
-        android:title="Save logs" />
+        android:title="@string/save_results" />
 
     <item
         android:id="@+id/see_log"
-        android:title="See logs" />
+        android:title="@string/see_results" />
 
 </menu>
