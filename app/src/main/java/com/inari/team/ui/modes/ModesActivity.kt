@@ -13,12 +13,10 @@ import com.inari.team.utils.AppSharedPreferences
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.activity_modes.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
-import kotlinx.android.synthetic.main.mode_list_item.*
 
 class ModesActivity : AppCompatActivity() {
 
-    private val mPrefs = AppSharedPreferences.getInstance()
-    private var modes: ArrayList<Mode> = arrayListOf()
+    private val mAdapter = ModesListAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +26,7 @@ class ModesActivity : AppCompatActivity() {
 
         modesRVList.layoutManager = LinearLayoutManager(this)
 
-        modes = mPrefs.getModesList()
-
-        modesRVList.adapter = ModesListAdapter(modes, this)
+        modesRVList.adapter = mAdapter
 
         fabNewMode.setOnClickListener {
             showNewModeDialog()
@@ -99,7 +95,7 @@ class ModesActivity : AppCompatActivity() {
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")
             dialog.dismiss()
-            TODO("Reload list after adding mode")
+            mAdapter.update()
         }
 
     }

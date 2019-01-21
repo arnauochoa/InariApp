@@ -6,11 +6,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.inari.team.R
 import com.inari.team.data.Mode
+import com.inari.team.utils.AppSharedPreferences
+import com.inari.team.utils.toast
 
-class ModesListAdapter(private val modes: ArrayList<Mode>, val context: Context) :
+class ModesListAdapter(val context: Context) :
     RecyclerView.Adapter<ModesViewHolder>() {
 
-    private val expandedArray: BooleanArray = BooleanArray(modes.size)
+    private val mPrefs = AppSharedPreferences.getInstance()
+    private var modes = mPrefs.getModesList()
+
+    private var expandedArray: BooleanArray = BooleanArray(modes.size)
 
     override fun getItemCount(): Int {
         return modes.size
@@ -22,11 +27,10 @@ class ModesListAdapter(private val modes: ArrayList<Mode>, val context: Context)
 
     override fun onBindViewHolder(holder: ModesViewHolder, position: Int) {
         val mode = modes[position]
-        val expanded = expandedArray[position]
+        var expanded = expandedArray[position]
 
         holder.modeName.text = mode.name
-        holder.constellationsDescription.text = mode.constellationsAsString()
-        holder.bandsDescription.text = mode.bandsAsString()
+        setDescription(holder, mode)
         holder.setExpanded(expanded)
 
         holder.itemView.setOnClickListener {
@@ -34,10 +38,24 @@ class ModesListAdapter(private val modes: ArrayList<Mode>, val context: Context)
             notifyItemChanged(position)
         }
 
+        holder.deleteButton.setOnClickListener {
+            toast("Mode '" + modes[position].name + "' deleted")
+            modes = mPrefs.deleteMode(mode)
+            this.notifyDataSetChanged()
+        }
 
     }
 
-    private fun getDescription(mode: Mode): CharSequence {
-        return mode.constellations.toString()
+    private fun setDescription(holder: ModesViewHolder, mode: Mode) {
+        holder.constellationsDescription.text = mode.constellationsAsString()
+        holder.bandsDescription.text = mode.bandsAsString()
+        holder.correctionsDescription.text = mode.correctionsAsString()
+        holder.algorithmDescription.text = mode.algorithmAsString()
+    }
+
+    fun update() {
+        modes = mPrefs.getModesList()
+        expandedArray = expandedArray.plus(false)
+        this.notifyDataSetChanged()
     }
 }

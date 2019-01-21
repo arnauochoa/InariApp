@@ -1,13 +1,13 @@
 package com.inari.team.data
 
 data class Mode(
-    val id:Int,
+    val id: Int,
     val name: String = "",
     val constellations: ArrayList<Int>,
     val bands: ArrayList<Int>,
     val corrections: ArrayList<Int>,
     val algorithm: Int
-){
+) {
 
     companion object {
 
@@ -31,10 +31,10 @@ data class Mode(
     fun constellationsAsString(): CharSequence? {
         var constellationsString = ""
 
-        if (constellations.contains(CONST_GPS)){
+        if (constellations.contains(CONST_GPS)) {
             constellationsString = "GPS"
         }
-        if (constellations.contains(CONST_GAL)){
+        if (constellations.contains(CONST_GAL)) {
             if (constellationsString.isNotBlank()) constellationsString += ", "
             constellationsString += "Galileo"
         }
@@ -52,6 +52,39 @@ data class Mode(
             bandsString += "L5"
         }
         return bandsString
+    }
+
+    fun correctionsAsString(): CharSequence? {
+        var correctionsString = ""
+
+        if (corrections.contains(CORR_IONOSPHERE)) {
+            correctionsString = "Ionosphere"
+        }
+        if (corrections.contains(CORR_TROPOSPHERE)) {
+            if (correctionsString.isNotBlank()) correctionsString += ", "
+            correctionsString += "Troposphere"
+        }
+        if (corrections.contains(CORR_MULTIPATH)) {
+            if (correctionsString.isNotBlank()) correctionsString += ", "
+            correctionsString += "Multipath"
+        }
+        if (corrections.contains(CORR_CAMERA)) {
+            if (correctionsString.isNotBlank()) correctionsString += ", "
+            correctionsString += "Camera"
+        }
+        if (correctionsString.isBlank()) correctionsString = "None"
+        return correctionsString
+    }
+
+    fun algorithmAsString(): CharSequence? {
+        var algorithmString = ""
+
+        when (algorithm) {
+            ALG_LS -> algorithmString = "Least Squares"
+            ALG_WLS -> algorithmString = "Weighted Least Squares"
+            ALG_KALMAN -> algorithmString = "Kalman Filter"
+        }
+        return algorithmString
     }
 
 }

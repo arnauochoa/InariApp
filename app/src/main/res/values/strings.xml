@@ -22,4 +22,6 @@
     <string name="see_modes_button">see modes</string>
     <string name="constellations_subtitle">Constellations: </string>
     <string name="bands_subtitle">Bands: </string>
+    <string name="corrections_subtitle">Corrections: </string>
+    <string name="algorithm_subtitle">Algorithm: </string>
 </resources>

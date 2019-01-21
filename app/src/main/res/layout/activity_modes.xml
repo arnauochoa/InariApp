@@ -10,7 +10,8 @@
     <android.support.v7.widget.RecyclerView
             android:id="@+id/modesRVList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@color/colorLightGrayBackground"/>
 
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabNewMode"

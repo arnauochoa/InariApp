@@ -44,7 +44,6 @@ class StatisticsActivity : AppCompatActivity() {
 
         newModeButton.setOnClickListener {
             startActivity(Intent(this@StatisticsActivity, ModesActivity::class.java))
-            //showNewModeDialog()
         }
 
         setToolbarTitle(type)
@@ -149,7 +148,6 @@ class StatisticsActivity : AppCompatActivity() {
         onBackPressed()
         return true
     }
-
 
 }
 
