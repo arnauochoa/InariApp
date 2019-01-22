@@ -4,19 +4,19 @@
     <item
         android:id="@+id/action_position"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
-        android:title="Position"
+        android:icon="@drawable/ic_position"
+        android:title="@string/position_bottom"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_status"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
-        android:title="GNSS state"
+        android:icon="@drawable/ic_satellite"
+        android:title="@string/gnss_state_bottom"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_statistics"
         android:enabled="true"
-        android:icon="@mipmap/ic_launcher"
-        android:title="Statistics"
+        android:icon="@drawable/ic_statistics"
+        android:title="@string/statistics_bottom"
         app:showAsAction="ifRoom" />
 </menu>

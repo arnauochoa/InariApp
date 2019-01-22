@@ -31,4 +31,7 @@
     <string name="hvdop_title">H/V DOP:</string>
     <string name="save_results">Save results</string>
     <string name="see_results">See results</string>
+    <string name="position_bottom">Position</string>
+    <string name="gnss_state_bottom">GNSS state</string>
+    <string name="statistics_bottom">Statistics</string>
 </resources>

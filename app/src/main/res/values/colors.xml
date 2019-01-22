@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorAccentLight">#E43E78</color>
+    <color name="colorPrimary">#578ff7</color>
+    <color name="colorPrimaryLight">#90bfff</color>
+    <color name="colorPrimaryDark">#0062c4</color>
+    <color name="colorAccent">#ff940f</color>
+    <color name="colorAccentLight">#ffc54c</color>
+    <color name="colorAccentDark">#c66500</color>
 
-    <color name="compareButton">#FF9800</color>
-    <color name="saveButton">#8BC34A</color>
+    <color name="colorLegend1">#0048FF</color>
+    <color name="colorLegend2">#FF1F1F</color>
 
     <color name="colorLightGrayBackground">#DFDFDF</color>
     <color name="colorDarkGrayBackground">#777777</color>
