@@ -139,14 +139,14 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
                     }
                     saveLog(fileName + format)
                     dialog.dismiss()
-                } else toast("empty filename")
+                } else toast("File name can not be empty")
             }
             dialog.show()
         }
     }
 
     private fun saveLog(fileName: String) {
-        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), "abcscnvoiernavodsnvo"))
+        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), getString(R.string.sample_text)))
         showSavedSnackBar()
     }
 
