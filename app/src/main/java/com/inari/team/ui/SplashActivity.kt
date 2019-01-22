@@ -22,11 +22,13 @@ class SplashActivity : AppCompatActivity() {
 
         Handler().postDelayed({
 
+            if (AppSharedPreferences.getInstance().getModesList().isEmpty()) {
+                addDefaultModes()
+            }
+
             if (checkPermissionsList(arrayOf(PERMISSION_WRITE_EXTERNAL_STORAGE,
                             PERMISSION_READ_EXTERNAL_STORAGE, PERMISSION_ACCESS_FINE_LOCATION))) {
-                if (AppSharedPreferences.getInstance().getModesList().isEmpty()) {
-                    addDefaultModes()
-                }
+                var modes = AppSharedPreferences.getInstance().getModesList()
 
                 goToMainActivity()
             } else {
