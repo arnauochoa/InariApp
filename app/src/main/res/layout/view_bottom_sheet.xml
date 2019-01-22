@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/clBottomSheet"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="400dp"
     android:elevation="8dp"
     android:visibility="gone"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -37,7 +37,7 @@
             android:id="@+id/constellationsSelection"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="54dp"
             android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -45,8 +45,8 @@
                 android:id="@+id/constellationsTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/default_gap"
-                android:text="Constellations"
+                android:layout_marginStart="16dp"
+                android:text="@string/constellations_subtitle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -91,8 +91,8 @@
                 android:id="@+id/bandsTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/default_gap"
-                android:text="Bands"
+                android:layout_marginStart="16dp"
+                android:text="@string/bands_subtitle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -134,8 +134,8 @@
                 android:id="@+id/correctionsTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/default_gap"
-                android:text="Corrections"
+                android:layout_marginStart="16dp"
+                android:text="@string/corrections_subtitle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -195,8 +195,8 @@
                 android:id="@+id/appCompatTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/default_gap"
-                android:text="Constellations"
+                android:layout_marginStart="16dp"
+                android:text="@string/algorithm_subtitle"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
