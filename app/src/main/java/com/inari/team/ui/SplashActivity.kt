@@ -9,11 +9,14 @@ import com.inari.team.R
 import com.inari.team.data.Mode
 import com.inari.team.utils.*
 import java.io.File
+import java.io.IOException
 
 class SplashActivity : AppCompatActivity() {
 
     private val root: File =
         android.os.Environment.getExternalStorageDirectory()
+
+    private val APP_ROOT: String = "/Inari/Logs/"
 
     companion object {
         private const val TIME_OUT = 2000L
@@ -28,10 +31,15 @@ class SplashActivity : AppCompatActivity() {
 
             if (AppSharedPreferences.getInstance().getModesList().isEmpty()) {
                 addDefaultModes()
+                try {
+                    val dir =
+                        File(root.absolutePath + APP_ROOT)
+                    dir.mkdirs()
+                }catch (e: IOException){
+                }
             }
-            val root = root.absolutePath + "/Inari/Logs/"
-            val resultsDirectory = File(root)
-            resultsDirectory.mkdir()
+
+
 
             if (checkPermissionsList(arrayOf(PERMISSION_WRITE_EXTERNAL_STORAGE,
                             PERMISSION_READ_EXTERNAL_STORAGE, PERMISSION_ACCESS_FINE_LOCATION))) {
