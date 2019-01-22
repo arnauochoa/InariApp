@@ -62,8 +62,7 @@
                     android:text="GPS"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:checked="true"/>
+                    app:layout_constraintTop_toTopOf="parent"/>
 
             <CheckBox
                     android:id="@+id/constOption2"
@@ -109,8 +108,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/bandsTextView"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:checked="true"/>
+                    app:layout_constraintTop_toTopOf="parent"/>
 
             <CheckBox
                     android:id="@+id/bandsOption2"
@@ -220,7 +218,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:checked="true"
                         android:text="LS"/>
 
                 <RadioButton
