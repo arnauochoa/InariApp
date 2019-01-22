@@ -4,11 +4,15 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Path
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat.startActivity
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -21,6 +25,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.inari.team.R
 import com.inari.team.ui.logs.LogsActivity
+import com.inari.team.utils.context
 import com.inari.team.utils.saveFile
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
@@ -28,6 +33,9 @@ import kotlinx.android.synthetic.main.fragment_position.*
 import kotlinx.android.synthetic.main.view_bottom_sheet.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 
 
 class PositionFragment : Fragment(), OnMapReadyCallback {
@@ -43,8 +51,8 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
 
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_position, container, false)
     }
@@ -79,12 +87,12 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
             mapFragment = (it.findFragmentByTag(FRAG_TAG) as? SupportMapFragment) ?: SupportMapFragment()
             mapFragment?.let { map ->
                 it.beginTransaction()
-                        .replace(
-                                R.id.mapFragmentContainer,
-                                map,
-                                FRAG_TAG
-                        )
-                        .commit()
+                    .replace(
+                        R.id.mapFragmentContainer,
+                        map,
+                        FRAG_TAG
+                    )
+                    .commit()
                 it.executePendingTransactions()
 
                 map.getMapAsync(this@PositionFragment)
@@ -97,6 +105,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.save_log -> {
