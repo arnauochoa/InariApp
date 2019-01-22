@@ -9,6 +9,12 @@ import android.widget.AdapterView
 import com.inari.team.R
 import com.inari.team.data.Mode
 import com.inari.team.ui.modes.ModesActivity
+import com.inari.team.ui.statistics.StatisticsActivity.Companion.CNO
+import com.inari.team.ui.statistics.StatisticsActivity.Companion.GRAPH4
+import com.inari.team.ui.statistics.StatisticsActivity.Companion.GRAPH5
+import com.inari.team.ui.statistics.StatisticsActivity.Companion.GRAPH6
+import com.inari.team.ui.statistics.StatisticsActivity.Companion.MAP
+import com.inari.team.ui.statistics.StatisticsActivity.Companion.RMS
 import com.inari.team.utils.AppSharedPreferences
 import kotlinx.android.synthetic.main.activity_statistics.*
 
@@ -35,6 +41,8 @@ class StatisticsActivity : AppCompatActivity() {
 
     private lateinit var mode1: Mode
     private lateinit var mode2: Mode
+
+    private var isMap = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,34 +97,48 @@ class StatisticsActivity : AppCompatActivity() {
     }
 
     private fun setGraph() {
-        mode1?.let { m1 ->
-            mode2?.let { m2 ->
-                val graphNum = (m1.id + m2.id) % 8
-                when (graphNum) {
-                    1 -> {
-                        graph.setImageResource(R.drawable.graph1)
-                    }
-                    2 -> {
-                        graph.setImageResource(R.drawable.graph2)
-                    }
-                    3 -> {
-                        graph.setImageResource(R.drawable.graph3)
-                    }
-                    4 -> {
-                        graph.setImageResource(R.drawable.graph4)
-                    }
-                    5 -> {
-                        graph.setImageResource(R.drawable.graph5)
-                    }
-                    6 -> {
-                        graph.setImageResource(R.drawable.graph6)
-                    }
-                    7 -> {
-                        graph.setImageResource(R.drawable.graph7)
-                    }
-                    8 -> {
-                        graph.setImageResource(R.drawable.graph8)
-                    }
+        if (!isMap) {
+            val graphNum = (mode1.id + mode2.id) % 8
+            when (graphNum) {
+                1 -> {
+                    graph.setImageResource(R.drawable.graph1)
+                }
+                2 -> {
+                    graph.setImageResource(R.drawable.graph2)
+                }
+                3 -> {
+                    graph.setImageResource(R.drawable.graph3)
+                }
+                4 -> {
+                    graph.setImageResource(R.drawable.graph4)
+                }
+                5 -> {
+                    graph.setImageResource(R.drawable.graph5)
+                }
+                6 -> {
+                    graph.setImageResource(R.drawable.graph6)
+                }
+                7 -> {
+                    graph.setImageResource(R.drawable.graph7)
+                }
+                8 -> {
+                    graph.setImageResource(R.drawable.graph8)
+                }
+            }
+        } else {
+            val graphNum = (mode1.id + mode2.id) % 4
+            when (graphNum) {
+                1 -> {
+                    graph.setImageResource(R.drawable.map1)
+                }
+                2 -> {
+                    graph.setImageResource(R.drawable.map2)
+                }
+                3 -> {
+                    graph.setImageResource(R.drawable.map3)
+                }
+                4 -> {
+                    graph.setImageResource(R.drawable.map4)
                 }
             }
         }
@@ -134,7 +156,7 @@ class StatisticsActivity : AppCompatActivity() {
             }
             MAP -> {
                 supportActionBar?.setTitle(getString(R.string.stats_card_3))
-                //crides al nom de la funcio de MAP
+                isMap = true
             }
             GRAPH4 -> {
                 supportActionBar?.setTitle(getString(R.string.stats_card_4))
