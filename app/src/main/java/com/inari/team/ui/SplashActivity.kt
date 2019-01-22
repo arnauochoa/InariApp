@@ -57,7 +57,7 @@ class SplashActivity : AppCompatActivity() {
         )
         val mode3 = Mode(
                 2,
-                "Multiconstellation Kalman",
+                "Multiconst Kalman",
                 arrayListOf(Mode.CONST_GPS, Mode.CONST_GAL),
                 arrayListOf(Mode.BAND_L1, Mode.BAND_L5),
                 arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE, Mode.CORR_MULTIPATH),

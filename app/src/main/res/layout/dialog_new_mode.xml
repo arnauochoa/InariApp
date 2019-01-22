@@ -33,7 +33,8 @@
                 android:hint="@string/mode_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/newModeTitle"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                android:maxLength="18"/>
 
         <android.support.constraint.ConstraintLayout
                 android:id="@+id/constellationsSelection"
