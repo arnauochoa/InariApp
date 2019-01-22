@@ -40,8 +40,8 @@
                     android:layout_gravity="center">
                 <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="top"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
                         android:textAlignment="center"
                         android:text="@string/stats_card_1"
                         android:paddingBottom="@dimen/default_gap"
@@ -49,7 +49,7 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_launcher_background"/>
+                        android:src="@drawable/graph6"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -75,7 +75,8 @@
                     android:layout_gravity="center">
                 <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
                         android:layout_gravity="top"
                         android:textAlignment="center"
                         android:text="@string/stats_card_2"
@@ -84,7 +85,7 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_launcher_background"/>
+                        android:src="@drawable/graph2"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -109,8 +110,9 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center">
                 <TextView
-                        android:layout_width="201dp"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
                         android:layout_gravity="top"
                         android:textAlignment="center"
                         android:text="@string/stats_card_3"
@@ -145,7 +147,8 @@
                     android:layout_gravity="center">
                 <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
                         android:layout_gravity="top"
                         android:textAlignment="center"
                         android:text="@string/stats_card_4"
@@ -154,7 +157,7 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_launcher_background"/>
+                        android:src="@drawable/graph4"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -180,7 +183,8 @@
                     android:layout_gravity="center">
                 <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
                         android:layout_gravity="top"
                         android:textAlignment="center"
                         android:text="@string/stats_card_5"
@@ -189,7 +193,7 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_launcher_background"/>
+                        android:src="@drawable/graph4"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -215,7 +219,8 @@
                     android:layout_gravity="center">
                 <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
+                        android:gravity="center_vertical"
                         android:layout_gravity="top"
                         android:textAlignment="center"
                         android:text="@string/stats_card_6"
@@ -224,7 +229,7 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/ic_launcher_background"/>
+                        android:src="@drawable/graph1"/>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

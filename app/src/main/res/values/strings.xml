@@ -6,9 +6,9 @@
     <string name="stats_card_1">RMS error</string>
     <string name="stats_card_2">C/N0</string>
     <string name="stats_card_3">Map</string>
-    <string name="stats_card_4">Graph 4</string>
-    <string name="stats_card_5">Graph 5</string>
-    <string name="stats_card_6">Graph 6</string>
+    <string name="stats_card_4">Number of \nsatellites</string>
+    <string name="stats_card_5">Code minus \nCarrier</string>
+    <string name="stats_card_6">GDOP</string>
     <string name="save_log">Save log</string>
     <string name="filename">Filename</string>
     <string name="file_format">File format:</string>

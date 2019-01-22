@@ -23,6 +23,8 @@ class StatisticsActivity : AppCompatActivity() {
         const val GRAPH4: String = "GRAPH4"
         const val GRAPH5: String = "GRAPH5"
         const val GRAPH6: String = "GRAPH6"
+        private const val DEFAULT_MODE_1: Int = 0
+        private const val DEFAULT_MODE_2: Int = 1
     }
 
     private val mPrefs = AppSharedPreferences.getInstance()
@@ -30,6 +32,9 @@ class StatisticsActivity : AppCompatActivity() {
 
     private var modes: ArrayList<Mode> = arrayListOf()
     private var modesNames: ArrayList<String> = arrayListOf()
+
+    private lateinit var mode1: Mode
+    private lateinit var mode2: Mode
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +47,9 @@ class StatisticsActivity : AppCompatActivity() {
         modes = mPrefs.getModesList()
         modesNames = mPrefs.getModesNames()
 
+        mode1 = modes[DEFAULT_MODE_1]
+        mode2 = modes[DEFAULT_MODE_2]
+
         newModeButton.setOnClickListener {
             startActivity(Intent(this@StatisticsActivity, ModesActivity::class.java))
         }
@@ -49,6 +57,7 @@ class StatisticsActivity : AppCompatActivity() {
         setToolbarTitle(type)
 
         setAdapters()
+        setGraph()
 
         buttonCompareSave.setOnClickListener {
             changeButton()
@@ -75,6 +84,41 @@ class StatisticsActivity : AppCompatActivity() {
         } else {
             buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
             buttonCompareSave.text = getString(R.string.save_button)
+            setGraph()
+        }
+    }
+
+    private fun setGraph() {
+        mode1?.let { m1 ->
+            mode2?.let { m2 ->
+                val graphNum = (m1.id + m2.id) % 8
+                when (graphNum) {
+                    1 -> {
+                        graph.setImageResource(R.drawable.graph1)
+                    }
+                    2 -> {
+                        graph.setImageResource(R.drawable.graph2)
+                    }
+                    3 -> {
+                        graph.setImageResource(R.drawable.graph3)
+                    }
+                    4 -> {
+                        graph.setImageResource(R.drawable.graph4)
+                    }
+                    5 -> {
+                        graph.setImageResource(R.drawable.graph5)
+                    }
+                    6 -> {
+                        graph.setImageResource(R.drawable.graph6)
+                    }
+                    7 -> {
+                        graph.setImageResource(R.drawable.graph7)
+                    }
+                    8 -> {
+                        graph.setImageResource(R.drawable.graph8)
+                    }
+                }
+            }
         }
     }
 
@@ -109,8 +153,8 @@ class StatisticsActivity : AppCompatActivity() {
 
     private fun setAdapters() {
 
-        val adapterA = ModesAdapter(this, modes, 0, 1)
-        val adapterB = ModesAdapter(this, modes, 1, 0)
+        val adapterA = ModesAdapter(this, modes, DEFAULT_MODE_1, DEFAULT_MODE_2)
+        val adapterB = ModesAdapter(this, modes, DEFAULT_MODE_2, DEFAULT_MODE_1)
 
 
         spinnerModeA.adapter = adapterA
@@ -132,6 +176,7 @@ class StatisticsActivity : AppCompatActivity() {
                 spinnerModeA.setSelection(0)
                 hasCompared = false
                 changeButton()
+                mode1 = adapterA.selectedMode!!
             }
 
         }
@@ -151,6 +196,7 @@ class StatisticsActivity : AppCompatActivity() {
                 spinnerModeB.setSelection(0)
                 hasCompared = false
                 changeButton()
+                mode2 = adapterB.selectedMode!!
             }
 
         }
