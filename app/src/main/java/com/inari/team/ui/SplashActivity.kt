@@ -28,8 +28,6 @@ class SplashActivity : AppCompatActivity() {
 
             if (checkPermissionsList(arrayOf(PERMISSION_WRITE_EXTERNAL_STORAGE,
                             PERMISSION_READ_EXTERNAL_STORAGE, PERMISSION_ACCESS_FINE_LOCATION))) {
-                var modes = AppSharedPreferences.getInstance().getModesList()
-
                 goToMainActivity()
             } else {
                 requestPermissionss(arrayOf(PERMISSION_ACCESS_FINE_LOCATION,
