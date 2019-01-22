@@ -69,11 +69,11 @@ class StatisticsActivity : AppCompatActivity() {
 
     private fun changeButton() {
         if (!hasCompared) {
-            buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.saveButton))
+            buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccentLight))
             buttonCompareSave.text = getString(R.string.compare_button)
             hasCompared = true
         } else {
-            buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.compareButton))
+            buttonCompareSave.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
             buttonCompareSave.text = getString(R.string.save_button)
         }
     }
