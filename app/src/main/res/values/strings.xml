@@ -3,4 +3,48 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="stats_card_1">RMS error</string>
+    <string name="stats_card_2">C/N0</string>
+    <string name="stats_card_3">Map</string>
+    <string name="stats_card_4">Number of\nsatellites</string>
+    <string name="stats_card_5">Code minus\nCarrier</string>
+    <string name="stats_card_6">GDOP</string>
+    <string name="save_log">Save log</string>
+    <string name="filename">Filename</string>
+    <string name="file_format">File format:</string>
+    <string name="rinex">RINEX</string>
+    <string name="nma">NMA</string>
+    <string name="save">save</string>
+    <string name="new_mode">New mode</string>
+    <string name="mode_name">Mode name</string>
+    <string name="compare_button">compare</string>
+    <string name="save_button">save</string>
+    <string name="see_modes_button">see modes</string>
+    <string name="constellations_subtitle">Constellations:</string>
+    <string name="bands_subtitle">Bands:</string>
+    <string name="corrections_subtitle">Corrections:</string>
+    <string name="algorithm_subtitle">Algorithm:</string>
+    <string name="CN0_strip_title">Carrier to Noise Density Ratio:</string>
+    <string name="num_sats_title">Number of satellites:</string>
+    <string name="pdop_title">PDOP:</string>
+    <string name="cn0_title">C/N0:</string>
+    <string name="hvdop_title">H/V DOP:</string>
+    <string name="save_results">Save results</string>
+    <string name="see_results">See results</string>
+    <string name="position_bottom">Position</string>
+    <string name="gnss_state_bottom">GNSS state</string>
+    <string name="statistics_bottom">Statistics</string>
+    <string name="sample_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin at sapien nec nibh dictum
+        posuere quis eu lectus. Integer volutpat felis a enim vestibulum eleifend. Mauris scelerisque, nibh sed laoreet
+        tempus, nunc est vehicula enim, eget lacinia enim velit a odio. Proin lectus felis, tincidunt a porttitor sed,
+        posuere sed justo. Aenean vitae quam sit amet nulla tempor tristique. Proin bibendum eros eu velit vestibulum
+        ultrices. Aliquam tristique accumsan metus quis rutrum. Vivamus ut eros malesuada, euismod mi ac, molestie
+        tortor. Pellentesque dapibus ex at quam elementum, non porttitor elit elementum. Suspendisse tempus, mauris in
+        ullamcorper auctor, diam massa porttitor nibh, eget laoreet lectus dui in nulla. Ut vitae blandit erat.\n\n
+
+        Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vivamus scelerisque
+        facilisis elit eu gravida. Etiam venenatis libero sit amet ipsum efficitur, vitae tempus nulla luctus. Duis ut
+        semper ex. Aenean sagittis mollis massa, sed aliquam ex porta non. Donec eleifend lorem vitae velit malesuada
+        vehicula vel cursus nunc. Curabitur vehicula fermentum arcu, sed pulvinar tortor malesuada quis.
+    </string>
 </resources>
