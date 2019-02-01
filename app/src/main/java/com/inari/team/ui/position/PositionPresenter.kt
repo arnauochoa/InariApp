@@ -1,15 +1,11 @@
 package com.inari.team.ui.position
 
-import android.content.Context
 import android.location.GnssMeasurementsEvent
 import android.location.GnssNavigationMessage
 import android.location.GnssStatus
 import com.google.android.gms.maps.model.LatLng
 
-class PositionPresenter(context: Context) {
-
-    private var mView: PositionView? = context as? PositionView
-
+class PositionPresenter(private val mView: PositionView?) {
     private var parameters: String? = null
 
     private var gnssStatus: GnssStatus? = null
@@ -42,7 +38,7 @@ class PositionPresenter(context: Context) {
 
     }
 
-    fun calculatePositionWithGnss(){
+    fun calculatePositionWithGnss() {
         //Calculate the position when parameters are defined and when there are measurements
         this.parameters?.let { params ->
             this.gnssStatus?.let { status ->

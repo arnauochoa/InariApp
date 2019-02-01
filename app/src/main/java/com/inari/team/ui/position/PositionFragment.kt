@@ -61,7 +61,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mPresenter = PositionPresenter(view.context)
+        mPresenter = PositionPresenter(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
         setHasOptionsMenu(true)
