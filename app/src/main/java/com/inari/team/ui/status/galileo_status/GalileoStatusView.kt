@@ -1,9 +1,8 @@
-package com.inari.team.ui.status.allStatus
+package com.inari.team.ui.status.galileo_status
 
-interface AllStatusView{
+interface GalileoStatusView {
 
     fun onAvgCNoObtained(avgCNo: String)
 
     fun onSatellitesCountObtained(satellitesCount: String)
-
 }

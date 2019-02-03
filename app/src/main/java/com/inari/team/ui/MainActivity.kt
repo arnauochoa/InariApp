@@ -11,9 +11,9 @@ import android.util.Log
 import com.inari.team.R
 import com.inari.team.ui.position.PositionFragment
 import com.inari.team.ui.statistics.StatisticsFragment
-import com.inari.team.ui.status.allStatus.AllStatusFragment
-import com.inari.team.ui.status.GPSStatusFragment
-import com.inari.team.ui.status.GalileoStatusFragment
+import com.inari.team.ui.status.all_status.AllStatusFragment
+import com.inari.team.ui.status.gps_status.GPSStatusFragment
+import com.inari.team.ui.status.galileo_status.GalileoStatusFragment
 import com.inari.team.ui.status.StatusFragment
 import com.inari.team.utils.BarAdapter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -79,6 +79,8 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
             override fun onSatelliteStatusChanged(status: GnssStatus) {
                 //once gnss status received, notice position fragment
                 positionFragment?.onGnnsDataReceived(gnssStatus = status)
+                gpsStatusFragment?.onGnssStatusReceived(status)
+                galileoStatusFragment?.onGnssStatusReceived(status)
                 allStatusFragment?.onGnssStatusReceived(status)
 
             }

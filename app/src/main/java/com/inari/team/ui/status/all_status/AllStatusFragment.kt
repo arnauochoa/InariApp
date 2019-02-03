@@ -1,5 +1,4 @@
-package com.inari.team.ui.status.allStatus
-
+package com.inari.team.ui.status.all_status
 
 import android.location.GnssStatus
 import android.os.Build
@@ -28,7 +27,6 @@ class AllStatusFragment : Fragment(), AllStatusView {
         super.onViewCreated(view, savedInstanceState)
 
         mPresenter = AllStatusPresenter(this)
-
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
