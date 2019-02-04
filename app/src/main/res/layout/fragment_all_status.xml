@@ -5,7 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.status.AllStatusFragment"
+        tools:context=".ui.status.all_status.AllStatusFragment"
         android:background="@color/colorLightGrayBackground">
 
     <ScrollView
@@ -112,8 +112,7 @@
                                 android:layout_height="wrap_content"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/numSatsTitleALL"
-                                android:layout_marginStart="@dimen/default_gap"
-                                android:text="31"/>
+                                android:layout_marginStart="@dimen/default_gap"/>
 
                         <TextView
                                 android:id="@+id/pdopTitleALL"
@@ -131,8 +130,7 @@
                                 android:layout_height="wrap_content"
                                 app:layout_constraintTop_toTopOf="@id/pdopTitleALL"
                                 app:layout_constraintStart_toEndOf="@id/pdopTitleALL"
-                                android:layout_marginStart="@dimen/default_gap"
-                                android:text="2.9"/>
+                                android:layout_marginStart="@dimen/default_gap"/>
 
                     </android.support.constraint.ConstraintLayout>
 
@@ -161,8 +159,7 @@
                                 android:layout_height="wrap_content"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/cn0TitleALL"
-                                android:layout_marginStart="@dimen/default_gap"
-                                android:text="33 dB-Hz"/>
+                                android:layout_marginStart="@dimen/default_gap"/>
 
                         <TextView
                                 android:id="@+id/hvdopTitleALL"
@@ -180,8 +177,7 @@
                                 android:layout_height="wrap_content"
                                 app:layout_constraintTop_toTopOf="@id/hvdopTitleALL"
                                 app:layout_constraintStart_toEndOf="@id/hvdopTitleALL"
-                                android:layout_marginStart="@dimen/default_gap"
-                                android:text="1.5/2.1"/>
+                                android:layout_marginStart="@dimen/default_gap"/>
 
                     </android.support.constraint.ConstraintLayout>
 
