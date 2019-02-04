@@ -15,6 +15,12 @@ class AppSharedPreferences {
 
         const val MY_PREFS: String = "MY_PREFS"
         const val MODES: String = "modes"
+        const val PARAMETERS: String = "parameters"
+        const val GNSS_STATUS: String = "gnssStatus"
+        const val GNSS_MEASUREMENTS: String = "gnssMeasurements"
+        const val GNSS_CLOCK: String = "gnssClock"
+        const val NAVIGATION_MESSAGES: String = "navigationMessages"
+
 
         private var INSTANCE: AppSharedPreferences? = null
 
@@ -97,5 +103,22 @@ class AppSharedPreferences {
 
         return modesList
     }
+
+    fun saveData(type: String, data: String) {
+        mPrefs.edit()
+            .putString(type, data)
+            .apply()
+    }
+
+    fun deleteData(type: String) {
+        mPrefs.edit()
+            .remove(type)
+            .apply()
+    }
+
+    fun getData(type: String): String?{
+        return mPrefs.getString(type, "")
+    }
+
 
 }

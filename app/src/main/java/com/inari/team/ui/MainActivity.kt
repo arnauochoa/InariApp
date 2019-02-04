@@ -9,6 +9,7 @@ import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.inari.team.R
+import com.inari.team.data.NavigationMessage
 import com.inari.team.ui.position.PositionFragment
 import com.inari.team.ui.statistics.StatisticsFragment
 import com.inari.team.ui.status.all_status.AllStatusFragment
@@ -37,6 +38,8 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
     private var gpsStatusFragment: GPSStatusFragment? = null
     private var galileoStatusFragment: GalileoStatusFragment? = null
     private var allStatusFragment: AllStatusFragment? = null
+
+    private var navigationMessages = hashMapOf<Int, NavigationMessage>()
 
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -96,10 +99,36 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
 
         gnssNavigationMessageListener = object : GnssNavigationMessage.Callback() {
             override fun onGnssNavigationMessageReceived(navigationMessage: GnssNavigationMessage?) {
-                positionFragment?.onGnnsDataReceived(gnssNavigationMessage = navigationMessage)
+                navigationMessage?.let {
+                    addNavigationMessage(navigationMessage)
+                    positionFragment?.onGnnsDataReceived(gnssNavigationMessages = navigationMessages)
+                }
             }
         }
         locationManager?.registerGnssNavigationMessageCallback(gnssNavigationMessageListener)
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun addNavigationMessage(navigationMessage: GnssNavigationMessage?) {
+
+        navigationMessage?.let {
+            val svid = navigationMessage.svid
+            if (navigationMessages.containsKey(svid)) { //Remove old message from given satellite
+                navigationMessages.remove(svid)
+            }
+            navigationMessages.put(
+                svid,
+                NavigationMessage(
+                    navigationMessage.svid,
+                    navigationMessage.type,
+                    navigationMessage.status,
+                    navigationMessage.messageId,
+                    navigationMessage.submessageId,
+                    navigationMessage.data
+                )
+            )
+        }
 
     }
 

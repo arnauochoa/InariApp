@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.GnssMeasurementsEvent
-import android.location.GnssNavigationMessage
 import android.location.GnssStatus
 import android.os.Build
 import android.os.Bundle
@@ -26,7 +25,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.inari.team.R
+import com.inari.team.data.NavigationMessage
+import com.inari.team.data.PositionParameters
 import com.inari.team.ui.logs.LogsActivity
+import com.inari.team.utils.AppSharedPreferences
 import com.inari.team.utils.saveFile
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
@@ -41,6 +43,8 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     companion object {
         const val FRAG_TAG = "position_fragment"
     }
+
+    private val mSharedPreferences = AppSharedPreferences.getInstance()
 
     private var mMap: GoogleMap? = null
     private var fusedLocationClient: FusedLocationProviderClient? = null
@@ -58,6 +62,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         return inflater.inflate(R.layout.fragment_position, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -72,12 +77,42 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
         fabClose.setOnClickListener {
             if (clBottomSheet.visibility == View.VISIBLE) {
-                clBottomSheet.visibility = View.GONE
+                val selectedParameters = getSelectedParameters()
+                if (selectedParameters == null) { // If no constellation or band has been selected
+                    toast("At least one constellation and one band must be selected")
+                } else {
+                    mPresenter?.setGnssData(selectedParameters)
+                    clBottomSheet.visibility = View.GONE
+                    mPresenter?.calculatePositionWithGnss()
+                }
             }
-            mPresenter?.setGnssData("Selected parameters")
-            mPresenter?.calculatePositionWithGnss()
         }
 
+    }
+
+    private fun getSelectedParameters(): PositionParameters? {
+        val constellations = arrayListOf<Int>()
+        val bands = arrayListOf<Int>()
+        val corrections = arrayListOf<Int>()
+        var algorithm = 0
+
+        if (constParam1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
+        if (constParam2.isChecked) constellations.add(PositionParameters.CONST_GAL)
+        if (bandsParam1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
+        if (bandsParam2.isChecked) bands.add(PositionParameters.BAND_L5)
+        if (correctionsParam1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
+        if (correctionsParam2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
+        if (correctionsParam3.isChecked) corrections.add(PositionParameters.CORR_MULTIPATH)
+        if (correctionsParam4.isChecked) corrections.add(PositionParameters.CORR_CAMERA)
+        if (algorithmParam1.isChecked) algorithm = PositionParameters.ALG_LS  // set selected algorithm
+        if (algorithmParam2.isChecked) algorithm = PositionParameters.ALG_WLS
+        if (algorithmParam3.isChecked) algorithm = PositionParameters.ALG_KALMAN
+
+        return if (constellations.isEmpty() || bands.isEmpty()) {
+            null
+        } else {
+            PositionParameters(constellations, bands, corrections, algorithm)
+        }
     }
 
     override fun onAttach(context: Context?) {
@@ -156,7 +191,18 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     }
 
     private fun saveLog(fileName: String) {
-        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), getString(R.string.sample_text)))
+        val parametersString =  mSharedPreferences.getData(AppSharedPreferences.PARAMETERS)
+        val gnssStatusString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_STATUS)
+        val gnssMeasurementsString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_MEASUREMENTS)
+        val gnssClockString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_CLOCK)
+        val gnssNavigationMessagesString =  mSharedPreferences.getData(AppSharedPreferences.NAVIGATION_MESSAGES)
+        var fileContent = "Parameters:\n$parametersString\n\n"
+        fileContent += "GNSS Status:\n$gnssStatusString\n\n"
+        fileContent += "GNSS Measurements:\n$gnssMeasurementsString\n\n"
+        fileContent += "GNSS Clock: \n$gnssClockString\n\n"
+        fileContent += "Navigation Messages: \n$gnssNavigationMessagesString"
+
+        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), fileContent))
         showSavedSnackBar()
     }
 
@@ -213,12 +259,12 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     fun onGnnsDataReceived(
         gnssStatus: GnssStatus? = null,
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null,
-        gnssNavigationMessage: GnssNavigationMessage? = null
+        gnssNavigationMessages: HashMap<Int, NavigationMessage>? = null
     ) {
         mPresenter?.setGnssData(
             gnssStatus = gnssStatus,
             gnssMeasurementsEvent = gnssMeasurementsEvent,
-            gnssNavigationMessage = gnssNavigationMessage
+            gnssNavigationMessages = gnssNavigationMessages
         )
     }
 
