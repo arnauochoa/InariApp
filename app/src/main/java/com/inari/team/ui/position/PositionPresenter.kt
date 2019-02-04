@@ -68,13 +68,23 @@ class PositionPresenter(private val mView: PositionView?) {
             gnssClockJson != null &&
             gnssNavigationMessageJson != null
         ) {
-            //TODO: Call MATLAB function with the strings previously obtained and params string
+            // compute position
+            val position = computePosition(
+                parametersJson,
+                gnssStatusJson,
+                gnssMeasurementsJson,
+                gnssClockJson,
+                gnssNavigationMessageJson
+            )
+
+            // Testing logs
             Log.d("parametersJson", parametersJson)
             Log.d("gnssStatusJson", gnssStatusJson)
             Log.d("gnssMeasurementsJson", gnssMeasurementsJson)
             Log.d("gnssClockJson", gnssClockJson)
             Log.d("gnssNavMessageJson", gnssNavigationMessageJson)
 
+            // Saving used data
             mSharedPreferences.deleteData(AppSharedPreferences.PARAMETERS)
             mSharedPreferences.deleteData(AppSharedPreferences.GNSS_STATUS)
             mSharedPreferences.deleteData(AppSharedPreferences.GNSS_MEASUREMENTS)
@@ -87,10 +97,20 @@ class PositionPresenter(private val mView: PositionView?) {
             mSharedPreferences.saveData(AppSharedPreferences.NAVIGATION_MESSAGES, gnssNavigationMessageJson)
 
             //once the result is obtained
-            //TODO: Transform resulting position to LatLng
-            mView?.onPositionCalculated(LatLng(0.0, 0.0))
+            mView?.onPositionCalculated(position)
         }
 
+    }
+
+    private fun computePosition(
+        parametersJson: String,
+        gnssStatusJson: String,
+        gnssMeasurementsJson: String,
+        gnssClockJson: String,
+        gnssNavigationMessageJson: String
+    ): LatLng {
+        //TODO: call MATLAB function and transform result to LatLng
+        return LatLng(0.0, 0.0)
     }
 
     private fun parametersAsJson(): String? {

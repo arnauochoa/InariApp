@@ -57,6 +57,11 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
         setGnssCallbacks()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        locationManager?.removeUpdates(this)
+    }
+
     @SuppressLint("MissingPermission")
     private fun startGnss() {
         locationManager?.requestLocationUpdates(locationProvider?.name, MIN_TIME, MIN_DISTANCE, this)

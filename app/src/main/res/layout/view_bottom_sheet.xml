@@ -62,7 +62,8 @@
                     android:text="GPS"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:checked="true"/>
 
             <CheckBox
                     android:id="@+id/constParam2"
@@ -108,7 +109,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/bandsTextView"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:checked="true"/>
 
             <CheckBox
                     android:id="@+id/bandsParam2"
@@ -148,7 +150,8 @@
                     android:text="Ionosphere"
                     app:layout_constraintBottom_toBottomOf="@+id/correctionsTextView"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/correctionsTextView"/>
+                    app:layout_constraintTop_toTopOf="@+id/correctionsTextView"
+                    android:checked="true"/>
 
             <CheckBox
                     android:id="@+id/correctionsParam2"
@@ -157,7 +160,8 @@
                     android:layout_marginStart="@dimen/marginSecondColumn"
                     android:text="Troposphere"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/correctionsParam1"/>
+                    app:layout_constraintTop_toTopOf="@+id/correctionsParam1"
+                    android:checked="true"/>
 
             <CheckBox
                     android:id="@+id/correctionsParam3"
