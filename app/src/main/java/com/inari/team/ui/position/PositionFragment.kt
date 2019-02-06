@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -192,11 +193,13 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
     private fun saveLog(fileName: String) {
         val parametersString =  mSharedPreferences.getData(AppSharedPreferences.PARAMETERS)
+        val locationString =  mSharedPreferences.getData(AppSharedPreferences.LOCATION)
         val gnssStatusString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_STATUS)
         val gnssMeasurementsString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_MEASUREMENTS)
         val gnssClockString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_CLOCK)
         val gnssNavigationMessagesString =  mSharedPreferences.getData(AppSharedPreferences.NAVIGATION_MESSAGES)
         var fileContent = "Parameters:\n$parametersString\n\n"
+        fileContent += "Reference Location:\n$locationString\n\n"
         fileContent += "GNSS Status:\n$gnssStatusString\n\n"
         fileContent += "GNSS Measurements:\n$gnssMeasurementsString\n\n"
         fileContent += "GNSS Clock: \n$gnssClockString\n\n"
@@ -257,11 +260,13 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun onGnnsDataReceived(
+        location: Location? = null,
         gnssStatus: GnssStatus? = null,
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null,
         gnssNavigationMessages: HashMap<Int, NavigationMessage>? = null
     ) {
         mPresenter?.setGnssData(
+            location = location,
             gnssStatus = gnssStatus,
             gnssMeasurementsEvent = gnssMeasurementsEvent,
             gnssNavigationMessages = gnssNavigationMessages
@@ -269,7 +274,12 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     }
 
     override fun onPositionCalculated(position: LatLng) {
+        toast("Position computed!")
         //position obtained
+    }
+
+    override fun onPositionNotCalculated() {
+        toast("There are not enough measurements yet.")
     }
 
     private fun showSavedSnackBar() {

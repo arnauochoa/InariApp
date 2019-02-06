@@ -193,7 +193,9 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
     }
 
     //callbacks
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onLocationChanged(location: Location?) {
+        positionFragment?.onGnnsDataReceived(location = location)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {

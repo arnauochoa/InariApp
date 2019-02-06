@@ -1,9 +1,6 @@
 package com.inari.team.ui.position
 
-import android.location.GnssClock
-import android.location.GnssMeasurement
-import android.location.GnssMeasurementsEvent
-import android.location.GnssStatus
+import android.location.*
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.Log
@@ -19,6 +16,7 @@ class PositionPresenter(private val mView: PositionView?) {
     val gson = GsonBuilder().setPrettyPrinting().create()
 
     private var parameters: PositionParameters? = null
+    private var location: Location? = null
     private var gnssStatus: GnssStatus? = null
     private var gnssMeasurements: Collection<GnssMeasurement>? = null
     private var gnssClock: GnssClock? = null
@@ -27,6 +25,7 @@ class PositionPresenter(private val mView: PositionView?) {
     @RequiresApi(Build.VERSION_CODES.N)
     fun setGnssData(
         parameters: PositionParameters? = null,
+        location: Location? = null,
         gnssStatus: GnssStatus? = null,
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null,
         gnssNavigationMessages: HashMap<Int, NavigationMessage>? = null
@@ -34,6 +33,10 @@ class PositionPresenter(private val mView: PositionView?) {
 
         parameters?.let {
             this.parameters = it
+        }
+
+        location?.let {
+            this.location = it
         }
 
         gnssStatus?.let {
@@ -55,8 +58,8 @@ class PositionPresenter(private val mView: PositionView?) {
     fun calculatePositionWithGnss() {
         //Calculate the position when parameters are defined and when there are measurements
 
-
         val parametersJson = parametersAsJson()
+        val locationJson = locationAsJson()
         val gnssStatusJson = gnssStatusAsJson()
         val gnssMeasurementsJson = gnssMeasurementsAsJson()
         val gnssClockJson = gnssClockAsJson()
@@ -64,6 +67,7 @@ class PositionPresenter(private val mView: PositionView?) {
 
         if (parametersJson != null &&
             gnssStatusJson != null &&
+            locationJson != null &&
             gnssMeasurementsJson != null &&
             gnssClockJson != null &&
             gnssNavigationMessageJson != null
@@ -79,6 +83,7 @@ class PositionPresenter(private val mView: PositionView?) {
 
             // Testing logs
             Log.d("parametersJson", parametersJson)
+            Log.d("locationJson", locationJson)
             Log.d("gnssStatusJson", gnssStatusJson)
             Log.d("gnssMeasurementsJson", gnssMeasurementsJson)
             Log.d("gnssClockJson", gnssClockJson)
@@ -86,11 +91,13 @@ class PositionPresenter(private val mView: PositionView?) {
 
             // Saving used data
             mSharedPreferences.deleteData(AppSharedPreferences.PARAMETERS)
+            mSharedPreferences.deleteData(AppSharedPreferences.LOCATION)
             mSharedPreferences.deleteData(AppSharedPreferences.GNSS_STATUS)
             mSharedPreferences.deleteData(AppSharedPreferences.GNSS_MEASUREMENTS)
             mSharedPreferences.deleteData(AppSharedPreferences.GNSS_CLOCK)
             mSharedPreferences.deleteData(AppSharedPreferences.NAVIGATION_MESSAGES)
             mSharedPreferences.saveData(AppSharedPreferences.PARAMETERS, parametersJson)
+            mSharedPreferences.saveData(AppSharedPreferences.LOCATION, locationJson)
             mSharedPreferences.saveData(AppSharedPreferences.GNSS_STATUS, gnssStatusJson)
             mSharedPreferences.saveData(AppSharedPreferences.GNSS_MEASUREMENTS, gnssMeasurementsJson)
             mSharedPreferences.saveData(AppSharedPreferences.GNSS_CLOCK, gnssClockJson)
@@ -98,6 +105,8 @@ class PositionPresenter(private val mView: PositionView?) {
 
             //once the result is obtained
             mView?.onPositionCalculated(position)
+        } else {
+            mView?.onPositionNotCalculated()
         }
 
     }
@@ -119,6 +128,19 @@ class PositionPresenter(private val mView: PositionView?) {
         } else {
             gson.toJson(parameters)
         }
+    }
+
+    private fun locationAsJson(): String? {
+        var locationJsonString: String? = null
+        location?.let { loc ->
+            val locationJson = JSONObject()
+            locationJson.put("latitude", loc.latitude)
+            locationJson.put("longitude", loc.longitude)
+            locationJson.put("altitude", loc.altitude)
+
+            locationJsonString = locationJson.toString(2)
+        }
+        return locationJsonString
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
