@@ -59,11 +59,25 @@ class PositionPresenter(private val mView: PositionView?) {
         //Calculate the position when parameters are defined and when there are measurements
 
         val parametersJson = parametersAsJson()
-        val locationJson = locationAsJson()
+        var locationJson = locationAsJson()
         val gnssStatusJson = gnssStatusAsJson()
-        val gnssMeasurementsJson = gnssMeasurementsAsJson()
-        val gnssClockJson = gnssClockAsJson()
-        val gnssNavigationMessageJson = gnssNavigationMessagesAsJson()
+        var gnssMeasurementsJson = gnssMeasurementsAsJson()
+        var gnssClockJson = gnssClockAsJson()
+        var gnssNavigationMessageJson = gnssNavigationMessagesAsJson()
+
+        if (gnssNavigationMessageJson == null) { //TODO: remove this when navigation data always acquired
+            gnssNavigationMessageJson = "empty"
+        }
+        if (locationJson == null) {
+            locationJson = "empty"
+        }
+        if (gnssMeasurementsJson == null) { //TODO: remove this when measurements data always acquired
+            gnssMeasurementsJson = "empty"
+        }
+        if (gnssClockJson == null) { //TODO: remove this when clock data always acquired
+            gnssClockJson = "empty"
+        }
+
 
         if (parametersJson != null &&
             gnssStatusJson != null &&
