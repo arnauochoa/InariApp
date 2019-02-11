@@ -20,7 +20,7 @@ class PositionPresenter(private val mView: PositionView?) {
         const val STATUS_KEY = "status"
         const val MEASUREMENTS_KEY = "measurements"
         const val CLOCK_KEY = "clock"
-        const val NAVIGATION_MESSAGES_KEY = "navMessage"
+        const val NAVIGATION_MESSAGES_KEY = "navMessages"
     }
 
     private val mSharedPreferences = AppSharedPreferences.getInstance()
@@ -71,7 +71,7 @@ class PositionPresenter(private val mView: PositionView?) {
 
         val mainJson = obtainJson()
 
-        if (mainJson != null) {
+        if (mainJson.isNotEmpty()) {
             // compute position
             val position = computePosition(mainJson)
 
@@ -90,6 +90,7 @@ class PositionPresenter(private val mView: PositionView?) {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun obtainJson(): String {
         val mainJson = JSONObject()
         mainJson.put(PARAMETERS_KEY, parametersAsJson())
