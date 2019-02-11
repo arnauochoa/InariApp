@@ -192,20 +192,9 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     }
 
     private fun saveLog(fileName: String) {
-        val parametersString =  mSharedPreferences.getData(AppSharedPreferences.PARAMETERS)
-        val locationString =  mSharedPreferences.getData(AppSharedPreferences.LOCATION)
-        val gnssStatusString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_STATUS)
-        val gnssMeasurementsString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_MEASUREMENTS)
-        val gnssClockString =  mSharedPreferences.getData(AppSharedPreferences.GNSS_CLOCK)
-        val gnssNavigationMessagesString =  mSharedPreferences.getData(AppSharedPreferences.NAVIGATION_MESSAGES)
-        var fileContent = "Parameters:\n$parametersString\n\n"
-        fileContent += "Reference Location:\n$locationString\n\n"
-        fileContent += "GNSS Status:\n$gnssStatusString\n\n"
-        fileContent += "GNSS Measurements:\n$gnssMeasurementsString\n\n"
-        fileContent += "GNSS Clock: \n$gnssClockString\n\n"
-        fileContent += "Navigation Messages: \n$gnssNavigationMessagesString"
+        val pvtInfoString =  mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
 
-        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), fileContent))
+        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
         showSavedSnackBar()
     }
 

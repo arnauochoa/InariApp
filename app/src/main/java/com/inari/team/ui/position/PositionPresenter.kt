@@ -9,9 +9,20 @@ import com.google.gson.GsonBuilder
 import com.inari.team.data.NavigationMessage
 import com.inari.team.data.PositionParameters
 import com.inari.team.utils.AppSharedPreferences
+import org.json.JSONArray
 import org.json.JSONObject
 
 class PositionPresenter(private val mView: PositionView?) {
+
+    companion object {
+        const val PARAMETERS_KEY = "parameters"
+        const val LOCATION_KEY = "location"
+        const val STATUS_KEY = "status"
+        const val MEASUREMENTS_KEY = "measurements"
+        const val CLOCK_KEY = "clock"
+        const val NAVIGATION_MESSAGES_KEY = "navMessage"
+    }
+
     private val mSharedPreferences = AppSharedPreferences.getInstance()
     val gson = GsonBuilder().setPrettyPrinting().create()
 
@@ -58,64 +69,18 @@ class PositionPresenter(private val mView: PositionView?) {
     fun calculatePositionWithGnss() {
         //Calculate the position when parameters are defined and when there are measurements
 
-        val parametersJson = parametersAsJson()
-        var locationJson = locationAsJson()
-        val gnssStatusJson = gnssStatusAsJson()
-        var gnssMeasurementsJson = gnssMeasurementsAsJson()
-        var gnssClockJson = gnssClockAsJson()
-        var gnssNavigationMessageJson = gnssNavigationMessagesAsJson()
+        val mainJson = obtainJson()
 
-        if (gnssNavigationMessageJson == null) { //TODO: remove this when navigation data always acquired
-            gnssNavigationMessageJson = "empty"
-        }
-        if (locationJson == null) {
-            locationJson = "empty"
-        }
-        if (gnssMeasurementsJson == null) { //TODO: remove this when measurements data always acquired
-            gnssMeasurementsJson = "empty"
-        }
-        if (gnssClockJson == null) { //TODO: remove this when clock data always acquired
-            gnssClockJson = "empty"
-        }
-
-
-        if (parametersJson != null &&
-            gnssStatusJson != null &&
-            locationJson != null &&
-            gnssMeasurementsJson != null &&
-            gnssClockJson != null &&
-            gnssNavigationMessageJson != null
-        ) {
+        if (mainJson != null) {
             // compute position
-            val position = computePosition(
-                parametersJson,
-                gnssStatusJson,
-                gnssMeasurementsJson,
-                gnssClockJson,
-                gnssNavigationMessageJson
-            )
+            val position = computePosition(mainJson)
 
             // Testing logs
-            Log.d("parametersJson", parametersJson)
-            Log.d("locationJson", locationJson)
-            Log.d("gnssStatusJson", gnssStatusJson)
-            Log.d("gnssMeasurementsJson", gnssMeasurementsJson)
-            Log.d("gnssClockJson", gnssClockJson)
-            Log.d("gnssNavMessageJson", gnssNavigationMessageJson)
+            Log.d("mainJson", mainJson)
 
             // Saving used data
-            mSharedPreferences.deleteData(AppSharedPreferences.PARAMETERS)
-            mSharedPreferences.deleteData(AppSharedPreferences.LOCATION)
-            mSharedPreferences.deleteData(AppSharedPreferences.GNSS_STATUS)
-            mSharedPreferences.deleteData(AppSharedPreferences.GNSS_MEASUREMENTS)
-            mSharedPreferences.deleteData(AppSharedPreferences.GNSS_CLOCK)
-            mSharedPreferences.deleteData(AppSharedPreferences.NAVIGATION_MESSAGES)
-            mSharedPreferences.saveData(AppSharedPreferences.PARAMETERS, parametersJson)
-            mSharedPreferences.saveData(AppSharedPreferences.LOCATION, locationJson)
-            mSharedPreferences.saveData(AppSharedPreferences.GNSS_STATUS, gnssStatusJson)
-            mSharedPreferences.saveData(AppSharedPreferences.GNSS_MEASUREMENTS, gnssMeasurementsJson)
-            mSharedPreferences.saveData(AppSharedPreferences.GNSS_CLOCK, gnssClockJson)
-            mSharedPreferences.saveData(AppSharedPreferences.NAVIGATION_MESSAGES, gnssNavigationMessageJson)
+            mSharedPreferences.deleteData(AppSharedPreferences.PVT_INFO)
+            mSharedPreferences.saveData(AppSharedPreferences.PVT_INFO, mainJson)
 
             //once the result is obtained
             mView?.onPositionCalculated(position)
@@ -125,43 +90,45 @@ class PositionPresenter(private val mView: PositionView?) {
 
     }
 
-    private fun computePosition(
-        parametersJson: String,
-        gnssStatusJson: String,
-        gnssMeasurementsJson: String,
-        gnssClockJson: String,
-        gnssNavigationMessageJson: String
-    ): LatLng {
+    private fun obtainJson(): String {
+        val mainJson = JSONObject()
+        mainJson.put(PARAMETERS_KEY, parametersAsJson())
+        mainJson.put(LOCATION_KEY, locationAsJson())
+        mainJson.put(STATUS_KEY, gnssStatusAsJson())
+        mainJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson())
+        mainJson.put(CLOCK_KEY, gnssClockAsJson())
+        mainJson.put(NAVIGATION_MESSAGES_KEY, gnssNavigationMessagesAsJson())
+
+        return mainJson.toString(2)
+    }
+
+    private fun computePosition(mainJson: String): LatLng {
         //TODO: call MATLAB function and transform result to LatLng
         return LatLng(0.0, 0.0)
     }
 
-    private fun parametersAsJson(): String? {
-        return if (parameters == null) {
-            null
-        } else {
-            gson.toJson(parameters)
+    private fun parametersAsJson(): JSONObject {
+        var parametersJson = JSONObject()
+        parameters?.let {
+            parametersJson = JSONObject(gson.toJson(it))
         }
+        return parametersJson
     }
 
-    private fun locationAsJson(): String? {
-        var locationJsonString: String? = null
+    private fun locationAsJson(): JSONObject {
+        val childJson = JSONObject()
         location?.let { loc ->
-            val locationJson = JSONObject()
-            locationJson.put("latitude", loc.latitude)
-            locationJson.put("longitude", loc.longitude)
-            locationJson.put("altitude", loc.altitude)
-
-            locationJsonString = locationJson.toString(2)
+            childJson.put("latitude", loc.latitude)
+            childJson.put("longitude", loc.longitude)
+            childJson.put("altitude", loc.altitude)
         }
-        return locationJsonString
+        return childJson
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun gnssStatusAsJson(): String? {
-        var statusJsonString: String? = null
+    private fun gnssStatusAsJson(): JSONArray {
+        val statusJsonArray = JSONArray()
         gnssStatus?.let { status ->
-            val parentJson = JSONObject()
             for (sat in 0 until status.satelliteCount) {
                 val childJson = JSONObject()
                 childJson.put("svid", status.getSvid(sat))
@@ -175,19 +142,16 @@ class PositionPresenter(private val mView: PositionView?) {
                 childJson.put("hasEphemerisData", status.hasEphemerisData(sat))
                 childJson.put("usedInFix", status.usedInFix(sat))
 
-                parentJson.put(sat.toString(), childJson)
+                statusJsonArray.put(childJson)
             }
-            statusJsonString = parentJson.toString(2)
         }
-        return statusJsonString
+        return statusJsonArray
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun gnssMeasurementsAsJson(): String? {
-        var measurementsJsonString: String? = null
+    private fun gnssMeasurementsAsJson(): JSONArray {
+        val measurementsJsonArray = JSONArray()
         gnssMeasurements?.let { measurements ->
-            val parentJson = JSONObject()
-            var meas = 0 // measurement index
             measurements.forEach { measurement ->
                 val childJson = JSONObject()
                 childJson.put("svid", measurement.svid)
@@ -223,20 +187,16 @@ class PositionPresenter(private val mView: PositionView?) {
                     childJson.put("snrInDb", measurement.snrInDb)
                 }
 
-                parentJson.put(meas.toString(), childJson)
-                meas++
+                measurementsJsonArray.put(childJson)
             }
-
-            measurementsJsonString = parentJson.toString(2)
         }
-        return measurementsJsonString
+        return measurementsJsonArray
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun gnssClockAsJson(): String? {
-        var clockJsonString: String? = null
+    private fun gnssClockAsJson(): JSONObject {
+        val clockJson = JSONObject()
         gnssClock?.let { clock ->
-            val clockJson = JSONObject()
             clockJson.put("timeNanos", clock.timeNanos)
             clockJson.put("hardwareClockDiscontinuityCount", clock.hardwareClockDiscontinuityCount)
             clockJson.put("hasBiasNanos", clock.hasBiasNanos())
@@ -267,17 +227,24 @@ class PositionPresenter(private val mView: PositionView?) {
             if (clock.hasDriftUncertaintyNanosPerSecond()) {
                 clockJson.put("driftUncertaintyNanosPerSecond", clock.driftUncertaintyNanosPerSecond)
             }
-            clockJsonString = clockJson.toString(2)
         }
-        return clockJsonString
+        return clockJson
     }
 
-    private fun gnssNavigationMessagesAsJson(): String? {
-        return if (navigationMessages.isEmpty()) {
-            null
-        } else {
-            gson.toJson(navigationMessages)
+    private fun gnssNavigationMessagesAsJson(): JSONArray {
+        val messagesJsonArray = JSONArray()
+
+        navigationMessages.forEach {
+            val childJson = JSONObject()
+            childJson.put("svid", it.value.svid)
+            childJson.put("type", it.value.type)
+            childJson.put("status", it.value.status)
+            childJson.put("messageId", it.value.messageId)
+            childJson.put("submessageId", it.value.submessageId)
+            childJson.put("data", it.value.data?.contentToString())
+            messagesJsonArray.put(childJson)
         }
+        return messagesJsonArray
     }
 
 }

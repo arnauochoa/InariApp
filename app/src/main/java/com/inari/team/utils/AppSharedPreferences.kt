@@ -15,12 +15,7 @@ class AppSharedPreferences {
 
         const val MY_PREFS: String = "MY_PREFS"
         const val MODES: String = "modes"
-        const val PARAMETERS: String = "parameters"
-        const val LOCATION: String = "location"
-        const val GNSS_STATUS: String = "gnssStatus"
-        const val GNSS_MEASUREMENTS: String = "gnssMeasurements"
-        const val GNSS_CLOCK: String = "gnssClock"
-        const val NAVIGATION_MESSAGES: String = "navigationMessages"
+        const val PVT_INFO: String = "PVT_INFO"
 
 
         private var INSTANCE: AppSharedPreferences? = null
