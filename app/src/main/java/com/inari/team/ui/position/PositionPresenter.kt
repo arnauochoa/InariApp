@@ -122,6 +122,8 @@ class PositionPresenter(private val mView: PositionView?) {
 
     private fun computePosition(mainJson: String): LatLng {
         //TODO: call MATLAB function and transform result to LatLng
+        // latLong = matlabFunction(mainJson)
+        // return LatLng(lat, long)
         return LatLng(0.0, 0.0)
     }
 

@@ -319,6 +319,9 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     override fun onPositionCalculated(position: LatLng) {
         //toast("Position computed!")
         hideMapLoading()
+        mMap?.clear()
+        addMarker(position, "")
+        moveCamera(position)
         //position obtained
     }
 
