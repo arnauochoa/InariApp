@@ -27,6 +27,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.R
@@ -123,14 +124,18 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     }
 
     private fun obtainEphemerisData() {
+        var ephResponse: EphemerisResponse? = null
         refPos?.let {
             val latE7 = (it.latitude * 1e7).roundToLong()
             val lngE7 = (it.longitude * 1e7).roundToLong()
 
             StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
             suplController?.sendSuplRequest(latE7, lngE7)
-            val ephResponse = suplController?.generateEphResponse(latE7, lngE7)
+            ephResponse = suplController?.generateEphResponse(latE7, lngE7)
             mPresenter?.setGnssData(ephemerisResponse = ephResponse)
+        }
+        if (ephResponse == null) {
+            toast("Ephemeris data could not be obtained")
         }
     }
 
@@ -302,7 +307,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     ) {
         location?.let {
             refPos = LatLng(location.latitude, location.longitude)
-            //obtainEphemerisData()
         }
         mPresenter?.setGnssData(
             location = location,
@@ -313,7 +317,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     }
 
     override fun onPositionCalculated(position: LatLng) {
-        toast("Position computed!")
+        //toast("Position computed!")
         hideMapLoading()
         //position obtained
     }
