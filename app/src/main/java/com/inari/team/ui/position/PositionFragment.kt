@@ -12,9 +12,11 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat.startActivity
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,11 +27,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.location.suplclient.ephemeris.EphemerisResponse
+import com.google.location.suplclient.supl.SuplConnectionRequest
+import com.google.location.suplclient.supl.SuplController
 import com.inari.team.R
 import com.inari.team.data.NavigationMessage
 import com.inari.team.data.PositionParameters
 import com.inari.team.ui.logs.LogsActivity
 import com.inari.team.utils.AppSharedPreferences
+import com.inari.team.utils.context
 import com.inari.team.utils.saveFile
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
@@ -37,12 +43,18 @@ import kotlinx.android.synthetic.main.fragment_position.*
 import kotlinx.android.synthetic.main.view_bottom_sheet.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import kotlin.math.roundToLong
 
 
 class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
     companion object {
         const val FRAG_TAG = "position_fragment"
+        const val SUPL_SERVER_HOST = "supl.google.com"
+        const val SUPL_SERVER_PORT = 7275
+        const val SUPL_SSL_ENABLED = true
+        const val SUPL_MESSAGE_LOGGING_ENABLED = true
+        const val SUPL_LOGGING_ENABLED = true
     }
 
     private val mSharedPreferences = AppSharedPreferences.getInstance()
@@ -55,6 +67,10 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     private var mListener: PositionListener? = null
 
     private var mPresenter: PositionPresenter? = null
+
+    private var suplController: SuplController? = null
+
+    private var refPos: LatLng? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,6 +85,8 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
         mPresenter = PositionPresenter(this)
 
+        buildSuplController()
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
         setHasOptionsMenu(true)
 
@@ -82,14 +100,45 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
                 if (selectedParameters == null) { // If no constellation or band has been selected
                     toast("At least one constellation and one band must be selected")
                 } else {
-                    mPresenter?.setGnssData(selectedParameters)
                     clBottomSheet.visibility = View.GONE
+                    showMapLoading()
+                    obtainEphemerisData()
+                    mPresenter?.setGnssData(selectedParameters)
                     mPresenter?.calculatePositionWithGnss()
                 }
             }
         }
 
     }
+
+    private fun buildSuplController() {
+        val request = SuplConnectionRequest.builder()
+            .setServerHost(SUPL_SERVER_HOST)
+            .setServerPort(SUPL_SERVER_PORT)
+            .setSslEnabled(SUPL_SSL_ENABLED)
+            .setMessageLoggingEnabled(SUPL_MESSAGE_LOGGING_ENABLED)
+            .setLoggingEnabled(SUPL_LOGGING_ENABLED)
+            .build()
+        suplController = SuplController(request)
+
+    }
+
+    private fun obtainEphemerisData() {
+        var ephResponse: EphemerisResponse? = null
+        refPos?.let {
+            val latE7 = (it.latitude * 1e7).roundToLong()
+            val lngE7 = (it.longitude * 1e7).roundToLong()
+
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+            suplController?.sendSuplRequest(latE7, lngE7)
+            ephResponse = suplController?.generateEphResponse(latE7, lngE7)
+            mPresenter?.setGnssData(ephemerisResponse = ephResponse)
+        }
+        if (ephResponse == null) {
+            toast("Ephemeris data could not be obtained")
+        }
+    }
+
 
     private fun getSelectedParameters(): PositionParameters? {
         val constellations = arrayListOf<Int>()
@@ -192,10 +241,12 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     }
 
     private fun saveLog(fileName: String) {
-        val pvtInfoString =  mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
+        val pvtInfoString = mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
 
-        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
-        showSavedSnackBar()
+        pvtInfoString?.let {
+            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
+            showSavedSnackBar()
+        }
     }
 
 
@@ -254,6 +305,9 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null,
         gnssNavigationMessages: HashMap<Int, NavigationMessage>? = null
     ) {
+        location?.let {
+            refPos = LatLng(location.latitude, location.longitude)
+        }
         mPresenter?.setGnssData(
             location = location,
             gnssStatus = gnssStatus,
@@ -263,7 +317,8 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     }
 
     override fun onPositionCalculated(position: LatLng) {
-        toast("Position computed!")
+        //toast("Position computed!")
+        hideMapLoading()
         //position obtained
     }
 
