@@ -5,7 +5,12 @@ import android.os.Build
 import android.support.annotation.RequiresApi
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.location.suplclient.ephemeris.EphemerisResponse
+import com.google.location.suplclient.ephemeris.GalEphemeris
+import com.google.location.suplclient.ephemeris.GloEphemeris
+import com.google.location.suplclient.ephemeris.GpsEphemeris
 import com.inari.team.data.NavigationMessage
 import com.inari.team.data.PositionParameters
 import com.inari.team.utils.AppSharedPreferences
@@ -21,6 +26,11 @@ class PositionPresenter(private val mView: PositionView?) {
         const val MEASUREMENTS_KEY = "measurements"
         const val CLOCK_KEY = "clock"
         const val NAVIGATION_MESSAGES_KEY = "navMessages"
+        const val EPHEMERIS_DATA_KEY = "ephemerisData"
+        const val GALILEO_KEY = "galileo"
+        const val GPS_KEY = "gps"
+        const val GLONASS_KEY = "glonass"
+        const val IONO_PROTO_KEY = "ionoProto"
     }
 
     private val mSharedPreferences = AppSharedPreferences.getInstance()
@@ -32,6 +42,7 @@ class PositionPresenter(private val mView: PositionView?) {
     private var gnssMeasurements: Collection<GnssMeasurement>? = null
     private var gnssClock: GnssClock? = null
     private var navigationMessages = hashMapOf<Int, NavigationMessage>()
+    private var ephemerisResponse: EphemerisResponse? = null
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun setGnssData(
@@ -39,7 +50,8 @@ class PositionPresenter(private val mView: PositionView?) {
         location: Location? = null,
         gnssStatus: GnssStatus? = null,
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null,
-        gnssNavigationMessages: HashMap<Int, NavigationMessage>? = null
+        gnssNavigationMessages: HashMap<Int, NavigationMessage>? = null,
+        ephemerisResponse: EphemerisResponse? = null
     ) {
 
         parameters?.let {
@@ -61,6 +73,10 @@ class PositionPresenter(private val mView: PositionView?) {
 
         gnssNavigationMessages?.let {
             this.navigationMessages = it
+        }
+
+        ephemerisResponse?.let {
+            this.ephemerisResponse = it
         }
 
     }
@@ -99,6 +115,7 @@ class PositionPresenter(private val mView: PositionView?) {
         mainJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson())
         mainJson.put(CLOCK_KEY, gnssClockAsJson())
         mainJson.put(NAVIGATION_MESSAGES_KEY, gnssNavigationMessagesAsJson())
+        mainJson.put(EPHEMERIS_DATA_KEY, ephemerisResponseAsJson())
 
         return mainJson.toString(2)
     }
@@ -246,6 +263,31 @@ class PositionPresenter(private val mView: PositionView?) {
             messagesJsonArray.put(childJson)
         }
         return messagesJsonArray
+    }
+
+    private fun ephemerisResponseAsJson(): JSONObject {
+        val gson = Gson()
+        val ephemerisJson = JSONObject()
+        ephemerisResponse?.let {
+            val galileoEphemerisJsonArray = JSONArray()
+            val gpsEphemerisJsonArray = JSONArray()
+            val glonassEphemerisJsonArray = JSONArray()
+            it.ephList.forEach { ephemeris ->
+                val ephJson = JSONObject(gson.toJson(ephemeris)) // Creates JSONObject of GnssEphemeris object
+                when (ephemeris) {
+                    is GalEphemeris -> galileoEphemerisJsonArray.put(ephJson)
+                    is GpsEphemeris -> gpsEphemerisJsonArray.put(ephJson)
+                    is GloEphemeris -> glonassEphemerisJsonArray.put(ephJson)
+                }
+            }
+            ephemerisJson.put(GALILEO_KEY, galileoEphemerisJsonArray)
+            ephemerisJson.put(GPS_KEY, gpsEphemerisJsonArray)
+            ephemerisJson.put(GLONASS_KEY, glonassEphemerisJsonArray)
+
+            val ionoProtoJson = JSONObject(gson.toJson(it.ionoProto))
+            ephemerisJson.put(IONO_PROTO_KEY, ionoProtoJson)
+        }
+        return ephemerisJson
     }
 
 }
