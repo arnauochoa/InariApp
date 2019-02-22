@@ -20,16 +20,16 @@ import org.json.JSONObject
 class PositionPresenter(private val mView: PositionView?) {
 
     companion object {
-        const val PARAMETERS_KEY = "parameters"
-        const val LOCATION_KEY = "location"
-        const val STATUS_KEY = "status"
-        const val MEASUREMENTS_KEY = "measurements"
-        const val CLOCK_KEY = "clock"
-        const val NAVIGATION_MESSAGES_KEY = "navMessages"
-        const val EPHEMERIS_DATA_KEY = "ephemerisData"
-        const val GALILEO_KEY = "galileo"
-        const val GPS_KEY = "gps"
-        const val GLONASS_KEY = "glonass"
+        const val PARAMETERS_KEY = "Params"
+        const val LOCATION_KEY = "Location"
+        const val STATUS_KEY = "Status"
+        const val MEASUREMENTS_KEY = "Meas"
+        const val CLOCK_KEY = "Clock"
+        const val NAVIGATION_MESSAGES_KEY = "navMsgs"
+        const val EPHEMERIS_DATA_KEY = "ephData"
+        const val GALILEO_KEY = "Galileo"
+        const val GPS_KEY = "GPS"
+        const val GLONASS_KEY = "GLONASS"
         const val IONO_PROTO_KEY = "ionoProto"
     }
 
@@ -130,7 +130,7 @@ class PositionPresenter(private val mView: PositionView?) {
     private fun parametersAsJson(): JSONObject {
         var parametersJson = JSONObject()
         parameters?.let {
-            parametersJson = JSONObject(gson.toJson(it))
+            parametersJson = it.toJSONObject()
         }
         return parametersJson
     }

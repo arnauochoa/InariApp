@@ -141,10 +141,10 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
 
     private fun getSelectedParameters(): PositionParameters? {
-        val constellations = arrayListOf<Int>()
-        val bands = arrayListOf<Int>()
-        val corrections = arrayListOf<Int>()
-        var algorithm = 0
+        val constellations = arrayListOf<String>()
+        val bands = arrayListOf<String>()
+        val corrections = arrayListOf<String>()
+        var algorithm: String? = null
 
         if (constParam1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
         if (constParam2.isChecked) constellations.add(PositionParameters.CONST_GAL)
