@@ -52,7 +52,7 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
             <CheckBox
-                    android:id="@+id/constOption1"
+                    android:id="@+id/constParam1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginFirstColumn"
@@ -62,10 +62,11 @@
                     android:text="GPS"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:checked="true"/>
 
             <CheckBox
-                    android:id="@+id/constOption2"
+                    android:id="@+id/constParam2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginSecondColumn"
@@ -98,7 +99,7 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
             <CheckBox
-                    android:id="@+id/bandsOption1"
+                    android:id="@+id/bandsParam1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginFirstColumn"
@@ -108,10 +109,11 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/bandsTextView"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:checked="true"/>
 
             <CheckBox
-                    android:id="@+id/bandsOption2"
+                    android:id="@+id/bandsParam2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginSecondColumn"
@@ -141,26 +143,28 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
             <CheckBox
-                    android:id="@+id/correctionsOption1"
+                    android:id="@+id/correctionsParam1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginFirstColumn"
                     android:text="Ionosphere"
                     app:layout_constraintBottom_toBottomOf="@+id/correctionsTextView"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/correctionsTextView"/>
+                    app:layout_constraintTop_toTopOf="@+id/correctionsTextView"
+                    android:checked="true"/>
 
             <CheckBox
-                    android:id="@+id/correctionsOption2"
+                    android:id="@+id/correctionsParam2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginSecondColumn"
                     android:text="Troposphere"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/correctionsOption1"/>
+                    app:layout_constraintTop_toTopOf="@+id/correctionsParam1"
+                    android:checked="true"/>
 
             <CheckBox
-                    android:id="@+id/correctionsOption3"
+                    android:id="@+id/correctionsParam3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginFirstColumn"
@@ -168,17 +172,17 @@
                     android:text="Multipath"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/correctionsOption1"/>
+                    app:layout_constraintTop_toBottomOf="@id/correctionsParam1"/>
 
             <CheckBox
-                    android:id="@+id/correctionsOption4"
+                    android:id="@+id/correctionsParam4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/marginSecondColumn"
                     android:text="Camera"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/correctionsOption2"/>
+                    app:layout_constraintTop_toBottomOf="@id/correctionsParam2"/>
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
@@ -215,18 +219,20 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                 <RadioButton
+                        android:id="@+id/algorithmParam1"
+                        android:checked="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="LS"/>
-
                 <RadioButton
+                        android:id="@+id/algorithmParam2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:text="WLS"/>
-
                 <RadioButton
+                        android:id="@+id/algorithmParam3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"

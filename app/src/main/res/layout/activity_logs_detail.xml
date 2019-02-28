@@ -8,17 +8,19 @@
         tools:context=".ui.logs.LogsDetailActivity"
         android:background="@color/colorLightGrayBackground">
 
-    <TextView
-            android:id="@+id/file"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_margin="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@android:color/white"
-            android:padding="@dimen/default_gap"/>
-
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+        <TextView
+                android:id="@+id/file"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_margin="16dp"
+                android:background="@android:color/white"
+                android:padding="@dimen/default_gap"/>
+    </ScrollView>
 </android.support.constraint.ConstraintLayout>

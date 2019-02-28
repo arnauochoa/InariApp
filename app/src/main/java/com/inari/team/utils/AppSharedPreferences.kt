@@ -15,6 +15,8 @@ class AppSharedPreferences {
 
         const val MY_PREFS: String = "MY_PREFS"
         const val MODES: String = "modes"
+        const val PVT_INFO: String = "PVT_INFO"
+
 
         private var INSTANCE: AppSharedPreferences? = null
 
@@ -97,5 +99,22 @@ class AppSharedPreferences {
 
         return modesList
     }
+
+    fun saveData(type: String, data: String) {
+        mPrefs.edit()
+            .putString(type, data)
+            .apply()
+    }
+
+    fun deleteData(type: String) {
+        mPrefs.edit()
+            .remove(type)
+            .apply()
+    }
+
+    fun getData(type: String): String?{
+        return mPrefs.getString(type, "")
+    }
+
 
 }

@@ -1,0 +1,17 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.google.guava:guava:19+'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
+    //api 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-4'
+    api 'com.google.protobuf:protobuf-java:3.4.0'
+    implementation 'com.google.auto.value:auto-value:1.5.3'
+    implementation 'javax.annotation:jsr250-api:1.0'
+    compile group: 'joda-time', name: 'joda-time', version: '2.3'
+
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"

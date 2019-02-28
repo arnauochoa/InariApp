@@ -44,6 +44,10 @@ How to use git version control:
 	--> git add . (añade trabajo para realizar un commit)
 	--> git commit -m "mensaje de commit" (realiza un commit en la branch, puedes hacer tantos como quieras)
 	--> git push origin feature/nombreRama (si se quiere subir una rama al servidor porque el trabajo está a medias).
+	--> git status (da información de la rama actual y los archivos cambiados)
+	--> git branch -l (lista de las ramas actuales)
+	--> git branch -d feature/nombreRama (elimina rama en local)
+	--> git push origin --delete feature/nombreRama (elimina rama en remoto)
 	--> es aconsejable no tocar los mismos archivos los dos a la vez cuando se sale del mismo punto de develop porque cuando el segundo vaya a meter su trabajo puede dar conflicto el merge.
 
 
