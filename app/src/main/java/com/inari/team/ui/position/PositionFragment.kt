@@ -16,7 +16,6 @@ import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat.startActivity
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -43,6 +42,8 @@ import kotlinx.android.synthetic.main.fragment_position.*
 import kotlinx.android.synthetic.main.view_bottom_sheet.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.math.roundToLong
 
 
@@ -101,6 +102,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
                     toast("At least one constellation and one band must be selected")
                 } else {
                     clBottomSheet.visibility = View.GONE
+                    mMap?.clear()
                     showMapLoading()
                     obtainEphemerisData()
                     mPresenter?.setGnssData(selectedParameters)
@@ -319,7 +321,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     override fun onPositionCalculated(position: LatLng) {
         //toast("Position computed!")
         hideMapLoading()
-        mMap?.clear()
         addMarker(position, "")
         moveCamera(position)
         //position obtained

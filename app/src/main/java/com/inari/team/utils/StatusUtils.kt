@@ -15,9 +15,12 @@ fun obtainCNos(gnssStatus: GnssStatus?, constellation: Int? = null): ArrayList<F
     val cnos = arrayListOf<Float>()
     gnssStatus?.let { status ->
         if (constellation == null) { // All constellations
-            for (sat in 0 until status.satelliteCount) {
-                cnos.add(status.getCn0DbHz(sat))
-            }
+            for (sat in 0 until status.satelliteCount)
+                if (status.getConstellationType(sat) == GnssStatus.CONSTELLATION_GPS ||
+                    status.getConstellationType(sat) == GnssStatus.CONSTELLATION_GALILEO) {
+
+                    cnos.add(status.getCn0DbHz(sat))
+                }
         } else { // Specified constellation
             for (sat in 0 until status.satelliteCount) if (status.getConstellationType(sat) == constellation) {
                 cnos.add(status.getCn0DbHz(sat))
@@ -32,7 +35,7 @@ fun obtainCNos(gnssStatus: GnssStatus?, constellation: Int? = null): ArrayList<F
  */
 fun getCNoString(cnos: ArrayList<Float>?): String {
     var avgCNoString = "--"
-    if (!cnos.isNullOrEmpty()){
+    if (!cnos.isNullOrEmpty()) {
         val avgCNo = takeTwoDecimals(cnos.average())
         avgCNoString = "$avgCNo dB-Hz"
     }

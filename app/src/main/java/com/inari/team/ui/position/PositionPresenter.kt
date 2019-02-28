@@ -7,6 +7,7 @@ import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.location.suplclient.asn1.supl2.rrlp_components.LAC
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.ephemeris.GalEphemeris
 import com.google.location.suplclient.ephemeris.GloEphemeris
@@ -98,8 +99,11 @@ class PositionPresenter(private val mView: PositionView?) {
             mSharedPreferences.deleteData(AppSharedPreferences.PVT_INFO)
             mSharedPreferences.saveData(AppSharedPreferences.PVT_INFO, mainJson)
 
-            //once the result is obtained
-            mView?.onPositionCalculated(position)
+            if (position != null) {
+                mView?.onPositionCalculated(position)
+            } else {
+                mView?.onPositionNotCalculated()
+            }
         } else {
             mView?.onPositionNotCalculated()
         }
@@ -120,11 +124,16 @@ class PositionPresenter(private val mView: PositionView?) {
         return mainJson.toString(2)
     }
 
-    private fun computePosition(mainJson: String): LatLng {
+    private fun computePosition(mainJson: String): LatLng? {
+        var position: LatLng? = null
         //TODO: call MATLAB function and transform result to LatLng
-        // latLong = matlabFunction(mainJson)
-        // return LatLng(lat, long)
-        return LatLng(0.0, 0.0)
+        // val latLong = matlabFunction(mainJson)
+        // position = LatLng(latLong[0], latLong[1])
+        location?.let {
+            position = LatLng(it.latitude, it.longitude)
+        }
+        return position
+
     }
 
     private fun parametersAsJson(): JSONObject {
