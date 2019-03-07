@@ -23,6 +23,7 @@ import com.google.location.suplclient.asn1.supl2.lpp.NAV_ClockModel;
 import com.google.location.suplclient.asn1.supl2.lpp.NavModelKeplerianSet;
 import com.google.location.suplclient.asn1.supl2.lpp.NavModelNAV_KeplerianSet;
 import com.google.location.suplclient.asn1.supl2.lpp.NavModel_GLONASS_ECEF;
+import com.google.location.suplclient.asn1.supl2.lpp.NeQuickModelParameterV12;
 import com.google.location.suplclient.asn1.supl2.lpp.StandardClockModelElementV12;
 import com.google.location.suplclient.asn1.supl2.lpp_ver12.A_GNSS_ProvideAssistanceData;
 import com.google.location.suplclient.asn1.supl2.lpp_ver12.GNSS_NavModelSatelliteElement;
@@ -80,6 +81,34 @@ class SuplLppClientHelper {
     }
     return ionoBuilder.build();
   }
+
+  /**
+   * Builds an instance of {@link IonosphericModelProto} containing Klobuchar model parameters
+   * extracted from {@link NeQuickModelParameterV12}.
+   */
+  static IonosphericModelProto buildIonoModelProto(NeQuickModelParameterV12 iono) {
+    IonosphericModelProto.Builder ionoBuilder = IonosphericModelProto.newBuilder();
+    double[] alpha = new double[4];
+    alpha[0] = iono.getAi0().getLong() * ScaleFactors.NEQUICK_ALFA_0_SCALE_FACTOR;
+    alpha[1] = iono.getAi1().getLong() * ScaleFactors.NEQUICK_ALFA_1_SCALE_FACTOR;
+    alpha[2] = iono.getAi2().getLong() * ScaleFactors.NEQUICK_ALFA_2_SCALE_FACTOR;
+    alpha[3] = 0.0;
+    for (int i = 0; i < alpha.length; ++i) {
+      ionoBuilder.addAlpha(alpha[i]);
+    }
+
+    double[] beta = new double[4];
+    beta[0] = 0.0;
+    beta[1] = 0.0;
+    beta[2] = 0.0;
+    beta[3] = 0.0;
+    for (int i = 0; i < beta.length; ++i) {
+      ionoBuilder.addBeta(beta[i]);
+    }
+    return ionoBuilder.build();
+  }
+
+
 
   /**
    * Obtains the reference of {@link A_GNSS_ProvideAssistanceData} from {@link SUPLPOS}.

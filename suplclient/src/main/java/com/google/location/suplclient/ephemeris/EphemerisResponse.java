@@ -23,12 +23,17 @@ public class EphemerisResponse {
   /* A list of ephemeris for GNSS satellites */
   public final List<GnssEphemeris> ephList;
 
-  /* The parameters of the ionospheric model */
+  /* The parameters of a first ionospheric model */
   public final IonosphericModelProto ionoProto;
 
+  /* The parameters of a second ionospheric model */
+  public final IonosphericModelProto ionoProto2;
+
   /* Constructor */
-  public EphemerisResponse(List<GnssEphemeris> ephList, IonosphericModelProto ionoProto) {
+  public EphemerisResponse(List<GnssEphemeris> ephList, IonosphericModelProto ionoProto,
+                           IonosphericModelProto ionoProto2) {
     this.ephList = ephList;
     this.ionoProto = ionoProto;
+    this.ionoProto2 = ionoProto2;
   }
 }
