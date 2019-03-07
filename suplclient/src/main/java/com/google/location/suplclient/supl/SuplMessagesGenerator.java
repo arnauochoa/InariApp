@@ -40,6 +40,7 @@ import com.google.location.suplclient.asn1.supl2.ulp_components.Version;
 import com.google.location.suplclient.asn1.supl2.ulp_components.WcdmaCellInformation;
 import com.google.location.suplclient.asn1.supl2.ulp_version_2_parameter_extensions.GanssNavigationModelData;
 import com.google.location.suplclient.asn1.supl2.ulp_version_2_parameter_extensions.GanssReqGenericData;
+import com.google.location.suplclient.asn1.supl2.ulp_version_2_parameter_extensions.GanssRequestedCommonAssistanceDataList;
 import com.google.location.suplclient.asn1.supl2.ulp_version_2_parameter_extensions.GanssRequestedGenericAssistanceDataList;
 import com.google.location.suplclient.asn1.supl2.ulp_version_2_parameter_extensions.PosProtocolVersion3GPP;
 import com.google.location.suplclient.asn1.supl2.ulp_version_2_parameter_extensions.Ver2_PosProtocol_extension;
@@ -244,6 +245,7 @@ abstract class SuplMessagesGenerator {
     Position pos = suplPosInit.setPositionToNewInstance();
     timestampType utcTime = pos.setTimestampToNewInstance();
     Calendar currentTime = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+
     utcTime.setYear(currentTime.get(Calendar.YEAR));
     utcTime.setMonth(currentTime.get(Calendar.MONTH) + 1); // Calendar's MONTH starts from 0.
     utcTime.setDay(currentTime.get(Calendar.DAY_OF_MONTH));
@@ -337,6 +339,15 @@ abstract class SuplMessagesGenerator {
     navModel.setGanssWeekToNewInstance().setInteger(BigInteger.ZERO);
     navModel.setT_toeLimitToNewInstance().setInteger(BigInteger.ZERO);
     ganssRequestList.add(galileoRequest);
+
+    // Request GANSS Common assistance - PC
+    GanssRequestedCommonAssistanceDataList ganssCommonRequestList =
+            assistExtension.setGanssRequestedCommonAssistanceDataListToNewInstance();
+    ganssCommonRequestList.setGanssReferenceTimeToNewInstance().setValue(true);
+    ganssCommonRequestList.setGanssIonosphericModelToNewInstance().setValue(true);
+    ganssCommonRequestList.setGanssAdditionalIonosphericModelForDataID00ToNewInstance().setValue(false);
+    ganssCommonRequestList.setGanssAdditionalIonosphericModelForDataID11ToNewInstance().setValue(false);
+    ganssCommonRequestList.setGanssEarthOrientationParametersToNewInstance().setValue(false);
 
     return message;
   }

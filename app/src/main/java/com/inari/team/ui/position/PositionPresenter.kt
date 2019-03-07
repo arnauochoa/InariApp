@@ -7,7 +7,6 @@ import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.location.suplclient.asn1.supl2.rrlp_components.LAC
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.ephemeris.GalEphemeris
 import com.google.location.suplclient.ephemeris.GloEphemeris
@@ -31,7 +30,8 @@ class PositionPresenter(private val mView: PositionView?) {
         const val GALILEO_KEY = "Galileo"
         const val GPS_KEY = "GPS"
         const val GLONASS_KEY = "GLONASS"
-        const val IONO_PROTO_KEY = "ionoProto"
+        const val KLOBUCHAR_KEY = "Klobuchar"
+        const val NEQUICK_KEY = "NeQuick"
     }
 
     private val mSharedPreferences = AppSharedPreferences.getInstance()
@@ -113,12 +113,13 @@ class PositionPresenter(private val mView: PositionView?) {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun obtainJson(): String {
         val mainJson = JSONObject()
+        //TODO: remove unused jsons
         mainJson.put(PARAMETERS_KEY, parametersAsJson())
         mainJson.put(LOCATION_KEY, locationAsJson())
         mainJson.put(STATUS_KEY, gnssStatusAsJson())
         mainJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson())
         mainJson.put(CLOCK_KEY, gnssClockAsJson())
-        mainJson.put(NAVIGATION_MESSAGES_KEY, gnssNavigationMessagesAsJson())
+        // mainJson.put(NAVIGATION_MESSAGES_KEY, gnssNavigationMessagesAsJson())
         mainJson.put(EPHEMERIS_DATA_KEY, ephemerisResponseAsJson())
 
         return mainJson.toString(2)
@@ -295,8 +296,10 @@ class PositionPresenter(private val mView: PositionView?) {
             ephemerisJson.put(GPS_KEY, gpsEphemerisJsonArray)
             ephemerisJson.put(GLONASS_KEY, glonassEphemerisJsonArray)
 
-            val ionoProtoJson = JSONObject(gson.toJson(it.ionoProto))
-            ephemerisJson.put(IONO_PROTO_KEY, ionoProtoJson)
+            val klobucharJson = JSONObject(gson.toJson(it.ionoProto))
+            val neQuickJson = JSONObject(gson.toJson(it.ionoProto2))
+            ephemerisJson.put(KLOBUCHAR_KEY, klobucharJson)
+            ephemerisJson.put(NEQUICK_KEY, neQuickJson)
         }
         return ephemerisJson
     }
