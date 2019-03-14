@@ -31,11 +31,12 @@ data class PositionParameters(
         const val ALG_WLS = "WLS"
         const val ALG_KALMAN = "KAL"
 
-
-
+        const val AVERAGING_TIME_SEC_1 = 5L
+        const val AVERAGING_TIME_SEC_2 = 10L
+        const val AVERAGING_TIME_SEC_3 = 20L
     }
 
-    public fun toJSONObject(): JSONObject {
+    fun toJSONObject(): JSONObject {
         val parametersJson = JSONObject()
         parametersJson.put(CONSTELLATIONS_KEY, getConstellationsJson())
         parametersJson.put(BANDS_KEY, getBandsJson())
@@ -44,84 +45,84 @@ data class PositionParameters(
         return parametersJson
     }
 
-    private fun getConstellationsJson (): JSONObject {
+    private fun getConstellationsJson(): JSONObject {
         val constellationsJson = JSONObject()
 
         if (this.constellations.contains(PositionParameters.CONST_GPS)) {
             constellationsJson.put(CONST_GPS, true)
-        }else{
+        } else {
             constellationsJson.put(CONST_GPS, false)
         }
         if (this.constellations.contains(PositionParameters.CONST_GAL)) {
             constellationsJson.put(CONST_GAL, true)
-        }else{
+        } else {
             constellationsJson.put(CONST_GAL, false)
         }
         if (this.constellations.contains(PositionParameters.CONST_GLO)) {
             constellationsJson.put(CONST_GLO, true)
-        }else{
+        } else {
             constellationsJson.put(CONST_GLO, false)
         }
 
         return constellationsJson
     }
 
-    private fun getBandsJson (): JSONObject {
+    private fun getBandsJson(): JSONObject {
         val bandsJson = JSONObject()
 
         if (this.bands.contains(PositionParameters.BAND_L1)) {
             bandsJson.put(BAND_L1, true)
-        }else{
+        } else {
             bandsJson.put(BAND_L1, false)
         }
         if (this.bands.contains(PositionParameters.BAND_L5)) {
             bandsJson.put(BAND_L5, true)
-        }else{
+        } else {
             bandsJson.put(BAND_L5, false)
         }
 
         return bandsJson
     }
 
-    private fun getCorrectionsJson (): JSONObject {
+    private fun getCorrectionsJson(): JSONObject {
         val correctionsJson = JSONObject()
 
         if (this.corrections.contains(PositionParameters.CORR_IONOSPHERE)) {
             correctionsJson.put(CORR_IONOSPHERE, true)
-        }else{
+        } else {
             correctionsJson.put(CORR_IONOSPHERE, false)
         }
         if (this.corrections.contains(PositionParameters.CORR_TROPOSPHERE)) {
             correctionsJson.put(CORR_TROPOSPHERE, true)
-        }else{
+        } else {
             correctionsJson.put(CORR_TROPOSPHERE, false)
         }
         if (this.corrections.contains(PositionParameters.CORR_MULTIPATH)) {
             correctionsJson.put(CORR_MULTIPATH, true)
-        }else{
+        } else {
             correctionsJson.put(CORR_MULTIPATH, false)
         }
         if (this.corrections.contains(PositionParameters.CORR_PPP)) {
             correctionsJson.put(CORR_PPP, true)
-        }else{
+        } else {
             correctionsJson.put(CORR_PPP, false)
         }
         if (this.corrections.contains(PositionParameters.CORR_CAMERA)) {
             correctionsJson.put(CORR_CAMERA, true)
-        }else{
+        } else {
             correctionsJson.put(CORR_CAMERA, false)
         }
 
         return correctionsJson
     }
 
-    private fun getAlgorithmJson (): JSONObject {
+    private fun getAlgorithmJson(): JSONObject {
         val algorithmJson = JSONObject()
         algorithmJson.put(ALG_LS, false)
         algorithmJson.put(ALG_WLS, false)
         algorithmJson.put(ALG_KALMAN, false)
 
-        when (this.algorithm){
+        when (this.algorithm) {
             ALG_LS -> algorithmJson.put(ALG_LS, true)
             ALG_WLS -> algorithmJson.put(ALG_WLS, true)
             ALG_KALMAN -> algorithmJson.put(ALG_KALMAN, true)

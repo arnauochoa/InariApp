@@ -1,26 +1,21 @@
 package com.inari.team.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.*
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
+import android.widget.Toast
 import com.inari.team.R
-import com.inari.team.data.NavigationMessage
 import com.inari.team.ui.position.PositionFragment
 import com.inari.team.ui.statistics.StatisticsFragment
-import com.inari.team.ui.status.all_status.AllStatusFragment
-import com.inari.team.ui.status.gps_status.GPSStatusFragment
-import com.inari.team.ui.status.galileo_status.GalileoStatusFragment
 import com.inari.team.ui.status.StatusFragment
-import com.inari.team.utils.BarAdapter
+import com.inari.team.utils.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.PositionListener,
-    StatusFragment.StatusListener {
+class MainActivity : AppCompatActivity(), LocationListener {
 
     companion object {
         private const val MIN_TIME = 1L
@@ -32,125 +27,37 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
 
     private var gnssStatusListener: GnssStatus.Callback? = null
     private var gnssMeasurementsEventListener: GnssMeasurementsEvent.Callback? = null
-    private var gnssNavigationMessageListener: GnssNavigationMessage.Callback? = null
 
-    private var positionFragment: PositionFragment? = null
-    private var gpsStatusFragment: GPSStatusFragment? = null
-    private var galileoStatusFragment: GalileoStatusFragment? = null
-    private var allStatusFragment: AllStatusFragment? = null
-
-    private var navigationMessages = hashMapOf<Int, NavigationMessage>()
-
+    private var positionFragment = PositionFragment()
+    private var statusFragment = StatusFragment()
+    private var statisticsFragment = StatisticsFragment()
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setViewPager()
+        setBottomNavigation()
+
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationProvider = locationManager?.getProvider(LocationManager.GPS_PROVIDER)
 
         startGnss()
-
-        setViewPager()
-        setBottomNavigation()
-        setGnssCallbacks()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        locationManager?.removeUpdates(this)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun startGnss() {
-        locationManager?.requestLocationUpdates(locationProvider?.name, MIN_TIME, MIN_DISTANCE, this)
-    }
-
-    //setters
-    @RequiresApi(Build.VERSION_CODES.N)
-    @SuppressLint("MissingPermission")
-    private fun setGnssCallbacks() {
-        gnssStatusListener = object : GnssStatus.Callback() {
-            override fun onStarted() {
-                Log.d("Gnss Callbacks", "GnssStatus.Callback onStarted()")
-            }
-
-            override fun onStopped() {
-                Log.d("Gnss Callbacks", "GnssStatus.Callback onStopped()")
-            }
-
-            override fun onFirstFix(ttffMillis: Int) {
-                Log.d("Gnss Callbacks", "GnssStatus.Callback onFirstFix()")
-            }
-
-            override fun onSatelliteStatusChanged(status: GnssStatus) {
-                //once gnss status received, notice position fragment
-                positionFragment?.onGnnsDataReceived(gnssStatus = status)
-                gpsStatusFragment?.onGnssStatusReceived(status)
-                galileoStatusFragment?.onGnssStatusReceived(status)
-                allStatusFragment?.onGnssStatusReceived(status)
-
-            }
-        }
-        locationManager?.registerGnssStatusCallback(gnssStatusListener)
-
-        gnssMeasurementsEventListener = object : GnssMeasurementsEvent.Callback() {
-            override fun onGnssMeasurementsReceived(measurementsEvent: GnssMeasurementsEvent?) {
-                positionFragment?.onGnnsDataReceived(gnssMeasurementsEvent = measurementsEvent)
-            }
-        }
-        locationManager?.registerGnssMeasurementsCallback(gnssMeasurementsEventListener)
-
-        gnssNavigationMessageListener = object : GnssNavigationMessage.Callback() {
-            override fun onGnssNavigationMessageReceived(navigationMessage: GnssNavigationMessage?) {
-                navigationMessage?.let {
-                    addNavigationMessage(navigationMessage)
-                    positionFragment?.onGnnsDataReceived(gnssNavigationMessages = navigationMessages)
-                }
-            }
-        }
-        locationManager?.registerGnssNavigationMessageCallback(gnssNavigationMessageListener)
-
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun addNavigationMessage(navigationMessage: GnssNavigationMessage?) {
-
-        navigationMessage?.let {
-            val svid = navigationMessage.svid
-            if (navigationMessages.containsKey(svid)) { //Remove old message from given satellite
-                navigationMessages.remove(svid)
-            }
-            navigationMessages.put(
-                svid,
-                NavigationMessage(
-                    navigationMessage.svid,
-                    navigationMessage.type,
-                    navigationMessage.status,
-                    navigationMessage.messageId,
-                    navigationMessage.submessageId,
-                    navigationMessage.data
-                )
-            )
-        }
 
     }
 
     private fun setViewPager() {
         val pagerAdapter = BarAdapter(supportFragmentManager)
 
-        positionFragment = PositionFragment()
-
         pagerAdapter.addFragments(positionFragment, "Position")
-        pagerAdapter.addFragments(StatusFragment(), "GNSS state")
-        pagerAdapter.addFragments(StatisticsFragment(), "Statistics")
+        pagerAdapter.addFragments(statusFragment, "GNSS state")
+        pagerAdapter.addFragments(statisticsFragment, "Statistics")
 
         viewPager.setPagingEnabled(false)
         viewPager.offscreenPageLimit = 2
         viewPager.adapter = pagerAdapter
         viewPager.currentItem = 0
-
     }
 
     private fun setBottomNavigation() {
@@ -170,32 +77,47 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
         }
     }
 
+    private fun startGnss() {
+        if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+            gnssStatusListener = object : GnssStatus.Callback() {
+                override fun onSatelliteStatusChanged(status: GnssStatus) {
+                    //once gnss status received, notice position fragments
+                    positionFragment.onGnnsDataReceived(gnssStatus = status)
+                    statusFragment.onGnssStatusReceived(gnssStatus = status)
+                }
+            }
+
+            gnssMeasurementsEventListener = object : GnssMeasurementsEvent.Callback() {
+                override fun onGnssMeasurementsReceived(measurementsEvent: GnssMeasurementsEvent?) {
+                    positionFragment.onGnnsDataReceived(gnssMeasurementsEvent = measurementsEvent)
+                }
+            }
+
+            locationManager?.requestLocationUpdates(locationProvider?.name, MIN_TIME, MIN_DISTANCE, this)
+            locationManager?.registerGnssStatusCallback(gnssStatusListener)
+            locationManager?.registerGnssMeasurementsCallback(gnssMeasurementsEventListener)
+        } else {
+            requestPermissionss(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ), SplashActivity.PERMISSIONS_CODE
+
+            )
+        }
+
+    }
+
     //helpers
     private fun switchFragment(id: Int) {
         viewPager.setCurrentItem(id, false)
     }
 
-    //fragments callbacks
-    override fun requestGnss() {
-        //code to request gnss
-    }
-
-    override fun onGpsStatusFragmentSet(gpsStatusFragment: GPSStatusFragment) {
-        this.gpsStatusFragment = gpsStatusFragment
-    }
-
-    override fun onGalileoStatusFragmentSet(galileoStatusFragment: GalileoStatusFragment) {
-        this.galileoStatusFragment = galileoStatusFragment
-    }
-
-    override fun onAllStatusFragmentSet(allStatusFragment: AllStatusFragment) {
-        this.allStatusFragment = allStatusFragment
-    }
-
     //callbacks
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onLocationChanged(location: Location?) {
-        positionFragment?.onGnnsDataReceived(location = location)
+        positionFragment.onGnnsDataReceived(location = location)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -205,5 +127,24 @@ class MainActivity : AppCompatActivity(), LocationListener, PositionFragment.Pos
     }
 
     override fun onProviderDisabled(provider: String?) {
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (checkPermissionsList(arrayOf(PERMISSION_ACCESS_FINE_LOCATION))) {
+                startGnss()
+            } else {
+                toast("Location permissions are compulsory, please go to settings to enable.", Toast.LENGTH_LONG)
+                finish()
+            }
+        } else {
+            finish()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        locationManager?.removeUpdates(this)
     }
 }
