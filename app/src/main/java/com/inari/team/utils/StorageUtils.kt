@@ -54,6 +54,12 @@ fun saveFile(
     }
 }
 
+fun createDirectory (directoryName: String){
+    val dir =
+        File(root.absolutePath + APP_ROOT + directoryName)
+    dir.mkdirs()
+}
+
 fun getFilesList(): Array<File> {
     val path = Environment.getExternalStorageDirectory().toString() + APP_ROOT
     val directory = File(path)

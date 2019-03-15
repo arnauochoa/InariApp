@@ -4,5 +4,6 @@ import com.google.android.gms.maps.model.LatLng
 
 interface PositionView {
     fun onPositionCalculated(position: LatLng)
-    fun onPositionNotCalculated()
+    fun showError(error: String)
+    fun showMessage(message: String)
 }

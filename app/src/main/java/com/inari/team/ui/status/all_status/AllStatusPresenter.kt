@@ -19,7 +19,6 @@ class AllStatusPresenter(private val mView: AllStatusView?) {
     @RequiresApi(Build.VERSION_CODES.N)
     fun obtainStatusParameters() {
         allCNos = obtainCNos(gnssStatus)
-        mView?.onSatellitesCountObtained(getSatellitesCount(allCNos))
-        mView?.onAvgCNoObtained(getCNoString(allCNos))
+        mView?.onStatusDataReceived(getCNoString(allCNos), getSatellitesCount(allCNos))
     }
 }

@@ -22,24 +22,19 @@ class AllStatusFragment : Fragment(), AllStatusView {
         return inflater.inflate(R.layout.fragment_all_status, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mPresenter = AllStatusPresenter(this)
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     fun onGnssStatusReceived(gnssStatus: GnssStatus) {
         mPresenter?.newGnssStatus(gnssStatus)
         mPresenter?.obtainStatusParameters()
     }
 
-    override fun onAvgCNoObtained(avgCNo: String) {
+    override fun onStatusDataReceived(avgCNo: String, satellitesCount: String) {
         cn0ContentALL.text = avgCNo
-    }
-
-    override fun onSatellitesCountObtained(satellitesCount: String) {
         numSatsContentALL.text = satellitesCount
     }
 

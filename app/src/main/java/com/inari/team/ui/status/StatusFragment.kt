@@ -2,12 +2,16 @@ package com.inari.team.ui.status
 
 
 import android.content.Context
+import android.location.GnssStatus
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.gms.common.api.PendingResult
 import com.inari.team.R
 import com.inari.team.ui.status.all_status.AllStatusFragment
 import com.inari.team.ui.status.galileo_status.GalileoStatusFragment
@@ -17,15 +21,11 @@ import kotlinx.android.synthetic.main.fragment_status.*
 
 class StatusFragment : Fragment() {
 
-    companion object {
-        const val FRAG_TAG = "status_fragment"
-    }
+    private var gpsStatusFragment = GPSStatusFragment()
+    private var galileoStatusFragment = GalileoStatusFragment()
+    private var allStatusFragment = AllStatusFragment()
 
-    private var gpsStatusFragment: GPSStatusFragment? = null
-    private var galileoStatusFragment: GalileoStatusFragment? = null
-    private var allStatusFragment: AllStatusFragment? = null
-
-    private var mListener: StatusListener? = null
+    private var mListener: PendingResult.StatusListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +43,7 @@ class StatusFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        mListener = context as? StatusListener
+        mListener = context as? PendingResult.StatusListener
     }
 
     private fun setViewPager() {
@@ -54,14 +54,11 @@ class StatusFragment : Fragment() {
         tabLayout.addTab(tabLayout.newTab().setText("All"))
         tabLayout.tabGravity = TabLayout.GRAVITY_FILL
 
-        prepareFragments()
-
         pagerAdapter.addFragments(gpsStatusFragment, "GPS")
         pagerAdapter.addFragments(galileoStatusFragment, "Galileo")
         pagerAdapter.addFragments(allStatusFragment, "All")
 
-        //viewPager.setPagingEnabled(false)
-        viewPager.offscreenPageLimit = 2
+        viewPager.offscreenPageLimit = 3
         viewPager.adapter = pagerAdapter
         viewPager.currentItem = 0
 
@@ -81,26 +78,11 @@ class StatusFragment : Fragment() {
 
     }
 
-    private fun prepareFragments(){
-        gpsStatusFragment = GPSStatusFragment()
-        galileoStatusFragment = GalileoStatusFragment()
-        allStatusFragment = AllStatusFragment()
-
-        gpsStatusFragment?.let {
-            mListener?.onGpsStatusFragmentSet(it)
-        }
-        galileoStatusFragment?.let {
-            mListener?.onGalileoStatusFragmentSet(it)
-        }
-        allStatusFragment?.let {
-            mListener?.onAllStatusFragmentSet(it)
-        }
+    fun onGnssStatusReceived(gnssStatus: GnssStatus) {
+        gpsStatusFragment.onGnssStatusReceived(gnssStatus)
+        galileoStatusFragment.onGnssStatusReceived(gnssStatus)
+        allStatusFragment.onGnssStatusReceived(gnssStatus)
     }
 
-    interface StatusListener{
-        fun onGpsStatusFragmentSet(gpsStatusFragment: GPSStatusFragment)
-        fun onGalileoStatusFragmentSet(galileoStatusFragment: GalileoStatusFragment)
-        fun onAllStatusFragmentSet(allStatusFragment: AllStatusFragment)
-    }
 
 }

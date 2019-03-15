@@ -20,7 +20,7 @@ class SplashActivity : AppCompatActivity() {
 
     companion object {
         private const val TIME_OUT = 2000L
-        private const val PERMISSIONS_CODE = 99
+        const val PERMISSIONS_CODE = 99
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

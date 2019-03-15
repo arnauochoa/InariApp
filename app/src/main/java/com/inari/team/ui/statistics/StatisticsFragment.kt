@@ -30,7 +30,6 @@ class StatisticsFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         cardRMS.setOnClickListener(this)
-
         cardCNO.setOnClickListener(this)
         cardMap.setOnClickListener(this)
         cardGraph4.setOnClickListener(this)
