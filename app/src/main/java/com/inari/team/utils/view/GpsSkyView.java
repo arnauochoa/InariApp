@@ -13,11 +13,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import com.inari.team.R;
-import com.inari.team.utils.GnssType;
-import com.inari.team.utils.GpsTestUtil;
-import com.inari.team.utils.MathUtils;
 import com.inari.team.utils.UIUtils;
-import com.inari.team.utils.skyplot.GpsTestListener;
+import com.inari.team.utils.skyplot.*;
 
 import java.util.Iterator;
 
