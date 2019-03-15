@@ -16,7 +16,6 @@ import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.view.*
-import android.widget.Toast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -42,7 +41,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import java.util.*
 import kotlin.math.roundToLong
 
 
@@ -73,133 +71,21 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
     private var isPositioningStarted = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_position, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
+        setViews()
 
         mPresenter = PositionPresenter(this)
 
         buildSuplController()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
-        setHasOptionsMenu(true)
 
-        setViews()
-    }
-
-    private fun setViews() {
-        fabOptions.setOnClickListener {
-            clBottomSheet.visibility = View.VISIBLE
-        }
-
-        fabClose.setOnClickListener {
-            val selectedParameters = getSelectedParameters()
-            if (selectedParameters == null) { // If no constellation or band has been selected
-                toast("At least one constellation and one band must be selected")
-            } else {
-                isPositioningStarted = true
-                mPresenter?.setGnssData(parameters = selectedParameters)
-                startPositioning()
-            }
-
-        }
-    }
-
-    private fun startPositioning() {
-        clBottomSheet.visibility = View.GONE
-        mMap?.clear()
-        showMapLoading()
-
-        GlobalScope.launch {
-            mPresenter?.setStartTime(avgTime)
-            obtainEphemerisData()
-        }
-    }
-
-    private fun buildSuplController() {
-        val request = SuplConnectionRequest.builder()
-            .setServerHost(SUPL_SERVER_HOST)
-            .setServerPort(SUPL_SERVER_PORT)
-            .setSslEnabled(SUPL_SSL_ENABLED)
-            .setMessageLoggingEnabled(SUPL_MESSAGE_LOGGING_ENABLED)
-            .setLoggingEnabled(SUPL_LOGGING_ENABLED)
-            .build()
-        suplController = SuplController(request)
-
-    }
-
-    private fun obtainEphemerisData() {
-        var ephResponse: EphemerisResponse? = null
-        refPos?.let {
-            val latE7 = (it.latitude * 1e7).roundToLong()
-            val lngE7 = (it.longitude * 1e7).roundToLong()
-
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
-            suplController?.sendSuplRequest(latE7, lngE7)
-            ephResponse = suplController?.generateEphResponse(latE7, lngE7)
-            mPresenter?.setGnssData(ephemerisResponse = ephResponse)
-        }
-        if (ephResponse == null) {
-            toast("Ephemeris data could not be obtained")
-        }
-    }
-
-
-    private fun getSelectedParameters(): PositionParameters? {
-        val constellations = arrayListOf<String>()
-        val bands = arrayListOf<String>()
-        val corrections = arrayListOf<String>()
-        var algorithm: String? = null
-
-        if (constParam1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
-        if (constParam2.isChecked) constellations.add(PositionParameters.CONST_GAL)
-        if (bandsParam1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
-        if (bandsParam2.isChecked) bands.add(PositionParameters.BAND_L5)
-        if (correctionsParam1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
-        if (correctionsParam2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
-        if (algorithmParam1.isChecked) algorithm = PositionParameters.ALG_LS  // set selected algorithm
-        if (algorithmParam2.isChecked) algorithm = PositionParameters.ALG_WLS
-        if (algorithmParam3.isChecked) algorithm = PositionParameters.ALG_KALMAN
-        if (averagingParam1.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_1 // set selected averaging time
-        if (averagingParam2.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_2
-        if (averagingParam3.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_3
-
-        return if (constellations.isEmpty() || bands.isEmpty()) {
-            null
-        } else {
-            PositionParameters(constellations, bands, corrections, algorithm)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Handler().postDelayed({
-            initMap()
-        }, 1000)
-    }
-
-    private fun initMap() {
-        childFragmentManager.let {
-            mapFragment = (it.findFragmentByTag(FRAG_TAG) as? SupportMapFragment) ?: SupportMapFragment()
-            mapFragment?.let { map ->
-                it.beginTransaction()
-                    .replace(
-                        R.id.mapFragmentContainer,
-                        map,
-                        FRAG_TAG
-                    )
-                    .commit()
-                it.executePendingTransactions()
-
-                map.getMapAsync(this@PositionFragment)
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -224,35 +110,44 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showSaveDialog() {
-        context?.let {
-            val dialog = AlertDialog.Builder(it).create()
-            val layout = View.inflate(it, R.layout.dialog_save_log, null)
-            dialog.window?.let { wind ->
-                wind.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            }
-            dialog.setView(layout)
-            layout.save.setOnClickListener {
-                val fileName = layout.fileName.text.toString()
-                if (fileName.isNotBlank()) {
-                    var format = ".rnx"
-                    if (layout.radioGroupFormat.checkedRadioButtonId != R.id.rinex) {
-                        format = ".nma"
-                    }
-                    saveLog(fileName + format)
-                    dialog.dismiss()
-                } else toast("File name can not be empty")
-            }
-            dialog.show()
+    private fun setViews() {
+        fabOptions.setOnClickListener {
+            clBottomSheet.visibility = View.VISIBLE
         }
+
+        fabClose.setOnClickListener {
+            val selectedParameters = getSelectedParameters()
+            if (selectedParameters == null) { // If no constellation or band has been selected
+                toast("At least one constellation and one band must be selected")
+            } else {
+                isPositioningStarted = true
+                mPresenter?.setGnssData(parameters = selectedParameters)
+                startPositioning()
+            }
+
+        }
+
+        //todo change when start and stop button implemented
+        Handler().postDelayed({
+            initMap()
+        }, 1000)
     }
 
-    private fun saveLog(fileName: String) {
-        val pvtInfoString = mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
+    private fun initMap() {
+        childFragmentManager.let {
+            mapFragment = (it.findFragmentByTag(FRAG_TAG) as? SupportMapFragment) ?: SupportMapFragment()
+            mapFragment?.let { map ->
+                it.beginTransaction()
+                    .replace(
+                        R.id.mapFragmentContainer,
+                        map,
+                        FRAG_TAG
+                    )
+                    .commit()
+                it.executePendingTransactions()
 
-        pvtInfoString?.let {
-            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
-            showSavedSnackBar()
+                map.getMapAsync(this@PositionFragment)
+            }
         }
     }
 
@@ -282,6 +177,112 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
     }
 
+    private fun getSelectedParameters(): PositionParameters? {
+        val constellations = arrayListOf<String>()
+        val bands = arrayListOf<String>()
+        val corrections = arrayListOf<String>()
+        var algorithm: String? = null
+
+        if (constParam1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
+        if (constParam2.isChecked) constellations.add(PositionParameters.CONST_GAL)
+        if (bandsParam1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
+        if (bandsParam2.isChecked) bands.add(PositionParameters.BAND_L5)
+        if (correctionsParam1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
+        if (correctionsParam2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
+        if (algorithmParam1.isChecked) algorithm = PositionParameters.ALG_LS  // set selected algorithm
+        if (algorithmParam2.isChecked) algorithm = PositionParameters.ALG_WLS
+        if (algorithmParam3.isChecked) algorithm = PositionParameters.ALG_KALMAN
+        if (averagingParam1.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_1 // set selected averaging time
+        if (averagingParam2.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_2
+        if (averagingParam3.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_3
+
+        return if (constellations.isEmpty() || bands.isEmpty()) {
+            null
+        } else {
+            PositionParameters(constellations, bands, corrections, algorithm)
+        }
+    }
+
+    private fun buildSuplController() {
+        val request = SuplConnectionRequest.builder()
+            .setServerHost(SUPL_SERVER_HOST)
+            .setServerPort(SUPL_SERVER_PORT)
+            .setSslEnabled(SUPL_SSL_ENABLED)
+            .setMessageLoggingEnabled(SUPL_MESSAGE_LOGGING_ENABLED)
+            .setLoggingEnabled(SUPL_LOGGING_ENABLED)
+            .build()
+        suplController = SuplController(request)
+
+    }
+
+    private fun startPositioning() {
+        clBottomSheet.visibility = View.GONE
+        mMap?.clear()
+        showMapLoading()
+
+        GlobalScope.launch {
+            mPresenter?.setStartTime(avgTime)
+            obtainEphemerisData()
+        }
+    }
+
+    private fun obtainEphemerisData() {
+        var ephResponse: EphemerisResponse? = null
+        refPos?.let {
+            val latE7 = (it.latitude * 1e7).roundToLong()
+            val lngE7 = (it.longitude * 1e7).roundToLong()
+
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+            suplController?.sendSuplRequest(latE7, lngE7)
+            ephResponse = suplController?.generateEphResponse(latE7, lngE7)
+            mPresenter?.setGnssData(ephemerisResponse = ephResponse)
+        }
+        if (ephResponse == null) {
+            toast("Ephemeris data could not be obtained")
+        }
+    }
+
+    private fun showSaveDialog() {
+        context?.let {
+            val dialog = AlertDialog.Builder(it).create()
+            val layout = View.inflate(it, R.layout.dialog_save_log, null)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.setView(layout)
+            layout.save.setOnClickListener {
+                val fileName = layout.fileName.text.toString()
+                if (fileName.isNotBlank()) {
+                    var format = ".rnx"
+                    if (layout.radioGroupFormat.checkedRadioButtonId != R.id.rinex) {
+                        format = ".nma"
+                    }
+                    saveLog(fileName + format)
+                    dialog.dismiss()
+                } else toast("File name can not be empty")
+            }
+            dialog.show()
+        }
+    }
+
+    private fun saveLog(fileName: String) {
+        val pvtInfoString = mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
+
+        pvtInfoString?.let {
+            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
+            showSavedSnackBar()
+        }
+    }
+
+    private fun showSavedSnackBar() {
+        val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
+        snackbar.setAction("OPEN") {
+            context?.let {
+                startActivity(Intent(it, LogsActivity::class.java))
+            }
+        }
+
+        snackbar.show()
+    }
+
     private fun animateCamera(latLng: LatLng) {
         mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
     }
@@ -297,13 +298,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         return mMap?.addMarker(markerOptions)
     }
 
-    fun showMapLoading() {
-        pbMap?.visibility = View.VISIBLE
-    }
-
-    fun hideMapLoading() {
-        pbMap?.visibility = View.GONE
-    }
 
     fun onGnnsDataReceived(
         location: Location? = null,
@@ -331,32 +325,25 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         //position obtained
     }
 
+    override fun showMapLoading() {
+        pbMap?.visibility = View.VISIBLE
+    }
+
+    override fun hideMapLoading() {
+        pbMap?.visibility = View.GONE
+    }
+
     override fun showError(error: String) {
-        activity?.runOnUiThread {
-            toast(error)
-        }
+        activity?.runOnUiThread { toast(error) }
     }
 
     override fun showMessage(message: String) {
-        activity?.runOnUiThread {
-            toast(message)
-        }
+        activity?.runOnUiThread { toast(message) }
     }
 
     fun onTimeOver() {
         mPresenter?.calculatePositionWithGnss()
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    private fun showSavedSnackBar() {
-        val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
-        snackbar.setAction("OPEN") {
-            context?.let {
-                startActivity(Intent(it, LogsActivity::class.java))
-            }
-        }
-
-        snackbar.show()
     }
 
 }

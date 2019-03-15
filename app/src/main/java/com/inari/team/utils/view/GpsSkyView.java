@@ -2,9 +2,11 @@ package com.inari.team.utils.view;
 
 import android.content.Context;
 import android.graphics.*;
-import android.location.*;
+import android.location.GnssMeasurementsEvent;
+import android.location.GnssStatus;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
@@ -679,10 +681,6 @@ public class GpsSkyView extends View implements GpsTestListener {
     public void gpsStop() {
     }
 
-    @Override
-    public void onGnssFirstFix(int ttffMillis) {
-
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -701,31 +699,6 @@ public class GpsSkyView extends View implements GpsTestListener {
     @Override
     public void onGnssMeasurementsReceived(GnssMeasurementsEvent event) {
 
-    }
-
-    @Override
-    public void onNmeaMessage(String message, long timestamp) {
-    }
-
-    @Deprecated
-    @Override
-    public void onGpsStatusChanged(int event, GpsStatus status) {
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
     }
 
     /**

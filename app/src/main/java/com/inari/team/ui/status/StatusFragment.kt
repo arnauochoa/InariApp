@@ -2,10 +2,7 @@ package com.inari.team.ui.status
 
 
 import android.content.Context
-import android.location.GnssStatus
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -77,12 +74,5 @@ class StatusFragment : Fragment() {
         })
 
     }
-
-    fun onGnssStatusReceived(gnssStatus: GnssStatus) {
-        gpsStatusFragment.onGnssStatusReceived(gnssStatus)
-        galileoStatusFragment.onGnssStatusReceived(gnssStatus)
-        allStatusFragment.onGnssStatusReceived(gnssStatus)
-    }
-
 
 }

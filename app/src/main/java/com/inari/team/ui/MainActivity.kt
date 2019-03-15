@@ -1,25 +1,38 @@
 package com.inari.team.ui
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.*
 import android.location.*
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
+import android.view.Surface
 import android.widget.Toast
 import com.inari.team.R
 import com.inari.team.ui.position.PositionFragment
 import com.inari.team.ui.statistics.StatisticsFragment
 import com.inari.team.ui.status.StatusFragment
 import com.inari.team.utils.*
+import com.inari.team.utils.skyplot.GpsTestListener
+import com.inari.team.utils.skyplot.GpsTestUtil
+import com.inari.team.utils.skyplot.MathUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
-class MainActivity : AppCompatActivity(), LocationListener {
+class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener {
 
     companion object {
         private const val MIN_TIME = 1L
         private const val MIN_DISTANCE = 0.0F
+
+        private var mActivity: MainActivity? = null
+
+        fun getInstance(): MainActivity? {
+            return mActivity
+        }
     }
 
     private var locationManager: LocationManager? = null
@@ -32,16 +45,45 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private var statusFragment = StatusFragment()
     private var statisticsFragment = StatisticsFragment()
 
+
+    // Holds sensor data
+    private val mRotationMatrix = FloatArray(16)
+
+    private val mRemappedMatrix = FloatArray(16)
+
+    private val mValues = FloatArray(3)
+
+    private val mTruncatedRotationVector = FloatArray(4)
+
+    private var mTruncateVector = false
+
+
+    internal var mStarted: Boolean = false
+
+    private var mFaceTrueNorth: Boolean = true
+
+
+    private val mGpsTestListeners = ArrayList<GpsTestListener>()
+
+    private var mGeomagneticField: GeomagneticField? = null
+
+    private var mSensorManager: SensorManager? = null
+
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        mActivity = this
 
         setViewPager()
         setBottomNavigation()
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationProvider = locationManager?.getProvider(LocationManager.GPS_PROVIDER)
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+        addOrientationSensorListener()
 
         startGnss()
 
@@ -84,7 +126,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
                 override fun onSatelliteStatusChanged(status: GnssStatus) {
                     //once gnss status received, notice position fragments
                     positionFragment.onGnnsDataReceived(gnssStatus = status)
-                    statusFragment.onGnssStatusReceived(gnssStatus = status)
+                    mGpsTestListeners.forEach {
+                        it.onSatelliteStatusChanged(status)
+                    }
                 }
             }
 
@@ -109,12 +153,127 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     }
 
+    fun addListener(listener: GpsTestListener) {
+        mGpsTestListeners.add(listener)
+    }
+
+    private fun addOrientationSensorListener() {
+        if (GpsTestUtil.isRotationVectorSensorSupported(this)) {
+            // Use the modern rotation vector sensors
+            val vectorSensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+            mSensorManager?.registerListener(this, vectorSensor, 16000) // ~60hz
+        } else {
+            // Use the legacy orientation sensors
+            val sensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_ORIENTATION)
+            if (sensor != null) {
+                mSensorManager?.registerListener(
+                    this, sensor,
+                    SensorManager.SENSOR_DELAY_GAME
+                )
+            }
+        }
+    }
+
     //helpers
     private fun switchFragment(id: Int) {
         viewPager.setCurrentItem(id, false)
     }
 
     //callbacks
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+    override fun onSensorChanged(event: SensorEvent) {
+
+        var orientation: Double
+        var tilt = java.lang.Double.NaN
+
+        when (event.sensor.type) {
+            Sensor.TYPE_ROTATION_VECTOR -> {
+                // Modern rotation vector sensors
+                if (!mTruncateVector) {
+                    try {
+                        SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values)
+                    } catch (e: IllegalArgumentException) {
+                        // On some Samsung devices, an exception is thrown if this vector > 4 (see #39)
+                        // Truncate the array, since we can deal with only the first four values
+                        mTruncateVector = true
+                        // Do the truncation here the first time the exception occurs
+                        getRotationMatrixFromTruncatedVector(event.values)
+                    }
+
+                } else {
+                    // Truncate the array to avoid the exception on some devices (see #39)
+                    getRotationMatrixFromTruncatedVector(event.values)
+                }
+
+                val rot = windowManager.defaultDisplay.rotation
+                when (rot) {
+                    Surface.ROTATION_0 ->
+                        // No orientation change, use default coordinate system
+                        SensorManager.getOrientation(mRotationMatrix, mValues)
+                    Surface.ROTATION_90 -> {
+                        // Log.d(TAG, "Rotation-90");
+                        SensorManager.remapCoordinateSystem(
+                            mRotationMatrix, SensorManager.AXIS_Y,
+                            SensorManager.AXIS_MINUS_X, mRemappedMatrix
+                        )
+                        SensorManager.getOrientation(mRemappedMatrix, mValues)
+                    }
+                    Surface.ROTATION_180 -> {
+                        // Log.d(TAG, "Rotation-180");
+                        SensorManager
+                            .remapCoordinateSystem(
+                                mRotationMatrix, SensorManager.AXIS_MINUS_X,
+                                SensorManager.AXIS_MINUS_Y, mRemappedMatrix
+                            )
+                        SensorManager.getOrientation(mRemappedMatrix, mValues)
+                    }
+                    Surface.ROTATION_270 -> {
+                        // Log.d(TAG, "Rotation-270");
+                        SensorManager
+                            .remapCoordinateSystem(
+                                mRotationMatrix, SensorManager.AXIS_MINUS_Y,
+                                SensorManager.AXIS_X, mRemappedMatrix
+                            )
+                        SensorManager.getOrientation(mRemappedMatrix, mValues)
+                    }
+                    else ->
+                        // This shouldn't happen - assume default orientation
+                        SensorManager.getOrientation(mRotationMatrix, mValues)
+                }// Log.d(TAG, "Rotation-0");
+                // Log.d(TAG, "Rotation-Unknown");
+                orientation = Math.toDegrees(mValues[0].toDouble())  // azimuth
+                tilt = Math.toDegrees(mValues[1].toDouble())
+            }
+            Sensor.TYPE_ORIENTATION ->
+                // Legacy orientation sensors
+                orientation = event.values[0].toDouble()
+            else ->
+                // A sensor we're not using, so return
+                return
+        }
+
+        // Correct for true north, if preference is set
+        if (mFaceTrueNorth && mGeomagneticField != null) {
+            orientation += mGeomagneticField?.declination?.toDouble() ?: 0.0
+            // Make sure value is between 0-360
+            orientation = MathUtils.mod(orientation.toFloat(), 360.0f).toDouble()
+        }
+
+        for (listener in mGpsTestListeners) {
+            listener.onOrientationChanged(orientation, tilt)
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+    private fun getRotationMatrixFromTruncatedVector(vector: FloatArray) {
+        System.arraycopy(vector, 0, mTruncatedRotationVector, 0, 4)
+        SensorManager.getRotationMatrixFromVector(mRotationMatrix, mTruncatedRotationVector)
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onLocationChanged(location: Location?) {
         positionFragment.onGnnsDataReceived(location = location)

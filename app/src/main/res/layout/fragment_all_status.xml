@@ -33,19 +33,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <!--<ImageView-->
-                    <!--android:id="@+id/skyplot"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="350dp"-->
-                    <!--app:layout_constraintStart_toStartOf="parent"-->
-                    <!--app:layout_constraintTop_toTopOf="parent"-->
-                    <!--android:layout_marginTop="@dimen/default_gap"-->
-                    <!--android:src="@drawable/skyplot"/>-->
-
                     <com.inari.team.utils.view.GpsSkyView
                         android:id="@+id/skyplot"
                         android:layout_width="0dp"
-                        android:layout_height="350dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_marginTop="@dimen/default_gap"
                         android:layout_marginEnd="8dp"
                         app:layout_constraintEnd_toEndOf="parent"

@@ -2,32 +2,24 @@ package com.inari.team.utils.skyplot;
 
 import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
-import android.location.GpsStatus;
-import android.location.LocationListener;
 
 /**
  * Interface used by GpsTestActivity to communicate with Gps*Fragments
  */
-public interface GpsTestListener extends LocationListener {
+public interface GpsTestListener {
 
     void gpsStart();
 
     void gpsStop();
 
-    @Deprecated
-    void onGpsStatusChanged(int event, GpsStatus status);
-
-    void onGnssFirstFix(int ttffMillis);
-
-    void onSatelliteStatusChanged(GnssStatus status);
-
     void onGnssStarted();
 
     void onGnssStopped();
+
+    void onSatelliteStatusChanged(GnssStatus status);
 
     void onGnssMeasurementsReceived(GnssMeasurementsEvent event);
 
     void onOrientationChanged(double orientation, double tilt);
 
-    void onNmeaMessage(String message, long timestamp);
 }
