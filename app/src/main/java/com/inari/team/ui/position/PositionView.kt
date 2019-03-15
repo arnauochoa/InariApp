@@ -6,4 +6,6 @@ interface PositionView {
     fun onPositionCalculated(position: LatLng)
     fun showError(error: String)
     fun showMessage(message: String)
+    fun showMapLoading()
+    fun hideMapLoading()
 }

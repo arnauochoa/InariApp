@@ -48,4 +48,7 @@
         semper ex. Aenean sagittis mollis massa, sed aliquam ex porta non. Donec eleifend lorem vitae velit malesuada
         vehicula vel cursus nunc. Curabitur vehicula fermentum arcu, sed pulvinar tortor malesuada quis.
     </string>
+
+    <string name="gps_lat_lon_dms_value">%1$d\u00B0 %2$d\' %3$d\"</string>
+
 </resources>
