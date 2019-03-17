@@ -202,6 +202,8 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
             mPresenter?.setStartTime(avgTime)
             mPresenter?.obtainEphemerisData()
         }
+
+        //mPresenter?.calculatePositionWithGnss()
     }
 
     private fun showSaveDialog() {

@@ -1,0 +1,16 @@
+{
+  "buildFiles": [
+    "/Users/arnauochoa/Documents/Galileo app/InariApp/app/CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "/Users/arnauochoa/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/arnauochoa/Documents/Galileo\\ app/InariApp/app/.externalNativeBuild/cmake/release/x86 --target clean"
+  ],
+  "libraries": {
+    "pvtEngine-lib-Release-x86": {
+      "artifactName": "pvtEngine-lib",
+      "buildCommand": "/Users/arnauochoa/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/arnauochoa/Documents/Galileo\\ app/InariApp/app/.externalNativeBuild/cmake/release/x86 --target pvtEngine-lib",
+      "abi": "x86",
+      "output": "/Users/arnauochoa/Documents/Galileo app/InariApp/app/build/intermediates/cmake/release/obj/x86/libpvtEngine-lib.so"
+    }
+  }
+}
