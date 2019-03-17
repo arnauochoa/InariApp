@@ -1,4 +1,4 @@
-package com.inari.team.utils.view;
+package com.inari.team.core.utils.view;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

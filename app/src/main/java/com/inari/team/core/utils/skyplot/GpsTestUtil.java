@@ -1,4 +1,4 @@
-package com.inari.team.utils.skyplot;
+package com.inari.team.core.utils.skyplot;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,13 +14,13 @@ import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 
-import static com.inari.team.utils.skyplot.GnssType.BEIDOU;
-import static com.inari.team.utils.skyplot.GnssType.GALILEO;
-import static com.inari.team.utils.skyplot.GnssType.GLONASS;
-import static com.inari.team.utils.skyplot.GnssType.NAVSTAR;
-import static com.inari.team.utils.skyplot.GnssType.QZSS;
-import static com.inari.team.utils.skyplot.GnssType.SBAS;
-import static com.inari.team.utils.skyplot.GnssType.UNKNOWN;
+import static com.inari.team.core.utils.skyplot.GnssType.BEIDOU;
+import static com.inari.team.core.utils.skyplot.GnssType.GALILEO;
+import static com.inari.team.core.utils.skyplot.GnssType.GLONASS;
+import static com.inari.team.core.utils.skyplot.GnssType.NAVSTAR;
+import static com.inari.team.core.utils.skyplot.GnssType.QZSS;
+import static com.inari.team.core.utils.skyplot.GnssType.SBAS;
+import static com.inari.team.core.utils.skyplot.GnssType.UNKNOWN;
 
 
 public class GpsTestUtil {

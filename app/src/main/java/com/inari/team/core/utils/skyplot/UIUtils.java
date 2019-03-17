@@ -1,4 +1,4 @@
-package com.inari.team.utils.skyplot;
+package com.inari.team.core.utils.skyplot;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,10 +13,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.TimeUnit;
 
-import static com.inari.team.utils.view.GpsSkyView.MAX_VALUE_CN0;
-import static com.inari.team.utils.view.GpsSkyView.MAX_VALUE_SNR;
-import static com.inari.team.utils.view.GpsSkyView.MIN_VALUE_CN0;
-import static com.inari.team.utils.view.GpsSkyView.MIN_VALUE_SNR;
+import static com.inari.team.core.utils.view.GpsSkyView.MAX_VALUE_CN0;
+import static com.inari.team.core.utils.view.GpsSkyView.MAX_VALUE_SNR;
+import static com.inari.team.core.utils.view.GpsSkyView.MIN_VALUE_CN0;
+import static com.inari.team.core.utils.view.GpsSkyView.MIN_VALUE_SNR;
 
 
 /**

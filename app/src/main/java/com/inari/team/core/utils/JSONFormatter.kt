@@ -1,4 +1,4 @@
-package com.inari.team.utils
+package com.inari.team.core.utils
 
 import android.location.GnssClock
 import android.location.GnssMeasurement
@@ -39,9 +39,15 @@ fun obtainJson(
         mainJson.put(PARAMETERS_KEY, parametersAsJson(parameters))
         mainJson.put(LOCATION_KEY, locationAsJson(location))
         mainJson.put(STATUS_KEY, gnssStatusAsJson(gnssStatus))
-        mainJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(gnssMeasurements))
+        mainJson.put(
+            MEASUREMENTS_KEY,
+            gnssMeasurementsAsJson(gnssMeasurements)
+        )
         mainJson.put(CLOCK_KEY, gnssClockAsJson(gnssClock))
-        mainJson.put(EPHEMERIS_DATA_KEY, ephemerisResponseAsJson(ephemerisResponse, lastEphemerisDate))
+        mainJson.put(
+            EPHEMERIS_DATA_KEY,
+            ephemerisResponseAsJson(ephemerisResponse, lastEphemerisDate)
+        )
     }
 
     return mainJson

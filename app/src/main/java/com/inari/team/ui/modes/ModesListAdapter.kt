@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.inari.team.R
 import com.inari.team.data.Mode
-import com.inari.team.utils.AppSharedPreferences
-import com.inari.team.utils.toast
+import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.toast
 
 class ModesListAdapter(val context: Context) :
     RecyclerView.Adapter<ModesViewHolder>() {

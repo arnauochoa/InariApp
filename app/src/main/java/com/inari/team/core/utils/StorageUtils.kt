@@ -1,4 +1,4 @@
-package com.inari.team.utils
+package com.inari.team.core.utils
 
 import android.annotation.SuppressLint
 import android.os.Environment
@@ -71,7 +71,7 @@ fun retrieveFile(url: String): String {
     return try {
         val file = ResponseBody.create(
                 MediaType.parse("text/plain"),
-                getStringFromFile("${root.absolutePath}$APP_ROOT$url")
+            getStringFromFile("${root.absolutePath}$APP_ROOT$url")
         ).string()
         file
 

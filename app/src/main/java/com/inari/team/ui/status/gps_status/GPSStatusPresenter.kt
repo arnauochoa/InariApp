@@ -3,9 +3,9 @@ package com.inari.team.ui.status.gps_status
 import android.location.GnssStatus
 import android.os.Build
 import android.support.annotation.RequiresApi
-import com.inari.team.utils.getCNoString
-import com.inari.team.utils.getSatellitesCount
-import com.inari.team.utils.obtainCNos
+import com.inari.team.core.utils.getCNoString
+import com.inari.team.core.utils.getSatellitesCount
+import com.inari.team.core.utils.obtainCNos
 
 class GPSStatusPresenter(private val mView: GPSStatusView?) {
 

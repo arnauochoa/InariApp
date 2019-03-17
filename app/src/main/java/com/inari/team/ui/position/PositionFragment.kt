@@ -11,11 +11,9 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat.startActivity
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -26,16 +24,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.location.suplclient.ephemeris.EphemerisResponse
-import com.google.location.suplclient.supl.SuplConnectionRequest
-import com.google.location.suplclient.supl.SuplController
 import com.inari.team.R
 import com.inari.team.data.PositionParameters
 import com.inari.team.ui.logs.LogsActivity
-import com.inari.team.utils.AppSharedPreferences
-import com.inari.team.utils.context
-import com.inari.team.utils.saveFile
-import com.inari.team.utils.toast
+import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.saveFile
+import com.inari.team.core.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
 import kotlinx.android.synthetic.main.view_bottom_sheet.*
@@ -43,7 +37,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import kotlin.math.roundToLong
 
 
 class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {

@@ -1,4 +1,4 @@
-package com.inari.team.utils.skyplot;
+package com.inari.team.core.utils.skyplot;
 
 /**
  * Container class for DOP values

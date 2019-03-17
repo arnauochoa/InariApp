@@ -9,9 +9,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
+import com.inari.team.core.utils.createDirectory
+import com.inari.team.core.utils.obtainJson
+import com.inari.team.core.utils.saveFile
 import com.inari.team.data.GnssData
 import com.inari.team.data.PositionParameters
-import com.inari.team.utils.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.json.JSONArray
@@ -36,8 +38,6 @@ class PositionPresenter(private val mView: PositionView?) {
         const val SUPL_LOGGING_ENABLED = true
         const val EPHEMERIS_UPDATE_TIME_HOURS = 1L
     }
-
-    private val mSharedPreferences = AppSharedPreferences.getInstance()
 
     private var lastDate = Date()
     private var startTimeString: String? = null

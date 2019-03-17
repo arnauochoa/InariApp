@@ -1,4 +1,4 @@
-package com.inari.team.utils.skyplot;
+package com.inari.team.core.utils.skyplot;
 
 /**
  * A utility class containing arithmetic and geometry helper methods.

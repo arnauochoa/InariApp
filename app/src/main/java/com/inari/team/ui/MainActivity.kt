@@ -12,13 +12,18 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Surface
 import android.widget.Toast
 import com.inari.team.R
+import com.inari.team.core.utils.BarAdapter
+import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
+import com.inari.team.core.utils.extensions.checkPermission
+import com.inari.team.core.utils.extensions.checkPermissionsList
+import com.inari.team.core.utils.extensions.requestPermissionss
+import com.inari.team.core.utils.skyplot.GpsTestListener
+import com.inari.team.core.utils.skyplot.GpsTestUtil
+import com.inari.team.core.utils.skyplot.MathUtils
+import com.inari.team.core.utils.toast
 import com.inari.team.ui.position.PositionFragment
 import com.inari.team.ui.statistics.StatisticsFragment
 import com.inari.team.ui.status.StatusFragment
-import com.inari.team.utils.*
-import com.inari.team.utils.skyplot.GpsTestListener
-import com.inari.team.utils.skyplot.GpsTestUtil
-import com.inari.team.utils.skyplot.MathUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
@@ -290,7 +295,10 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
             if (checkPermissionsList(arrayOf(PERMISSION_ACCESS_FINE_LOCATION))) {
                 startGnss()
             } else {
-                toast("Location permissions are compulsory, please go to settings to enable.", Toast.LENGTH_LONG)
+                toast(
+                    "Location permissions are compulsory, please go to settings to enable.",
+                    Toast.LENGTH_LONG
+                )
                 finish()
             }
         } else {

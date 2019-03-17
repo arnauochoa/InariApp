@@ -37,7 +37,7 @@ class ApiModule {
         }
 
         clientBuilder.addInterceptor { chain ->
-            val userToken = AppSharedPreferences.getInstance().getTestPreference()
+            val userToken = ""
             val request = if (userToken.isNotEmpty()) {
                 chain.request().newBuilder()
                     .addHeader("token", userToken)

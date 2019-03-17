@@ -6,6 +6,7 @@ import com.inari.team.BuildConfig
 import com.inari.team.R
 import com.inari.team.core.di.AppModule
 import com.inari.team.core.di.component.AppComponent
+import com.inari.team.core.di.component.DaggerAppComponent
 import timber.log.Timber
 
 class App : MultiDexApplication() {

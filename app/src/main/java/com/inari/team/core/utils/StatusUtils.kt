@@ -1,4 +1,4 @@
-package com.inari.team.utils
+package com.inari.team.core.utils
 
 import android.location.GnssStatus
 import android.os.Build

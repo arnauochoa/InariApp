@@ -1,4 +1,4 @@
-package com.inari.team.utils
+package com.inari.team.core.utils
 
 import android.widget.Toast
 import com.inari.team.core.App

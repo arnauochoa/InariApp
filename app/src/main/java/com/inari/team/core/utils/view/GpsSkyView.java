@@ -1,4 +1,4 @@
-package com.inari.team.utils.view;
+package com.inari.team.core.utils.view;
 
 import android.content.Context;
 import android.graphics.*;
@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import com.inari.team.R;
-import com.inari.team.utils.skyplot.*;
+import com.inari.team.core.utils.skyplot.*;
 
 import java.util.Iterator;
 
