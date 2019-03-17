@@ -15,6 +15,7 @@ import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat.startActivity
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -32,6 +33,7 @@ import com.inari.team.R
 import com.inari.team.data.PositionParameters
 import com.inari.team.ui.logs.LogsActivity
 import com.inari.team.utils.AppSharedPreferences
+import com.inari.team.utils.context
 import com.inari.team.utils.saveFile
 import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
@@ -48,11 +50,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
     companion object {
         const val FRAG_TAG = "position_fragment"
-        const val SUPL_SERVER_HOST = "supl.google.com"
-        const val SUPL_SERVER_PORT = 7275
-        const val SUPL_SSL_ENABLED = true
-        const val SUPL_MESSAGE_LOGGING_ENABLED = true
-        const val SUPL_LOGGING_ENABLED = true
     }
 
     private val mSharedPreferences = AppSharedPreferences.getInstance()
@@ -62,10 +59,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     private var mapFragment: SupportMapFragment? = null
 
     private var mPresenter: PositionPresenter? = null
-
-    private var suplController: SuplController? = null
-
-    private var refPos: LatLng? = null
 
     private var avgTime: Long = 5
 
@@ -82,10 +75,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
         mPresenter = PositionPresenter(this)
 
-        buildSuplController()
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -118,7 +108,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         fabClose.setOnClickListener {
             val selectedParameters = getSelectedParameters()
             if (selectedParameters == null) { // If no constellation or band has been selected
-                toast("At least one constellation and one band must be selected")
+                    showError("At least one constellation and one band must be selected")
             } else {
                 isPositioningStarted = true
                 mPresenter?.setGnssData(parameters = selectedParameters)
@@ -203,18 +193,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         }
     }
 
-    private fun buildSuplController() {
-        val request = SuplConnectionRequest.builder()
-            .setServerHost(SUPL_SERVER_HOST)
-            .setServerPort(SUPL_SERVER_PORT)
-            .setSslEnabled(SUPL_SSL_ENABLED)
-            .setMessageLoggingEnabled(SUPL_MESSAGE_LOGGING_ENABLED)
-            .setLoggingEnabled(SUPL_LOGGING_ENABLED)
-            .build()
-        suplController = SuplController(request)
-
-    }
-
     private fun startPositioning() {
         clBottomSheet.visibility = View.GONE
         mMap?.clear()
@@ -222,23 +200,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
         GlobalScope.launch {
             mPresenter?.setStartTime(avgTime)
-            obtainEphemerisData()
-        }
-    }
-
-    private fun obtainEphemerisData() {
-        var ephResponse: EphemerisResponse? = null
-        refPos?.let {
-            val latE7 = (it.latitude * 1e7).roundToLong()
-            val lngE7 = (it.longitude * 1e7).roundToLong()
-
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
-            suplController?.sendSuplRequest(latE7, lngE7)
-            ephResponse = suplController?.generateEphResponse(latE7, lngE7)
-            mPresenter?.setGnssData(ephemerisResponse = ephResponse)
-        }
-        if (ephResponse == null) {
-            toast("Ephemeris data could not be obtained")
+            mPresenter?.obtainEphemerisData()
         }
     }
 
@@ -257,7 +219,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
                     }
                     saveLog(fileName + format)
                     dialog.dismiss()
-                } else toast("File name can not be empty")
+                } else showError("File name can not be empty")
             }
             dialog.show()
         }
@@ -279,7 +241,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
                 startActivity(Intent(it, LogsActivity::class.java))
             }
         }
-
         snackbar.show()
     }
 
@@ -304,9 +265,6 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         gnssStatus: GnssStatus? = null,
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null
     ) {
-        location?.let {
-            refPos = LatLng(location.latitude, location.longitude)
-        }
         if (isPositioningStarted) {
             mPresenter?.setGnssData(
                 location = location,
@@ -340,10 +298,4 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
     override fun showMessage(message: String) {
         activity?.runOnUiThread { toast(message) }
     }
-
-    fun onTimeOver() {
-        mPresenter?.calculatePositionWithGnss()
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
 }

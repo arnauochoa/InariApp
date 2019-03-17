@@ -3,9 +3,12 @@ package com.inari.team.ui.position
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
 import android.location.Location
+import android.os.StrictMode
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.location.suplclient.ephemeris.EphemerisResponse
+import com.google.location.suplclient.supl.SuplConnectionRequest
+import com.google.location.suplclient.supl.SuplController
 import com.inari.team.data.GnssData
 import com.inari.team.data.PositionParameters
 import com.inari.team.utils.*
@@ -15,8 +18,18 @@ import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToLong
 
 class PositionPresenter(private val mView: PositionView?) {
+
+    companion object {
+        const val SUPL_SERVER_HOST = "supl.google.com"
+        const val SUPL_SERVER_PORT = 7275
+        const val SUPL_SSL_ENABLED = true
+        const val SUPL_MESSAGE_LOGGING_ENABLED = true
+        const val SUPL_LOGGING_ENABLED = true
+        const val EPHEMERIS_UPDATE_TIME_HOURS = 1L
+    }
 
     private val mSharedPreferences = AppSharedPreferences.getInstance()
 
@@ -28,7 +41,26 @@ class PositionPresenter(private val mView: PositionView?) {
 
     private var previousDataJson = JSONArray()
 
+    private var suplController: SuplController? = null
+    private var refPos: LatLng? = null
+    private var lastEphemerisDate = Date()
+
     private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
+
+    init {
+        buildSuplController()
+    }
+
+    private fun buildSuplController() {
+        val request = SuplConnectionRequest.builder()
+            .setServerHost(SUPL_SERVER_HOST)
+            .setServerPort(SUPL_SERVER_PORT)
+            .setSslEnabled(SUPL_SSL_ENABLED)
+            .setMessageLoggingEnabled(SUPL_MESSAGE_LOGGING_ENABLED)
+            .setLoggingEnabled(SUPL_LOGGING_ENABLED)
+            .build()
+        suplController = SuplController(request)
+    }
 
     fun setStartTime(avgTime: Long) {
         // Delete previous measurements
@@ -55,15 +87,27 @@ class PositionPresenter(private val mView: PositionView?) {
         gnssData.gnssStatus = gnssStatus ?: gnssData.gnssStatus
         gnssData.ephemerisResponse = ephemerisResponse ?: gnssData.ephemerisResponse
 
+        location?.let {
+            refPos = LatLng(location.latitude, location.longitude)
+        }
+
+        if (gnssData.ephemerisResponse == null) {
+            obtainEphemerisData()
+        }
+
         if (gnssData.parameters != null &&
             gnssData.location != null &&
             gnssData.gnssStatus != null &&
-            gnssData.ephemerisResponse != null) {
+            gnssData.ephemerisResponse != null
+        ) {
             gnssMeasurementsEvent?.let {
                 gnssData.gnssMeasurements = it.measurements
                 gnssData.gnssClock = it.clock
                 if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(avgTime)) {
                     calculatePositionWithGnss()
+                }
+                if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)){
+                    obtainEphemerisData()
                 }
                 saveNewGnssData()
             }
@@ -72,49 +116,63 @@ class PositionPresenter(private val mView: PositionView?) {
         }
     }
 
-private fun saveNewGnssData() {
-    val mainJson = obtainJson(gnssData)
-    // Testing logs
-    Log.d("mainJson", mainJson.toString(2))
-    previousDataJson.put(mainJson)
-}
+    fun obtainEphemerisData() {
+        var ephResponse: EphemerisResponse? = null
+        refPos?.let {
+            val latE7 = (it.latitude * 1e7).roundToLong()
+            val lngE7 = (it.longitude * 1e7).roundToLong()
 
-fun calculatePositionWithGnss() {
-    //Calculate position and restart averaging
-    saveLogsForPostProcessing()
-    val position = computePosition()
-    previousDataJson = JSONArray()
-    lastDate = Date()
-
-    if (position != null) {
-        mView?.onPositionCalculated(position)
-    } else {
-        mView?.showError("There are not enough measurements yet.")
+            lastEphemerisDate = Date()
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+            suplController?.sendSuplRequest(latE7, lngE7)
+            ephResponse = suplController?.generateEphResponse(latE7, lngE7)
+            setGnssData(ephemerisResponse = ephResponse)
+        }
+        if (ephResponse == null) mView?.showError("Ephemeris data could not be obtained")
     }
-}
 
-
-//Function used for testing
-private fun saveLogsForPostProcessing() {
-    val current = Date()
-    val fileName = "$startTimeString/${formatter.format(current)}.txt"
-    val pvtInfoString = previousDataJson.toString(2)
-    mView?.showMessage("Saving logs")
-    pvtInfoString?.let {
-        saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
+    private fun saveNewGnssData() {
+        val mainJson = obtainJson(gnssData, lastEphemerisDate)
+        // Testing logs
+        Log.d("mainJson", mainJson.toString(2))
+        previousDataJson.put(mainJson)
     }
-}
 
-private fun computePosition(): LatLng? {
-    var position: LatLng? = null
-    val pvtInfoString = mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
-    //TODO: call MATLAB function and transform result to LatLng
-    // val latLong = matlabFunction(pvtInfoString)
-    // position = LatLng(latLong[0], latLong[1])
-    gnssData.location?.let {
-        position = LatLng(it.latitude, it.longitude)
+    fun calculatePositionWithGnss() {
+        //Calculate position and restart averaging
+        saveLogsForPostProcessing()
+        val position = computePosition()
+        previousDataJson = JSONArray()
+        lastDate = Date()
+
+        if (position != null) {
+            mView?.onPositionCalculated(position)
+        } else {
+            mView?.showError("There are not enough measurements yet.")
+        }
     }
-    return position
-}
+
+    //Function used for testing
+    private fun saveLogsForPostProcessing() {
+        val current = Date()
+        val fileName = "$startTimeString/${formatter.format(current)}.txt"
+        val pvtInfoString = previousDataJson.toString(2)
+        mView?.showMessage("Saving logs")
+        pvtInfoString?.let {
+            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
+        }
+    }
+
+    private fun computePosition(): LatLng? {
+        var position: LatLng? = null
+        val pvtInfoString = mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
+        //TODO: call MATLAB function and transform result to LatLng
+        // val latLong = matlabFunction(pvtInfoString)
+        // position = LatLng(latLong[0], latLong[1])
+        gnssData.location?.let {
+            position = LatLng(it.latitude, it.longitude)
+        }
+        return position
+    }
 
 }

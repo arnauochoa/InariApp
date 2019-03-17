@@ -80,13 +80,11 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
         setBottomNavigation()
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationProvider = locationManager?.getProvider(LocationManager.GPS_PROVIDER)
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         addOrientationSensorListener()
 
         startGnss()
-
     }
 
     private fun setViewPager() {
@@ -121,7 +119,6 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
 
     private fun startGnss() {
         if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-
             gnssStatusListener = object : GnssStatus.Callback() {
                 override fun onSatelliteStatusChanged(status: GnssStatus) {
                     //once gnss status received, notice position fragments
@@ -138,7 +135,8 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
                 }
             }
 
-            locationManager?.requestLocationUpdates(locationProvider?.name, MIN_TIME, MIN_DISTANCE, this)
+            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this)
+            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this)
             locationManager?.registerGnssStatusCallback(gnssStatusListener)
             locationManager?.registerGnssMeasurementsCallback(gnssMeasurementsEventListener)
         } else {
@@ -147,10 +145,8 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
                     android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
                 ), SplashActivity.PERMISSIONS_CODE
-
             )
         }
-
     }
 
     fun addListener(listener: GpsTestListener) {
