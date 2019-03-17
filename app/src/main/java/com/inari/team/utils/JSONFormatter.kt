@@ -13,6 +13,8 @@ import com.inari.team.data.GnssData
 import com.inari.team.data.PositionParameters
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
 
 const val PARAMETERS_KEY = "Params"
 const val LOCATION_KEY = "Location"
@@ -25,10 +27,12 @@ const val GPS_KEY = "GPS"
 const val GLONASS_KEY = "GLONASS"
 const val KLOBUCHAR_KEY = "Klobuchar"
 const val NEQUICK_KEY = "NeQuick"
+private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
 
 
 fun obtainJson(
-    gnssData: GnssData
+    gnssData: GnssData,
+    lastEphemerisDate: Date
 ): JSONObject {
     val mainJson = JSONObject()
     with(gnssData) {
@@ -37,7 +41,7 @@ fun obtainJson(
         mainJson.put(STATUS_KEY, gnssStatusAsJson(gnssStatus))
         mainJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(gnssMeasurements))
         mainJson.put(CLOCK_KEY, gnssClockAsJson(gnssClock))
-        mainJson.put(EPHEMERIS_DATA_KEY, ephemerisResponseAsJson(ephemerisResponse))
+        mainJson.put(EPHEMERIS_DATA_KEY, ephemerisResponseAsJson(ephemerisResponse, lastEphemerisDate))
     }
 
     return mainJson
@@ -164,9 +168,13 @@ private fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
     return clockJson
 }
 
-private fun ephemerisResponseAsJson(ephemerisResponse: EphemerisResponse?): JSONObject {
+private fun ephemerisResponseAsJson(
+    ephemerisResponse: EphemerisResponse?,
+    lastEphemerisDate: Date
+): JSONObject {
     val gson = Gson()
     val ephemerisJson = JSONObject()
+    ephemerisJson.put("Time: ", formatter.format(lastEphemerisDate))
     ephemerisResponse?.let {
         val galileoEphemerisJsonArray = JSONArray()
         val gpsEphemerisJsonArray = JSONArray()
