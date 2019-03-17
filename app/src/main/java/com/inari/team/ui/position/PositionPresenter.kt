@@ -15,6 +15,7 @@ import com.inari.team.utils.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -23,6 +24,11 @@ import kotlin.math.roundToLong
 class PositionPresenter(private val mView: PositionView?) {
 
     companion object {
+        // Add C++ library
+        init {
+            System.loadLibrary("pvtEngine-lib")
+        }
+
         const val SUPL_SERVER_HOST = "supl.google.com"
         const val SUPL_SERVER_PORT = 7275
         const val SUPL_SSL_ENABLED = true
@@ -39,7 +45,7 @@ class PositionPresenter(private val mView: PositionView?) {
 
     private var gnssData = GnssData()
 
-    private var previousDataJson = JSONArray()
+    private var gnssDataJson = JSONArray()
 
     private var suplController: SuplController? = null
     private var refPos: LatLng? = null
@@ -64,7 +70,7 @@ class PositionPresenter(private val mView: PositionView?) {
 
     fun setStartTime(avgTime: Long) {
         // Delete previous measurements
-        previousDataJson = JSONArray()
+        gnssDataJson = JSONArray()
         lastDate = Date()
         this.avgTime = avgTime
         try {
@@ -106,7 +112,7 @@ class PositionPresenter(private val mView: PositionView?) {
                 if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(avgTime)) {
                     calculatePositionWithGnss()
                 }
-                if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)){
+                if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
                     obtainEphemerisData()
                 }
                 saveNewGnssData()
@@ -135,14 +141,14 @@ class PositionPresenter(private val mView: PositionView?) {
         val mainJson = obtainJson(gnssData, lastEphemerisDate)
         // Testing logs
         Log.d("mainJson", mainJson.toString(2))
-        previousDataJson.put(mainJson)
+        gnssDataJson.put(mainJson)
     }
 
     fun calculatePositionWithGnss() {
         //Calculate position and restart averaging
         saveLogsForPostProcessing()
         val position = computePosition()
-        previousDataJson = JSONArray()
+        gnssDataJson = JSONArray()
         lastDate = Date()
 
         if (position != null) {
@@ -156,7 +162,7 @@ class PositionPresenter(private val mView: PositionView?) {
     private fun saveLogsForPostProcessing() {
         val current = Date()
         val fileName = "$startTimeString/${formatter.format(current)}.txt"
-        val pvtInfoString = previousDataJson.toString(2)
+        val pvtInfoString = gnssDataJson.toString(2)
         mView?.showMessage("Saving logs")
         pvtInfoString?.let {
             saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
@@ -165,14 +171,17 @@ class PositionPresenter(private val mView: PositionView?) {
 
     private fun computePosition(): LatLng? {
         var position: LatLng? = null
-        val pvtInfoString = mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
-        //TODO: call MATLAB function and transform result to LatLng
-        // val latLong = matlabFunction(pvtInfoString)
-        // position = LatLng(latLong[0], latLong[1])
-        gnssData.location?.let {
-            position = LatLng(it.latitude, it.longitude)
+
+        if (gnssDataJson.length() > 0){
+            val gnssDataString = gnssDataJson.toString(2)
+            val positionJson = JSONObject(obtainPosition(gnssDataString))
+            val latitude = positionJson.get("lat") as Double
+            val longitude = positionJson.get("lng") as Double
+            position = LatLng(latitude, longitude)
         }
         return position
     }
+
+    external fun obtainPosition(gnssData: String): String
 
 }
