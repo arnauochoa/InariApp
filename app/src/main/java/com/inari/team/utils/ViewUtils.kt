@@ -1,8 +1,6 @@
 package com.inari.team.utils
 
 import android.widget.Toast
-import com.inari.team.App
-import io.reactivex.Single
 import java.io.*
 
 val context = App.getAppContext()

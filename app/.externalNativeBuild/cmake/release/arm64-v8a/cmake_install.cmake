@@ -1,4 +1,4 @@
-# Install script for directory: /Users/arnauochoa/Documents/Galileo app/InariApp/app
+# Install script for directory: /Users/albertbecerrahervas/Documents/projects/Inari/app
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

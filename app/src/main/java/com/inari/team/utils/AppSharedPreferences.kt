@@ -3,7 +3,6 @@ package com.inari.team.utils
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.inari.team.App
 import com.inari.team.data.Mode
 
 

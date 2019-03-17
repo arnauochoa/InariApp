@@ -1,9 +1,12 @@
 
 {
-	"buildFiles" : [ "/Users/arnauochoa/Documents/Galileo app/InariApp/app/CMakeLists.txt" ],
+	"buildFiles" : 
+	[
+		"/Users/albertbecerrahervas/Documents/projects/Inari/app/CMakeLists.txt"
+	],
 	"cleanCommands" : 
 	[
-		"/Users/arnauochoa/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/arnauochoa/Documents/Galileo\\ app/InariApp/app/.externalNativeBuild/cmake/release/x86_64 --target clean"
+		"/Users/albertbecerrahervas/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64 --target clean"
 	],
 	"cppFileExtensions" : [ "cpp" ],
 	"libraries" : 
@@ -12,153 +15,153 @@
 		{
 			"abi" : "x86_64",
 			"artifactName" : "pvtEngine-lib",
-			"buildCommand" : "/Users/arnauochoa/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/arnauochoa/Documents/Galileo\\ app/InariApp/app/.externalNativeBuild/cmake/release/x86_64 --target pvtEngine-lib",
+			"buildCommand" : "/Users/albertbecerrahervas/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64 --target pvtEngine-lib",
 			"buildType" : "release",
 			"files" : 
 			[
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/PVT_rcls.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/PVT_rcls.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/check_time.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/check_time.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/e_r_corr.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/e_r_corr.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/extract_info.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/extract_info.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/find_eph.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/find_eph.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/getCtrl_corr.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/getCtrl_corr.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/getEphMatrix.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/getEphMatrix.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/getProp_corr.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/getProp_corr.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/iono_error_correction.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/iono_error_correction.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/lla2ecef.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/lla2ecef.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/main_GNSS.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/main_GNSS.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/nsgpst2gpst.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/nsgpst2gpst.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/obtain_navFile.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/obtain_navFile.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/pseudo_gen.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/pseudo_gen.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/pvtEngine-lib.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/pvtEngine-lib.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/rad2deg.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/rad2deg.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/sat_clock_error_correction.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/sat_clock_error_correction.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/sat_pos.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/sat_pos.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/togeod.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/togeod.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/topocent.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/topocent.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/tropo_error_correction.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/tropo_error_correction.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				},
 				
 				{
-					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
-					"src" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/src/main/cpp/xyz2llh.cpp",
-					"workingDirectory" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/.externalNativeBuild/cmake/release/x86_64"
+					"flags" : "  --target=x86_64-none-linux-android26 --gcc-toolchain=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -DpvtEngine_lib_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++  -O2 -DNDEBUG  -fPIC    -c ",
+					"src" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/src/main/cpp/xyz2llh.cpp",
+					"workingDirectory" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/.externalNativeBuild/cmake/release/x86_64"
 				}
 			],
-			"output" : "/Users/arnauochoa/Documents/Galileo app/InariApp/app/build/intermediates/cmake/release/obj/x86_64/libpvtEngine-lib.so",
-			"toolchain" : "7935847106671341513"
+			"output" : "/Users/albertbecerrahervas/Documents/projects/Inari/app/build/intermediates/cmake/release/obj/x86_64/libpvtEngine-lib.so",
+			"toolchain" : "15930379589681677451"
 		}
 	},
 	"toolchains" : 
 	{
-		"7935847106671341513" : 
+		"15930379589681677451" : 
 		{
-			"cCompilerExecutable" : "/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
-			"cppCompilerExecutable" : "/Users/arnauochoa/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+			"cCompilerExecutable" : "/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+			"cppCompilerExecutable" : "/Users/albertbecerrahervas/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
 		}
 	}
 }

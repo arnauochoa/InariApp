@@ -2,4 +2,5 @@
 <resources>
     <dimen name="marginFirstColumn">120dp</dimen>
     <dimen name="marginSecondColumn">245dp</dimen>
+    <dimen name="default_gap">12dp</dimen>
 </resources>

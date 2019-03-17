@@ -27,6 +27,8 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+
+
         Handler().postDelayed({
 
             if (AppSharedPreferences.getInstance().getModesList().isEmpty()) {
