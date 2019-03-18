@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.inari.team.R
 import com.inari.team.ui.MainActivity
-import com.inari.team.utils.skyplot.GpsTestListener
+import com.inari.team.core.utils.skyplot.GpsTestListener
 import kotlinx.android.synthetic.main.fragment_galileo_status.*
 
 class GalileoStatusFragment : Fragment(), GalileoStatusView, GpsTestListener {

@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.inari.team.R
-import com.inari.team.utils.retrieveFile
+import com.inari.team.core.utils.retrieveFile
 import kotlinx.android.synthetic.main.activity_logs_detail.*
 
 class LogsDetailActivity : AppCompatActivity() {

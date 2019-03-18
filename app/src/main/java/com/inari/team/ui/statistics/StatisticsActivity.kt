@@ -9,13 +9,7 @@ import android.widget.AdapterView
 import com.inari.team.R
 import com.inari.team.data.Mode
 import com.inari.team.ui.modes.ModesActivity
-import com.inari.team.ui.statistics.StatisticsActivity.Companion.CNO
-import com.inari.team.ui.statistics.StatisticsActivity.Companion.GRAPH4
-import com.inari.team.ui.statistics.StatisticsActivity.Companion.GRAPH5
-import com.inari.team.ui.statistics.StatisticsActivity.Companion.GRAPH6
-import com.inari.team.ui.statistics.StatisticsActivity.Companion.MAP
-import com.inari.team.ui.statistics.StatisticsActivity.Companion.RMS
-import com.inari.team.utils.AppSharedPreferences
+import com.inari.team.core.utils.AppSharedPreferences
 import kotlinx.android.synthetic.main.activity_statistics.*
 
 

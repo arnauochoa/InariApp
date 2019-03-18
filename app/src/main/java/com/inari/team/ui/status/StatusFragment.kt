@@ -10,10 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.common.api.PendingResult
 import com.inari.team.R
+import com.inari.team.core.utils.BarAdapter
 import com.inari.team.ui.status.all_status.AllStatusFragment
 import com.inari.team.ui.status.galileo_status.GalileoStatusFragment
 import com.inari.team.ui.status.gps_status.GPSStatusFragment
-import com.inari.team.utils.BarAdapter
 import kotlinx.android.synthetic.main.fragment_status.*
 
 class StatusFragment : Fragment() {

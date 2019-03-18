@@ -5,8 +5,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
 import com.inari.team.R
-import com.inari.team.utils.getFilesList
-import com.inari.team.utils.toast
+import com.inari.team.core.utils.getFilesList
+import com.inari.team.core.utils.toast
 import kotlinx.android.synthetic.main.activity_logs.*
 
 class LogsActivity : AppCompatActivity() {

@@ -9,8 +9,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.inari.team.R
 import com.inari.team.data.Mode
-import com.inari.team.utils.AppSharedPreferences
-import com.inari.team.utils.toast
+import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.toast
 import kotlinx.android.synthetic.main.activity_modes.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
 

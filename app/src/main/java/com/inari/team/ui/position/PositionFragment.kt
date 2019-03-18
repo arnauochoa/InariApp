@@ -11,11 +11,8 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.StrictMode
 import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat.startActivity
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -26,43 +23,52 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.location.suplclient.ephemeris.EphemerisResponse
-import com.google.location.suplclient.supl.SuplConnectionRequest
-import com.google.location.suplclient.supl.SuplController
 import com.inari.team.R
+import com.inari.team.core.base.BaseFragment
+import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.extensions.Data
+import com.inari.team.core.utils.extensions.DataState.*
+import com.inari.team.core.utils.extensions.observe
+import com.inari.team.core.utils.extensions.withViewModel
+import com.inari.team.core.utils.saveFile
+import com.inari.team.core.utils.toast
 import com.inari.team.data.PositionParameters
 import com.inari.team.ui.logs.LogsActivity
-import com.inari.team.utils.AppSharedPreferences
-import com.inari.team.utils.context
-import com.inari.team.utils.saveFile
-import com.inari.team.utils.toast
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
 import kotlinx.android.synthetic.main.view_bottom_sheet.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import kotlin.math.roundToLong
+import javax.inject.Inject
 
 
-class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
+class PositionFragment : BaseFragment(), OnMapReadyCallback {
+
+    @Inject
+    lateinit var mSharedPreferences: AppSharedPreferences
 
     companion object {
         const val FRAG_TAG = "position_fragment"
     }
 
-    private val mSharedPreferences = AppSharedPreferences.getInstance()
-
     private var mMap: GoogleMap? = null
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var mapFragment: SupportMapFragment? = null
 
-    private var mPresenter: PositionPresenter? = null
+    private var viewModel: PositionViewModel? = null
 
     private var avgTime: Long = 5
 
     private var isPositioningStarted = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        fragmentComponent.inject(this)
+
+        viewModel = withViewModel(viewModelFactory) {
+            observe(position, ::updatePosition)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_position, container, false)
@@ -70,12 +76,11 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
-        setViews()
-
-        mPresenter = PositionPresenter(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
+
+        setHasOptionsMenu(true)
+        setViews()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -108,10 +113,10 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         fabClose.setOnClickListener {
             val selectedParameters = getSelectedParameters()
             if (selectedParameters == null) { // If no constellation or band has been selected
-                    showError("At least one constellation and one band must be selected")
+                showError("At least one constellation and one band must be selected")
             } else {
                 isPositioningStarted = true
-                mPresenter?.setGnssData(parameters = selectedParameters)
+                viewModel?.setGnssData(parameters = selectedParameters)
                 startPositioning()
             }
 
@@ -198,12 +203,9 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         mMap?.clear()
         showMapLoading()
 
-        GlobalScope.launch {
-            mPresenter?.setStartTime(avgTime)
-            mPresenter?.obtainEphemerisData()
-        }
+        viewModel?.setStartTime(avgTime)
+        viewModel?.obtainEphemerisData()
 
-        //mPresenter?.calculatePositionWithGnss()
     }
 
     private fun showSaveDialog() {
@@ -268,7 +270,7 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null
     ) {
         if (isPositioningStarted) {
-            mPresenter?.setGnssData(
+            viewModel?.setGnssData(
                 location = location,
                 gnssStatus = gnssStatus,
                 gnssMeasurementsEvent = gnssMeasurementsEvent
@@ -276,28 +278,41 @@ class PositionFragment : Fragment(), OnMapReadyCallback, PositionView {
         }
     }
 
-    override fun onPositionCalculated(position: LatLng) {
-        activity?.runOnUiThread {
-            hideMapLoading()
-            addMarker(position, "")
-            moveCamera(position)
+    private fun updatePosition(data: Data<LatLng>?) {
+        data?.let {
+            when (it.dataState) {
+                LOADING -> {
+                    showMapLoading()
+                }
+                SUCCESS -> {
+                    it.data?.let { position ->
+                        hideMapLoading()
+                        mMap?.clear()
+                        addMarker(position, "")
+                        moveCamera(position)
+                    }
+                }
+                ERROR -> {
+                    hideMapLoading()
+                    it.message?.let { msg -> showError(msg) }
+                }
+            }
         }
-        //position obtained
     }
 
-    override fun showMapLoading() {
+    private fun showMapLoading() {
         pbMap?.visibility = View.VISIBLE
     }
 
-    override fun hideMapLoading() {
+    private fun hideMapLoading() {
         pbMap?.visibility = View.GONE
     }
 
-    override fun showError(error: String) {
+    private fun showError(error: String) {
         activity?.runOnUiThread { toast(error) }
     }
 
-    override fun showMessage(message: String) {
-        activity?.runOnUiThread { toast(message) }
-    }
+//    private fun showMessage(message: String) {
+//        activity?.runOnUiThread { toast(message) }
+//    }
 }
