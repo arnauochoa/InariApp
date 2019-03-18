@@ -1,35 +1,47 @@
 package com.inari.team.ui.position
 
+import android.arch.lifecycle.MutableLiveData
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
 import android.location.Location
 import android.os.StrictMode
-import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
+import com.inari.team.core.base.BaseViewModel
 import com.inari.team.core.utils.createDirectory
+import com.inari.team.core.utils.extensions.Data
+import com.inari.team.core.utils.extensions.showError
+import com.inari.team.core.utils.extensions.updateData
 import com.inari.team.core.utils.obtainJson
 import com.inari.team.core.utils.saveFile
 import com.inari.team.data.GnssData
 import com.inari.team.data.PositionParameters
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.roundToLong
 
-class PositionPresenter(private val mView: PositionView?) {
+@Singleton
+class PositionViewModel @Inject constructor() : BaseViewModel() {
+
+    val position = MutableLiveData<Data<LatLng>>()
 
     companion object {
-        // Add C++ library
-        init {
-            System.loadLibrary("pvtEngine-lib")
-        }
+//        // Add C++ library
+//        init {
+//            System.loadLibrary("pvtEngine-lib")
+//        }
 
         const val SUPL_SERVER_HOST = "supl.google.com"
         const val SUPL_SERVER_PORT = 7275
@@ -54,6 +66,9 @@ class PositionPresenter(private val mView: PositionView?) {
     private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
 
     init {
+        // Add C++ library
+        System.loadLibrary("pvtEngine-lib")
+
         buildSuplController()
     }
 
@@ -69,15 +84,17 @@ class PositionPresenter(private val mView: PositionView?) {
     }
 
     fun setStartTime(avgTime: Long) {
-        // Delete previous measurements
-        gnssDataJson = JSONArray()
-        lastDate = Date()
-        this.avgTime = avgTime
-        try {
-            startTimeString = formatter.format(lastDate)
-            val directoryName = "$startTimeString/"
-            createDirectory(directoryName)
-        } catch (e: Exception) {
+        GlobalScope.launch {
+            // Delete previous measurements
+            gnssDataJson = JSONArray()
+            lastDate = Date()
+            this@PositionViewModel.avgTime = avgTime
+            try {
+                startTimeString = formatter.format(lastDate)
+                val directoryName = "$startTimeString/"
+                createDirectory(directoryName)
+            } catch (e: Exception) {
+            }
         }
     }
 
@@ -118,44 +135,48 @@ class PositionPresenter(private val mView: PositionView?) {
                 saveNewGnssData()
             }
         } else {
-            mView?.showError("There is not enough data yet.")
+            position.showError("There is not enough data yet.")
         }
     }
 
     fun obtainEphemerisData() {
-        var ephResponse: EphemerisResponse? = null
-        refPos?.let {
-            val latE7 = (it.latitude * 1e7).roundToLong()
-            val lngE7 = (it.longitude * 1e7).roundToLong()
+        GlobalScope.launch {
+            var ephResponse: EphemerisResponse? = null
+            refPos?.let {
+                val latE7 = (it.latitude * 1e7).roundToLong()
+                val lngE7 = (it.longitude * 1e7).roundToLong()
 
-            lastEphemerisDate = Date()
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
-            suplController?.sendSuplRequest(latE7, lngE7)
-            ephResponse = suplController?.generateEphResponse(latE7, lngE7)
-            setGnssData(ephemerisResponse = ephResponse)
+                lastEphemerisDate = Date()
+                StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+                suplController?.sendSuplRequest(latE7, lngE7)
+                ephResponse = suplController?.generateEphResponse(latE7, lngE7)
+                setGnssData(ephemerisResponse = ephResponse)
+            }
+            if (ephResponse == null) position.showError("Ephemeris data could not be obtained")
         }
-        if (ephResponse == null) mView?.showError("Ephemeris data could not be obtained")
     }
 
     private fun saveNewGnssData() {
         val mainJson = obtainJson(gnssData, lastEphemerisDate)
         // Testing logs
-        Log.d("mainJson", mainJson.toString(2))
+        //todo remove
+        Timber.d(mainJson.toString(2))
         gnssDataJson.put(mainJson)
     }
 
-    fun calculatePositionWithGnss() {
+    private fun calculatePositionWithGnss() {
         //Calculate position and restart averaging
         saveLogsForPostProcessing()
-        val position = computePosition()
+        val coordinates = computePosition()
         gnssDataJson = JSONArray()
         lastDate = Date()
 
-        if (position != null) {
-            mView?.onPositionCalculated(position)
-        } else {
-            mView?.showError("There are not enough measurements yet.")
+        coordinates?.let {
+            position.updateData(it)
+        } ?: kotlin.run {
+            position.showError("There are not enough measurements yet.")
         }
+
     }
 
     //Function used for testing
@@ -163,7 +184,7 @@ class PositionPresenter(private val mView: PositionView?) {
         val current = Date()
         val fileName = "$startTimeString/${formatter.format(current)}.txt"
         val pvtInfoString = gnssDataJson.toString(2)
-        mView?.showMessage("Saving logs")
+//        mView?.showMessage("Saving logs")
         pvtInfoString?.let {
             saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
         }
@@ -172,7 +193,7 @@ class PositionPresenter(private val mView: PositionView?) {
     private fun computePosition(): LatLng? {
         var position: LatLng? = null
 
-        if (gnssDataJson.length() > 0){
+        if (gnssDataJson.length() > 0) {
             val gnssDataString = gnssDataJson.toString(2)
             val positionJson = JSONObject(obtainPosition(gnssDataString))
             val latitude = positionJson.get("lat") as Double
@@ -182,6 +203,8 @@ class PositionPresenter(private val mView: PositionView?) {
         return position
     }
 
-    external fun obtainPosition(gnssData: String): String
+    //todo what is this?
+    private external fun obtainPosition(gnssData: String): String
+
 
 }

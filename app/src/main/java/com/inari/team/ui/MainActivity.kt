@@ -8,10 +8,10 @@ import android.location.*
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
-import android.support.v7.app.AppCompatActivity
 import android.view.Surface
 import android.widget.Toast
 import com.inari.team.R
+import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.utils.BarAdapter
 import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
 import com.inari.team.core.utils.extensions.checkPermission
@@ -27,7 +27,7 @@ import com.inari.team.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
-class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener {
+class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
     companion object {
         private const val MIN_TIME = 1L
@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
     }
 
     private var locationManager: LocationManager? = null
-    private var locationProvider: LocationProvider? = null
 
     private var gnssStatusListener: GnssStatus.Callback? = null
     private var gnssMeasurementsEventListener: GnssMeasurementsEvent.Callback? = null
@@ -63,8 +62,6 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
     private var mTruncateVector = false
 
 
-    internal var mStarted: Boolean = false
-
     private var mFaceTrueNorth: Boolean = true
 
 
@@ -79,6 +76,9 @@ class MainActivity : AppCompatActivity(), LocationListener, SensorEventListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        activityComponent.inject(this)
+
         mActivity = this
 
         setViewPager()

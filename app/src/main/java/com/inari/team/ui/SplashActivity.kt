@@ -27,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-
+        enableFullScreen(window)
 
         Handler().postDelayed({
 
