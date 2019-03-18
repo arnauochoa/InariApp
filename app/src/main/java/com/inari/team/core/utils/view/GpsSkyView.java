@@ -3,7 +3,6 @@ package com.inari.team.core.utils.view;
 import android.content.Context;
 import android.graphics.*;
 import android.location.GnssMeasurementsEvent;
-import android.location.GnssStatus;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.os.Build;
@@ -16,6 +15,7 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import com.inari.team.R;
 import com.inari.team.core.utils.skyplot.*;
+import com.inari.team.data.GnssStatus;
 
 import java.util.Iterator;
 
@@ -674,17 +674,7 @@ public class GpsSkyView extends View implements GpsTestListener {
     }
 
     @Override
-    public void gpsStart() {
-    }
-
-    @Override
-    public void gpsStop() {
-    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @Override
-    public void onSatelliteStatusChanged(GnssStatus status) {
+    public void onSatelliteStatusChanged(android.location.GnssStatus status) {
     }
 
     @Override

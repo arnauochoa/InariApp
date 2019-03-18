@@ -286,7 +286,9 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         data?.let {
             when (it.dataState) {
                 LOADING -> {
-                    showMapLoading()
+                    activity?.runOnUiThread{
+                        showMapLoading()
+                    }
                 }
                 SUCCESS -> {
                     it.data?.let { position ->

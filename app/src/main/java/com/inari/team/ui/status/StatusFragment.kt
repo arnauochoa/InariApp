@@ -1,7 +1,6 @@
 package com.inari.team.ui.status
 
 
-import android.content.Context
 import android.graphics.Color
 import android.location.GnssMeasurementsEvent
 import android.os.Bundle
@@ -19,10 +18,10 @@ import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
+import com.inari.team.core.utils.filterGnssStatus
 import com.inari.team.core.utils.skyplot.GpsTestListener
 import com.inari.team.data.GnssStatus
 import com.inari.team.data.StatusData
-import com.inari.team.ui.MainActivity
 import com.inari.team.ui.status.StatusFragment.Companion.CONSTELLATION.ALL
 import kotlinx.android.synthetic.main.fragment_status.*
 
@@ -37,7 +36,7 @@ class StatusFragment : BaseFragment(), GpsTestListener {
 
     private var viewModel: StatusViewModel? = null
 
-    private var selectedCONSTELLATION: CONSTELLATION = ALL
+    private var selectedConstellation: CONSTELLATION = ALL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,11 +56,6 @@ class StatusFragment : BaseFragment(), GpsTestListener {
         super.onViewCreated(view, savedInstanceState)
 
         setFilterTabs()
-    }
-
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        MainActivity.getInstance()?.addListener(this)
     }
 
     override fun onResume() {
@@ -100,13 +94,9 @@ class StatusFragment : BaseFragment(), GpsTestListener {
                 tab?.customView?.findViewById<ConstraintLayout>(R.id.tab)
                     ?.setBackgroundResource(R.drawable.bg_corners_red)
                 tab?.position?.let {
-                    //TODO: Filtrar dades i actualitzar vista
                     if (it < CONSTELLATION.values().size) {
-                        selectedCONSTELLATION = CONSTELLATION.values()[it]
+                        selectedConstellation = CONSTELLATION.values()[it]
                     }
-
-                    //                    filters.menuType = getMenuTypeFilter(it)
-//                    filterRestaurants(filters)
                 }
             }
 
@@ -115,19 +105,7 @@ class StatusFragment : BaseFragment(), GpsTestListener {
     }
 
     //helpers
-
-    private fun filterGnss() {
-        selectedCONSTELLATION.id
-
-        when (selectedCONSTELLATION) {
-            CONSTELLATION.ALL -> TODO()
-            CONSTELLATION.GALILEO -> TODO()
-            CONSTELLATION.GPS -> {
-            }
-        }
-    }
-
-    private fun createTab(title: String, image: String = ""): TabLayout.Tab {
+    private fun createTab(title: String): TabLayout.Tab {
         val tab = tabLayout.newTab().setCustomView(R.layout.item_filter_tab)
         tab.customView?.findViewById<TextView>(R.id.tvFilterTitle)?.text = title
         return tab
@@ -151,9 +129,11 @@ class StatusFragment : BaseFragment(), GpsTestListener {
         }
     }
 
-    override fun onSatelliteStatusChanged(status: GnssStatus) {
-        viewModel?.obtainStatusParameters(status)
-        skyplot.setGnssStatus(status)
+    override fun onSatelliteStatusChanged(status: android.location.GnssStatus) {
+        val filteredGnssStatus = filterGnssStatus(status, selectedConstellation)
+
+        viewModel?.obtainStatusParameters(filteredGnssStatus, selectedConstellation)
+        skyplot.setGnssStatus(filteredGnssStatus)
     }
 
     override fun onOrientationChanged(orientation: Double, tilt: Double) {
@@ -161,18 +141,15 @@ class StatusFragment : BaseFragment(), GpsTestListener {
     }
 
     override fun onGnssStopped() {
-    }
-
-    override fun gpsStart() {
-    }
-
-    override fun gpsStop() {
+        skyplot.setStopped()
     }
 
     override fun onGnssStarted() {
+        skyplot.setStarted()
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {
+        //no-op
     }
 
 
