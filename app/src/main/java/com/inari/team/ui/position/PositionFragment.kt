@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
+import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
@@ -46,6 +47,9 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     @Inject
     lateinit var mSharedPreferences: AppSharedPreferences
+
+    @Inject
+    lateinit var navigator: Navigator
 
     companion object {
         const val FRAG_TAG = "position_fragment"
@@ -96,7 +100,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
             }
             R.id.see_log -> {
                 context?.let {
-                    startActivity(Intent(it, LogsActivity::class.java))
+                    navigator.navigateToLogsActivity()
                 }
             }
             else -> {

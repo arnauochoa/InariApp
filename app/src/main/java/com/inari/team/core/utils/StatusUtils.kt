@@ -1,8 +1,9 @@
 package com.inari.team.core.utils
 
-import android.location.GnssStatus
 import android.os.Build
 import android.support.annotation.RequiresApi
+import com.inari.team.data.GnssStatus
+import com.inari.team.ui.status.StatusFragment
 import kotlin.math.floor
 
 
@@ -62,4 +63,25 @@ private fun takeTwoDecimals(value: Double): String {
     aux = floor(aux)
     aux /= 100
     return aux.toString()
+}
+
+fun filterGnssStatus(gnssStatus: GnssStatus?, selectedConstellation: StatusFragment.Companion.CONSTELLATION){
+
+    var filteredGnssStatus: com.inari.team.data.GnssStatus
+
+    gnssStatus?.let {status ->
+
+        for (sat in 0 until status.satelliteCount) if (status.getConstellationType(sat) == constellation) {
+            cnos.add(status.getCn0DbHz(sat))
+        }
+
+        if (selectedConstellation.id != StatusFragment.Companion.CONSTELLATION.ALL.id){
+
+        } else {
+            filteredGnssStatus = GnssStatus(
+
+            )
+        }
+    }
+
 }

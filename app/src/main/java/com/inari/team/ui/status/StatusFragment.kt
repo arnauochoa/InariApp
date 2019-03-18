@@ -4,7 +4,6 @@ package com.inari.team.ui.status
 import android.content.Context
 import android.graphics.Color
 import android.location.GnssMeasurementsEvent
-import android.location.GnssStatus
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
@@ -14,7 +13,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
-import com.google.android.gms.common.api.PendingResult
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.utils.extensions.Data
@@ -22,15 +20,24 @@ import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.skyplot.GpsTestListener
+import com.inari.team.data.GnssStatus
 import com.inari.team.data.StatusData
 import com.inari.team.ui.MainActivity
+import com.inari.team.ui.status.StatusFragment.Companion.CONSTELLATION.ALL
 import kotlinx.android.synthetic.main.fragment_status.*
 
 class StatusFragment : BaseFragment(), GpsTestListener {
 
-    private var mListener: PendingResult.StatusListener? = null
+
+    companion object {
+        enum class CONSTELLATION(var id: Int) {
+            ALL(-1), GALILEO(GnssStatus.CONSTELLATION_GALILEO), GPS(GnssStatus.CONSTELLATION_GPS)
+        }
+    }
 
     private var viewModel: StatusViewModel? = null
+
+    private var selectedCONSTELLATION: CONSTELLATION = ALL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +61,6 @@ class StatusFragment : BaseFragment(), GpsTestListener {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        mListener = context as? PendingResult.StatusListener
         MainActivity.getInstance()?.addListener(this)
     }
 
@@ -75,9 +81,9 @@ class StatusFragment : BaseFragment(), GpsTestListener {
 
         tabLayout.setSelectedTabIndicatorColor(Color.TRANSPARENT)
 
-        tabLayout.addTab(createTab("GPS", ""))
-        tabLayout.addTab(createTab("GALILEO", ""))
-        tabLayout.addTab(createTab("ALL", ""))
+        CONSTELLATION.values().forEach {
+            tabLayout.addTab(createTab(it.name))
+        }
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(p0: TabLayout.Tab?) {
@@ -94,6 +100,11 @@ class StatusFragment : BaseFragment(), GpsTestListener {
                 tab?.customView?.findViewById<ConstraintLayout>(R.id.tab)
                     ?.setBackgroundResource(R.drawable.bg_corners_red)
                 tab?.position?.let {
+                    //TODO: Filtrar dades i actualitzar vista
+                    if (it < CONSTELLATION.values().size) {
+                        selectedCONSTELLATION = CONSTELLATION.values()[it]
+                    }
+
                     //                    filters.menuType = getMenuTypeFilter(it)
 //                    filterRestaurants(filters)
                 }
@@ -104,12 +115,25 @@ class StatusFragment : BaseFragment(), GpsTestListener {
     }
 
     //helpers
-    private fun createTab(title: String, image: String): TabLayout.Tab {
+
+    private fun filterGnss() {
+        selectedCONSTELLATION.id
+
+        when (selectedCONSTELLATION) {
+            CONSTELLATION.ALL -> TODO()
+            CONSTELLATION.GALILEO -> TODO()
+            CONSTELLATION.GPS -> {
+            }
+        }
+    }
+
+    private fun createTab(title: String, image: String = ""): TabLayout.Tab {
         val tab = tabLayout.newTab().setCustomView(R.layout.item_filter_tab)
         tab.customView?.findViewById<TextView>(R.id.tvFilterTitle)?.text = title
         return tab
     }
 
+    //callbacks
     private fun updateStatusData(data: Data<StatusData>?) {
         data?.let {
             when (it.dataState) {
