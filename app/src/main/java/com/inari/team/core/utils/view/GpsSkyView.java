@@ -88,7 +88,7 @@ public class GpsSkyView extends View implements GpsTestListener {
     private void init(Context context) {
         mContext = context;
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        SAT_RADIUS = 5;
+        SAT_RADIUS = UIUtils.dpToPixels(context, 5);
 
         mHorizonActiveFillPaint = new Paint();
         mHorizonActiveFillPaint.setColor(Color.WHITE);
