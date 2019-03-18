@@ -8,10 +8,6 @@ import android.location.GnssStatus;
  */
 public interface GpsTestListener {
 
-    void gpsStart();
-
-    void gpsStop();
-
     void onGnssStarted();
 
     void onGnssStopped();

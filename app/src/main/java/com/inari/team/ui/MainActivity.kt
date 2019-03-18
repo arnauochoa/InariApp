@@ -65,8 +65,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     private var mFaceTrueNorth: Boolean = true
 
 
-    private val mGpsTestListeners = ArrayList<GpsTestListener>()
-
     private var mGeomagneticField: GeomagneticField? = null
 
     private var mSensorManager: SensorManager? = null
@@ -128,9 +126,17 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
                 override fun onSatelliteStatusChanged(status: GnssStatus) {
                     //once gnss status received, notice position fragments
                     positionFragment.onGnnsDataReceived(gnssStatus = status)
-                    mGpsTestListeners.forEach {
-                        it.onSatelliteStatusChanged(status)
-                    }
+                    statusFragment.onSatelliteStatusChanged(status = status)
+                }
+
+                override fun onStarted() {
+                    super.onStarted()
+                    statusFragment.onGnssStarted()
+                }
+
+                override fun onStopped() {
+                    super.onStopped()
+                    statusFragment.onGnssStopped()
                 }
             }
 
@@ -152,10 +158,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
                 ), SplashActivity.PERMISSIONS_CODE
             )
         }
-    }
-
-    fun addListener(listener: GpsTestListener) {
-        mGpsTestListeners.add(listener)
     }
 
     private fun addOrientationSensorListener() {
@@ -260,9 +262,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
             orientation = MathUtils.mod(orientation.toFloat(), 360.0f).toDouble()
         }
 
-        for (listener in mGpsTestListeners) {
-            listener.onOrientationChanged(orientation, tilt)
-        }
+        statusFragment.onOrientationChanged(orientation, tilt)
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)

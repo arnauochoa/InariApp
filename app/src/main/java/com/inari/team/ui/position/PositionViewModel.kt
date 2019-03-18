@@ -38,11 +38,6 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
     val position = MutableLiveData<Data<LatLng>>()
 
     companion object {
-//        // Add C++ library
-//        init {
-//            System.loadLibrary("pvtEngine-lib")
-//        }
-
         const val SUPL_SERVER_HOST = "supl.google.com"
         const val SUPL_SERVER_PORT = 7275
         const val SUPL_SSL_ENABLED = true
@@ -202,7 +197,10 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
         return position
     }
 
-    //todo what is this?
+    /**
+     * C++ function used to compute the PVT. This function is defined in Project view modes at the path:
+     * /app/src/main/cpp/pvtEngine-lib.cpp
+     */
     private external fun obtainPosition(gnssData: String): String
 
 

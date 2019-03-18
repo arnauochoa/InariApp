@@ -7,4 +7,6 @@ interface Navigator {
 
     fun navigateToMainActivity()
 
+    fun navigateToLogsActivity()
+
 }
