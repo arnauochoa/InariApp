@@ -184,7 +184,6 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
         val current = Date()
         val fileName = "$startTimeString/${formatter.format(current)}.txt"
         val pvtInfoString = gnssDataJson.toString(2)
-//        mView?.showMessage("Saving logs")
         pvtInfoString?.let {
             saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
         }
