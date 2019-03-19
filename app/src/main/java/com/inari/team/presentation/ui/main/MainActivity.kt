@@ -1,4 +1,4 @@
-package com.inari.team.presentation.ui
+package com.inari.team.presentation.ui.main
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -17,15 +17,14 @@ import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
 import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.checkPermissionsList
 import com.inari.team.core.utils.extensions.requestPermissionss
-import com.inari.team.core.utils.skyplot.GpsTestListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.ui.position.PositionFragment
+import com.inari.team.presentation.ui.splash.SplashActivity
 import com.inari.team.presentation.ui.statistics.StatisticsFragment
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
@@ -146,8 +145,12 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
                 }
             }
 
-            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this)
-            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this)
+            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                MIN_TIME,
+                MIN_DISTANCE, this)
+            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                MIN_TIME,
+                MIN_DISTANCE, this)
             locationManager?.registerGnssStatusCallback(gnssStatusListener)
             locationManager?.registerGnssMeasurementsCallback(gnssMeasurementsEventListener)
         } else {

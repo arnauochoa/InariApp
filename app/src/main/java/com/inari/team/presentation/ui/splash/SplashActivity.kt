@@ -1,4 +1,4 @@
-package com.inari.team.presentation.ui
+package com.inari.team.presentation.ui.splash
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,6 +9,7 @@ import com.inari.team.R
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.*
 import com.inari.team.presentation.model.Mode
+import com.inari.team.presentation.ui.main.MainActivity
 import java.io.File
 import java.io.IOException
 
@@ -71,7 +72,8 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(Mode.CONST_GPS),
             arrayListOf(Mode.BAND_L1),
             arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
-            Mode.ALG_LS
+            Mode.ALG_LS,
+            true
         )
         val mode2 = Mode(
             1,
@@ -79,7 +81,8 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(Mode.CONST_GAL),
             arrayListOf(Mode.BAND_L1),
             arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
-            Mode.ALG_WLS
+            Mode.ALG_WLS,
+            false
         )
         val mode3 = Mode(
             2,
@@ -87,7 +90,8 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(Mode.CONST_GPS, Mode.CONST_GAL),
             arrayListOf(Mode.BAND_L1, Mode.BAND_L5),
             arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE, Mode.CORR_MULTIPATH),
-            Mode.ALG_KALMAN
+            Mode.ALG_KALMAN,
+            false
         )
 
         val list = arrayListOf(mode, mode2, mode3)

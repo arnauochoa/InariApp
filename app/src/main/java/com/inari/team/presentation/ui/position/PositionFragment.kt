@@ -114,8 +114,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun setViews() {
         fabOptions.setOnClickListener {
-//            clBottomSheet.visibility = View.VISIBLE
-            navigator.navigateToGnssSettingsActivity()
+            navigator.navigateToModesActivity()
         }
 
         fabClose.setOnClickListener {
@@ -164,7 +163,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     fun setMap(map: GoogleMap?) {
 
         mMap = map
-        mMap?.setMaxZoomPreference(15f)
 
         mMap?.isMyLocationEnabled = true
         mMap?.uiSettings?.isMyLocationButtonEnabled = false
