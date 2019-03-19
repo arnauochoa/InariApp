@@ -43,6 +43,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
     private var gnssStatusListener: GnssStatus.Callback? = null
     private var gnssMeasurementsEventListener: GnssMeasurementsEvent.Callback? = null
+    private var gnssNmeaMessageListener: OnNmeaMessageListener? = null
 
     private var positionFragment = PositionFragment()
     private var statusFragment = StatusFragment()
@@ -144,14 +145,25 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
                 }
             }
 
-            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+            gnssNmeaMessageListener = OnNmeaMessageListener { message, timestamp ->
+                statusFragment.onNmeaMessageReceived(message, timestamp)
+            }
+
+            locationManager?.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
                 MIN_TIME,
-                MIN_DISTANCE, this)
-            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                MIN_DISTANCE, this
+            )
+            locationManager?.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER,
                 MIN_TIME,
-                MIN_DISTANCE, this)
+                MIN_DISTANCE, this
+            )
+
             locationManager?.registerGnssStatusCallback(gnssStatusListener)
             locationManager?.registerGnssMeasurementsCallback(gnssMeasurementsEventListener)
+            locationManager?.addNmeaListener(gnssNmeaMessageListener)
+
         } else {
             requestPermissionss(
                 arrayOf(

@@ -24,7 +24,7 @@
     <string name="corrections_subtitle">Corrections:</string>
     <string name="algorithm_subtitle">Algorithm:</string>
     <string name="averaging_subtitle">Averaging\n\t time:</string>
-    <string name="CN0_strip_title">Carrier to Noise Density Ratio:</string>
+    <string name="CN0_strip_title">Average  C/No (dB-Hz):</string>
     <string name="num_sats_title">Number of satellites:</string>
     <string name="pdop_title">PDOP:</string>
     <string name="cn0_title">C/N0:</string>
@@ -57,5 +57,13 @@
     <string name="modes">Modes</string>
     <string name="start_computing">Start Computing</string>
     <string name="stop_computing">Stop Computing</string>
+    <string name="sky_legend_cno_low">10</string>
+    <string name="sky_legend_cno_low_middle">18</string>
+    <string name="sky_legend_cno_middle">27</string>
+    <string name="sky_legend_cno_middle_high">36</string>
+    <string name="sky_legend_cno_high">45</string>
+    <string name="sky_legend_shape_navstar">GPS (USA)</string>
+    <string name="sky_legend_shape_galileo">Galileo (EU)</string>
+>>>>>>> 26834d9... GNSS STATE data and legend added
 
 </resources>

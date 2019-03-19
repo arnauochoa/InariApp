@@ -23,7 +23,7 @@ import java.util.Iterator;
  * View that shows satellite positions on a circle representing the sky
  */
 
-public class GpsSkyView extends View implements GpsTestListener {
+public class GpsSkyView extends View implements GnssEventsListener {
 
     public static final float MIN_VALUE_CN0 = 10.0f;
     public static final float MAX_VALUE_CN0 = 45.0f;
@@ -671,6 +671,10 @@ public class GpsSkyView extends View implements GpsTestListener {
     public void onOrientationChanged(double orientation, double tilt) {
         mOrientation = orientation;
         invalidate();
+    }
+
+    @Override
+    public void onNmeaMessageReceived(String message, long timestamp) {
     }
 
     @Override
