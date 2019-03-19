@@ -74,10 +74,7 @@ class AppSharedPreferences {
 
     fun saveModes(modes: List<Mode>) {
         val gson = Gson()
-        val modesList = getModesList()
-        modesList.addAll(modes)
-
-        val json = gson.toJson(modesList)
+        val json = gson.toJson(modes)
         mPrefs.edit()
             .putString(MODES, json)
             .apply()

@@ -23,23 +23,23 @@ class GnssSettingsActivity : BaseActivity() {
         setViews()
     }
 
-    fun setViews(){
+    private fun setViews() {
         setSupportActionBar(gnssSettingsToolbar)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_close)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.gnss_settings_title)
 
-        resetGnssSettings.setOnClickListener{
+        resetGnssSettings.setOnClickListener {
             resetGnssSettings()
         }
     }
 
-    private fun resetGnssSettings(){
+    private fun resetGnssSettings() {
         val filters = GnssSettings()
         mPrefs //save new settings
     }
 
-    fun applyFilters(){
+    fun applyFilters() {
         //save filters to preferences
 
         setResult(Activity.RESULT_OK)

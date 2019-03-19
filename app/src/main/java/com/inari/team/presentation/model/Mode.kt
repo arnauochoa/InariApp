@@ -6,7 +6,8 @@ data class Mode(
     val constellations: ArrayList<Int>,
     val bands: ArrayList<Int>,
     val corrections: ArrayList<Int>,
-    val algorithm: Int
+    val algorithm: Int,
+    var isSelected: Boolean
 ) {
 
     companion object {

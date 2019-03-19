@@ -4,23 +4,36 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.inari.team.R
-import com.inari.team.presentation.model.Mode
+import com.inari.team.core.base.BaseActivity
+import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.toast
+import com.inari.team.presentation.model.Mode
 import kotlinx.android.synthetic.main.activity_modes.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
+import javax.inject.Inject
 
-class ModesActivity : AppCompatActivity() {
+class ModesActivity : BaseActivity() {
 
-    private val mAdapter = ModesListAdapter(this)
+    companion object {
+        const val COMPARING_EXTRA: String = "comparing"
+    }
+
+    @Inject
+    lateinit var navigator: Navigator
+
+    @Inject
+    lateinit var mPrefs: AppSharedPreferences
+
+    private val mAdapter = ModesListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modes)
+        activityComponent.inject(this)
 
         setToolbar()
 
@@ -29,15 +42,22 @@ class ModesActivity : AppCompatActivity() {
         modesRVList.adapter = mAdapter
 
         fabNewMode.setOnClickListener {
-            showNewModeDialog()
+            navigator.navigateToGnssSettingsActivity()
         }
 
     }
 
     private fun setToolbar() {
+        setSupportActionBar(gnssModesToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Modes"
+        supportActionBar?.title = getString(R.string.modes)
+
+        apply_gnss_modes.setOnClickListener {
+            mPrefs.saveModes(mAdapter.getItems())
+            finish()
+        }
     }
+
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
@@ -90,7 +110,8 @@ class ModesActivity : AppCompatActivity() {
                 constellations,
                 bands,
                 corrections,
-                algorithm
+                algorithm,
+                false
             )
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")
