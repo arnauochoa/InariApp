@@ -6,7 +6,7 @@ import android.location.GnssStatus;
 /**
  * Interface used by GpsTestActivity to communicate with Gps*Fragments
  */
-public interface GpsTestListener {
+public interface GnssEventsListener {
 
     void onGnssStarted();
 
@@ -17,5 +17,7 @@ public interface GpsTestListener {
     void onGnssMeasurementsReceived(GnssMeasurementsEvent event);
 
     void onOrientationChanged(double orientation, double tilt);
+
+    void onNmeaMessageReceived(String message, long timestamp);
 
 }

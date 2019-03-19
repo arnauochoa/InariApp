@@ -3,8 +3,10 @@ package com.inari.team.core.utils
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.model.StatusData
 import com.inari.team.presentation.ui.status.StatusFragment
+import com.inari.team.presentation.ui.status.StatusFragment.Companion.CONSTELLATION.*
 import kotlin.math.floor
 
+private class Satellite(var svid: Int, var constellationId: Int)
 
 fun getStatusData(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.Companion.CONSTELLATION): StatusData {
     val statusData = StatusData()
@@ -20,22 +22,43 @@ fun getStatusData(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.
  */
 fun getCNoString(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.Companion.CONSTELLATION): String {
     var avgCNoString = "--"
-//    if (!cnos.isNullOrEmpty()) {
-//        val avgCNo = takeTwoDecimals(cnos.average())
-//        avgCNoString = "$avgCNo dB-Hz"
-//    }
+    val cnosArrayList = arrayListOf<Float>()
+
+    for (sat in 0 until gnssStatus.satelliteCount) {
+        cnosArrayList.add(gnssStatus.getCn0DbHz(sat))
+    }
+
+    if (!cnosArrayList.isNullOrEmpty()) {
+        val avgCNo = takeTwoDecimals(cnosArrayList.average())
+        avgCNoString = "$avgCNo dB-Hz"
+    }
     return avgCNoString
 }
+
 
 /**
  * Returns the string to be printed on the number of satellites field in status views.
  */
 fun getSatellitesCount(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.Companion.CONSTELLATION): String {
     var satellitesCountString = "--"
+    val satelliteArrayList = arrayListOf<Satellite>()
 
-//    cnos?.let {
-//        satellitesCountString = it.size.toString()
-//    }
+    for (sat in 0 until gnssStatus.satelliteCount) {
+        val satellite = Satellite(
+            gnssStatus.getSvid(sat),
+            gnssStatus.getConstellationType(sat)
+        )
+
+        // If satellite (svid-const) is not in satellites list, add it
+        if (!satelliteArrayList.any { it.svid == satellite.svid && it.constellationId == satellite.constellationId }) {
+            satelliteArrayList.add(satellite)
+        }
+    }
+
+    if (satelliteArrayList.isNotEmpty()) {
+        satellitesCountString = satelliteArrayList.size.toString()
+    }
+
     return satellitesCountString
 }
 
@@ -67,10 +90,9 @@ fun filterGnssStatus(
     with(gnssStatus) {
 
         for (sat in 0 until satelliteCount) {
-            if (selectedConstellation.id == StatusFragment.Companion.CONSTELLATION.ALL.id) {
-                if (getConstellationType(sat) == StatusFragment.Companion.CONSTELLATION.GALILEO.id || getConstellationType(
-                        sat
-                    ) == StatusFragment.Companion.CONSTELLATION.GPS.id
+            if (selectedConstellation.id == ALL.id) {
+                if (getConstellationType(sat) == GALILEO.id ||
+                    getConstellationType(sat) == GPS.id
                 ) {
                     mSvidWithFlags.add(getSvid(sat))
                     mCn0DbHz.add(getCn0DbHz(sat))
@@ -105,5 +127,4 @@ fun filterGnssStatus(
     )
 
     return filteredGnssStatus
-
 }

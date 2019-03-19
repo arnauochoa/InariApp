@@ -13,6 +13,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
+import org.jetbrains.annotations.NotNull;
 
 import static com.inari.team.core.utils.skyplot.GnssType.BEIDOU;
 import static com.inari.team.core.utils.skyplot.GnssType.GALILEO;
@@ -354,22 +355,23 @@ public class GpsTestUtil {
      * PDOP is 3.6, HDOP is 1.8, and VDOP is 3.1
      *
      * @param nmeaSentence a $GNGSA or $GPGSA NMEA sentence
+     * @param constellationTag
      * @return the dilution of precision, or null if dilution of precision can't be parsed
      */
-    public static DilutionOfPrecision getDop(String nmeaSentence) {
+    public static @org.jetbrains.annotations.Nullable DilutionOfPrecision getDop(String nmeaSentence, String constellationTag) {
         final int PDOP_INDEX = 15;
         final int HDOP_INDEX = 16;
         final int VDOP_INDEX = 17;
         String[] tokens = nmeaSentence.split(",");
 
-        if (nmeaSentence.startsWith("$GNGSA") || nmeaSentence.startsWith("$GPGSA")) {
+        if (nmeaSentence.startsWith(constellationTag)) {
             String pdop, hdop, vdop;
             try {
                 pdop = tokens[PDOP_INDEX];
                 hdop = tokens[HDOP_INDEX];
                 vdop = tokens[VDOP_INDEX];
             } catch (ArrayIndexOutOfBoundsException e) {
-                Log.e(TAG, "Bad NMEA message for parsing DOP - " + nmeaSentence + " :" + e);
+//                Log.e(TAG, "Bad NMEA message for parsing DOP - " + nmeaSentence + " :" + e);
                 return null;
             }
 
@@ -385,15 +387,15 @@ public class GpsTestUtil {
                             Double.valueOf(vdop));
                 } catch (NumberFormatException e) {
                     // See https://github.com/barbeau/gpstest/issues/71#issuecomment-263169174
-                    Log.e(TAG, "Invalid DOP values in NMEA: " + nmeaSentence);
+//                    Log.e(TAG, "Invalid DOP values in NMEA: " + nmeaSentence);
                 }
                 return dop;
             } else {
-                Log.w(TAG, "Empty DOP values in NMEA: " + nmeaSentence);
+//                Log.w(TAG, "Empty DOP values in NMEA: " + nmeaSentence);
                 return null;
             }
         } else {
-            Log.w(TAG, "Input must be a $GNGSA NMEA: " + nmeaSentence);
+//            Log.w(TAG, "Input must be a $GNGSA NMEA: " + nmeaSentence);
             return null;
         }
     }

@@ -19,15 +19,19 @@ import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.filterGnssStatus
-import com.inari.team.core.utils.skyplot.GpsTestListener
+import com.inari.team.core.utils.skyplot.DilutionOfPrecision
+import com.inari.team.core.utils.skyplot.GnssEventsListener
+import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.model.StatusData
 import kotlinx.android.synthetic.main.fragment_status.*
 
-class StatusFragment : BaseFragment(), GpsTestListener {
-
+class StatusFragment : BaseFragment(), GnssEventsListener {
 
     companion object {
+        const val GPS_DOP_TAG = "\$GPGSA"
+        const val GAL_DOP_TAG = "\$GAGSA"
+
         enum class CONSTELLATION(var id: Int) {
             ALL(-1), GALILEO(GnssStatus.CONSTELLATION_GALILEO), GPS(GnssStatus.CONSTELLATION_GPS)
         }
@@ -36,6 +40,9 @@ class StatusFragment : BaseFragment(), GpsTestListener {
     private var viewModel: StatusViewModel? = null
 
     private var selectedConstellation: CONSTELLATION = Companion.CONSTELLATION.ALL
+
+    private var dopGps: DilutionOfPrecision? = null
+    private var dopGal: DilutionOfPrecision? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +60,6 @@ class StatusFragment : BaseFragment(), GpsTestListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setFilterTabs()
     }
 
@@ -97,8 +103,10 @@ class StatusFragment : BaseFragment(), GpsTestListener {
                         selectedConstellation = CONSTELLATION.values()[it]
                     }
                 }
-            }
 
+                legend_cv.visibility = if (selectedConstellation == Companion.CONSTELLATION.ALL) VISIBLE else GONE
+                showDop()
+            }
         })
 
     }
@@ -110,6 +118,26 @@ class StatusFragment : BaseFragment(), GpsTestListener {
         return tab
     }
 
+    private fun showDop() {
+        val dopToShow = when (selectedConstellation) {
+            Companion.CONSTELLATION.GPS -> dopGps
+            Companion.CONSTELLATION.GALILEO -> dopGal
+            Companion.CONSTELLATION.ALL -> dopGps //TODO: what DOP should we show?
+        }
+
+        if (dopToShow == null) {
+            pdopContent.text = "--"
+            hvdopContent.text = "--/--"
+        } else {
+            pdopContent.text = "${dopToShow.positionDop}"
+            hvdopContent.text = "${dopToShow.horizontalDop}/${dopToShow.verticalDop}"
+        }
+    }
+
+    //Todo: Funció per mostrar la average CNO sobre la llegenda:
+    // Average CNO es pot obtenir a core/utils/StatusUtils.kt --> getCNoString (retorna un String, pero es pot fer que
+    // retorni un float o el que calgui)
+
     //callbacks
     private fun updateStatusData(data: Data<StatusData>?) {
         data?.let {
@@ -118,8 +146,8 @@ class StatusFragment : BaseFragment(), GpsTestListener {
                 }
                 SUCCESS -> {
                     it.data?.let { statusData ->
-                        cn0ContentALL.text = statusData.CN0
-                        numSatsContentALL.text = statusData.satellitesCount
+                        cn0Content.text = statusData.CN0
+                        numSatsContent.text = statusData.satellitesCount
                     }
                 }
                 ERROR -> {
@@ -151,5 +179,14 @@ class StatusFragment : BaseFragment(), GpsTestListener {
         //no-op
     }
 
+    override fun onNmeaMessageReceived(message: String?, timestamp: Long) {
+        //todo: If GpsTestUtil is translated to kotlin, pass selected constellation instead of constellation tag
+        val newDopGps = GpsTestUtil.getDop(message, GPS_DOP_TAG)
+        val newDopGal = GpsTestUtil.getDop(message, GAL_DOP_TAG)
 
+        dopGps = newDopGps ?: dopGps
+        dopGal = newDopGal ?: dopGal
+
+        showDop()
+    }
 }
