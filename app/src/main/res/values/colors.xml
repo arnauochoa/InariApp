@@ -14,6 +14,8 @@
     <color name="colorDarkGrayBackground">#777777</color>
     <color name="green">#8BC34A</color>
 
+    <color name="transparentWhite">#B2FFFFFF</color>
+
 
     <!-- GPSTest Theme -->
     <!--<color name="colorPrimary">#3F51B5</color>-->

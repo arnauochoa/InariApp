@@ -9,4 +9,6 @@ interface Navigator {
 
     fun navigateToLogsActivity()
 
+    fun navigateToGnssSettingsActivity()
+
 }

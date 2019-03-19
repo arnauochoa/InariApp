@@ -9,8 +9,8 @@ import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.ephemeris.GalEphemeris
 import com.google.location.suplclient.ephemeris.GloEphemeris
 import com.google.location.suplclient.ephemeris.GpsEphemeris
-import com.inari.team.data.GnssData
-import com.inari.team.data.PositionParameters
+import com.inari.team.presentation.model.GnssData
+import com.inari.team.presentation.model.PositionParameters
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat

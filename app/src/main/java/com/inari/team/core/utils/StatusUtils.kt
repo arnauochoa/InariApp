@@ -1,13 +1,12 @@
 package com.inari.team.core.utils
 
 import com.inari.team.data.GnssStatus
-import com.inari.team.data.StatusData
-import com.inari.team.ui.status.StatusFragment.Companion.CONSTELLATION
-import com.inari.team.ui.status.StatusFragment.Companion.CONSTELLATION.*
+import com.inari.team.presentation.model.StatusData
+import com.inari.team.presentation.ui.status.StatusFragment
 import kotlin.math.floor
 
 
-fun getStatusData(gnssStatus: GnssStatus, selectedConstellation: CONSTELLATION): StatusData {
+fun getStatusData(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.Companion.CONSTELLATION): StatusData {
     val statusData = StatusData()
 
     statusData.CN0 = getCNoString(gnssStatus, selectedConstellation)
@@ -19,7 +18,7 @@ fun getStatusData(gnssStatus: GnssStatus, selectedConstellation: CONSTELLATION):
 /**
  * Returns the string to be printed on the average CNo field in status views.
  */
-fun getCNoString(gnssStatus: GnssStatus, selectedConstellation: CONSTELLATION): String {
+fun getCNoString(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.Companion.CONSTELLATION): String {
     var avgCNoString = "--"
 //    if (!cnos.isNullOrEmpty()) {
 //        val avgCNo = takeTwoDecimals(cnos.average())
@@ -31,7 +30,7 @@ fun getCNoString(gnssStatus: GnssStatus, selectedConstellation: CONSTELLATION): 
 /**
  * Returns the string to be printed on the number of satellites field in status views.
  */
-fun getSatellitesCount(gnssStatus: GnssStatus, selectedConstellation: CONSTELLATION): String {
+fun getSatellitesCount(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.Companion.CONSTELLATION): String {
     var satellitesCountString = "--"
 
 //    cnos?.let {
@@ -52,7 +51,7 @@ private fun takeTwoDecimals(value: Double): String {
 
 fun filterGnssStatus(
     gnssStatus: android.location.GnssStatus,
-    selectedConstellation: CONSTELLATION
+    selectedConstellation: StatusFragment.Companion.CONSTELLATION
 ): GnssStatus {
 
     val filteredGnssStatus: GnssStatus
@@ -68,8 +67,11 @@ fun filterGnssStatus(
     with(gnssStatus) {
 
         for (sat in 0 until satelliteCount) {
-            if (selectedConstellation.id == ALL.id) {
-                if (getConstellationType(sat) == GALILEO.id || getConstellationType(sat) == GPS.id) {
+            if (selectedConstellation.id == StatusFragment.Companion.CONSTELLATION.ALL.id) {
+                if (getConstellationType(sat) == StatusFragment.Companion.CONSTELLATION.GALILEO.id || getConstellationType(
+                        sat
+                    ) == StatusFragment.Companion.CONSTELLATION.GPS.id
+                ) {
                     mSvidWithFlags.add(getSvid(sat))
                     mCn0DbHz.add(getCn0DbHz(sat))
                     mElevations.add(getElevationDegrees(sat))
