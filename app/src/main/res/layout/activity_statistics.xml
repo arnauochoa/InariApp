@@ -5,7 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.statistics.StatisticsActivity"
+        tools:context=".presentation.ui.statistics.StatisticsActivity"
         android:background="@color/colorLightGrayBackground">
 
     <android.support.v7.widget.Toolbar

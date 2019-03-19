@@ -7,4 +7,7 @@ interface Navigator {
 
     fun navigateToMainActivity()
 
+
+    fun navigateToGnssSettingsActivity()
+
 }

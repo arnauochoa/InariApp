@@ -5,8 +5,8 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.inari.team.core.utils.extensions.ViewModelFactory
 import com.inari.team.core.utils.extensions.ViewModelKey
-import com.inari.team.ui.position.PositionViewModel
-import com.inari.team.ui.status.StatusViewModel
+import com.inari.team.presentation.ui.position.PositionViewModel
+import com.inari.team.presentation.ui.status.StatusViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
