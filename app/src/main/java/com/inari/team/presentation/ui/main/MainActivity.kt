@@ -69,7 +69,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     private var mSensorManager: SensorManager? = null
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -278,7 +277,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onLocationChanged(location: Location?) {
         positionFragment.onGnnsDataReceived(location = location)
     }
