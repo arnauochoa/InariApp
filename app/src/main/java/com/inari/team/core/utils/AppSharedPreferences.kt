@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.inari.team.core.App
-import com.inari.team.data.Mode
+import com.inari.team.presentation.model.Mode
 
 
 class AppSharedPreferences {

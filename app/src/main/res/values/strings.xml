@@ -51,5 +51,10 @@
 
     <string name="gps_lat_lon_dms_value">%1$d\u00B0 %2$d\' %3$d\"</string>
     <string name="legend">LEGEND</string>
+    <string name="reset">RESET</string>
+    <string name="gnss_settings_title">GNSS Settings</string>
+    <string name="apply">Apply</string>
+    <string name="constellations_title">CONSTELLATIONS</string>
+    <string name="bands_title">BANDS</string>
 
 </resources>

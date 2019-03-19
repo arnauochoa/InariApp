@@ -10,7 +10,9 @@
 
 extern "C" JNIEXPORT jstring JNICALL
 
-Java_com_inari_team_ui_position_PositionViewModel_obtainPosition(JNIEnv *env, jobject instance, jstring jsonData) {
+
+Java_com_inari_team_presentation_ui_position_PositionViewModel_obtainPosition(JNIEnv *env, jobject instance,
+                                                                              jstring jsonData) {
 
     const char *gnssData = env->GetStringUTFChars(jsonData, nullptr);
 
@@ -23,10 +25,10 @@ Java_com_inari_team_ui_position_PositionViewModel_obtainPosition(JNIEnv *env, jo
     extract_info(firstGnssInfo, acqInfo);
 
     // eph Matrix
-    double ** eph;
-    double * iono;
+    double **eph;
+    double *iono;
     int ephN, ephM;
-    getEphMatrix(acqInfo,eph,iono, ephN, ephM);
+    getEphMatrix(acqInfo, eph, iono, ephN, ephM);
 
     // Some initializations
 
@@ -46,7 +48,7 @@ Java_com_inari_team_ui_position_PositionViewModel_obtainPosition(JNIEnv *env, jo
     double PVT[4];    //  PVT solution
     double posllh[3];      //  Position in Latitude, Longitude and Height
 
-    PVT_recls(acqInfo, eph, ephN, ephM, iono, Nit, PVT0, enabCorr, PVT );
+    PVT_recls(acqInfo, eph, ephN, ephM, iono, Nit, PVT0, enabCorr, PVT);
 
     xyz2llh(PVT, posllh);     // Getting position in Latitude, Longitude, Height format
 

@@ -7,7 +7,7 @@
               android:orientation="vertical"
               android:background="#dfdfdf"
               android:weightSum="10"
-              tools:context=".ui.statistics.StatisticsFragment">
+              tools:context=".presentation.ui.statistics.StatisticsFragment">
 
 
     <android.support.v7.widget.GridLayout

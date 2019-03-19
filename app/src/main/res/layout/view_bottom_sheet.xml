@@ -222,6 +222,13 @@
         </android.support.constraint.ConstraintLayout>
 
         <android.support.constraint.ConstraintLayout
+                android:id="@+id/enableAveraging"
+                android:layout_width="match_parent"
+                android:layout_height="0dp">
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
                 android:id="@+id/averagingSelection"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -229,7 +236,7 @@
                 android:layout_marginBottom="60dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/algorithmsSelection">
+                app:layout_constraintTop_toBottomOf="@id/enableAveraging">
 
             <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/averagingTextView"
