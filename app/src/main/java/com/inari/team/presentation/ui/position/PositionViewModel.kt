@@ -94,26 +94,27 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
     }
 
     fun setGnssData(
-        parameters: PositionParameters? = null,
+        parameters: List<PositionParameters> = arrayListOf(),
         location: Location? = null,
         gnssStatus: GnssStatus? = null,
         gnssMeasurementsEvent: GnssMeasurementsEvent? = null,
         ephemerisResponse: EphemerisResponse? = null
     ) {
-        gnssData.parameters = parameters ?: gnssData.parameters
+
+        gnssData.parameters = if (parameters.isNotEmpty()) parameters else gnssData.parameters
         gnssData.location = location ?: gnssData.location
         gnssData.gnssStatus = gnssStatus ?: gnssData.gnssStatus
         gnssData.ephemerisResponse = ephemerisResponse ?: gnssData.ephemerisResponse
 
         location?.let {
-            refPos = LatLng(location.latitude, location.longitude)
+            refPos = LatLng(it.latitude, it.longitude)
         }
 
         if (gnssData.ephemerisResponse == null) {
             obtainEphemerisData()
         }
 
-        if (gnssData.parameters != null &&
+        if (gnssData.parameters.isNotEmpty() &&
             gnssData.location != null &&
             gnssData.gnssStatus != null &&
             gnssData.ephemerisResponse != null

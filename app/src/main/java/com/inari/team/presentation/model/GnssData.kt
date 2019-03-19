@@ -7,7 +7,7 @@ import android.location.Location
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 
 data class GnssData(
-    var parameters: PositionParameters? = null,
+    var parameters: List<PositionParameters> = arrayListOf(),
     var location: Location? = null,
     var gnssStatus: GnssStatus? = null,
     var gnssMeasurements: Collection<GnssMeasurement>? = null,

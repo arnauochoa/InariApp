@@ -7,7 +7,6 @@ import android.hardware.*
 import android.location.*
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.view.Surface
 import android.widget.Toast
 import com.inari.team.R
@@ -17,6 +16,7 @@ import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
 import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.checkPermissionsList
 import com.inari.team.core.utils.extensions.requestPermissionss
+import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
 import com.inari.team.core.utils.toast
@@ -49,6 +49,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     private var statusFragment = StatusFragment()
     private var statisticsFragment = StatisticsFragment()
 
+    private var gnssListeners = arrayListOf<GnssEventsListener>()
 
     // Holds sensor data
     private val mRotationMatrix = FloatArray(16)
@@ -61,9 +62,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
     private var mTruncateVector = false
 
-
     private var mFaceTrueNorth: Boolean = true
-
 
     private var mGeomagneticField: GeomagneticField? = null
 
@@ -73,7 +72,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         activityComponent.inject(this)
 
         mActivity = this
@@ -106,13 +104,13 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.action_position -> {
-                    switchFragment(0)
+                    viewPager.setCurrentItem(0, false)
                 }
                 R.id.action_status -> {
-                    switchFragment(1)
+                    viewPager.setCurrentItem(1, false)
                 }
                 R.id.action_statistics -> {
-                    switchFragment(2)
+                    viewPager.setCurrentItem(2, false)
                 }
             }
             true
@@ -124,29 +122,46 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
             gnssStatusListener = object : GnssStatus.Callback() {
                 override fun onSatelliteStatusChanged(status: GnssStatus) {
                     //once gnss status received, notice position fragments
-                    positionFragment.onGnnsDataReceived(gnssStatus = status)
-                    statusFragment.onSatelliteStatusChanged(status = status)
+//                    positionFragment.onGnnsDataReceived(gnssStatus = status)
+//                    statusFragment.onSatelliteStatusChanged(status = status)
+
+                    gnssListeners.forEach {
+                        it.onSatelliteStatusChanged(status)
+                    }
                 }
 
                 override fun onStarted() {
                     super.onStarted()
-                    statusFragment.onGnssStarted()
+//                    statusFragment.onGnssStarted()
+
+                    gnssListeners.forEach {
+                        it.onGnssStarted()
+                    }
+
                 }
 
                 override fun onStopped() {
                     super.onStopped()
-                    statusFragment.onGnssStopped()
+//                    statusFragment.onGnssStopped()
+
+                    gnssListeners.forEach {
+                        it.onGnssStopped()
+                    }
                 }
             }
 
             gnssMeasurementsEventListener = object : GnssMeasurementsEvent.Callback() {
                 override fun onGnssMeasurementsReceived(measurementsEvent: GnssMeasurementsEvent?) {
-                    positionFragment.onGnnsDataReceived(gnssMeasurementsEvent = measurementsEvent)
+                    gnssListeners.forEach {
+                        it.onGnssMeasurementsReceived(measurementsEvent)
+                    }
                 }
             }
 
             gnssNmeaMessageListener = OnNmeaMessageListener { message, timestamp ->
-                statusFragment.onNmeaMessageReceived(message, timestamp)
+                gnssListeners.forEach {
+                    it.onNmeaMessageReceived(message, timestamp)
+                }
             }
 
             locationManager?.requestLocationUpdates(
@@ -191,9 +206,12 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
         }
     }
 
-    //helpers
-    private fun switchFragment(id: Int) {
-        viewPager.setCurrentItem(id, false)
+    fun subscribeToGnssEvents(listener: GnssEventsListener) {
+        gnssListeners.add(listener)
+    }
+
+    fun unSubscribeToGnssEvent(listener: GnssEventsListener) {
+        gnssListeners.remove(listener)
     }
 
     //callbacks
@@ -276,7 +294,9 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
             orientation = MathUtils.mod(orientation.toFloat(), 360.0f).toDouble()
         }
 
-        statusFragment.onOrientationChanged(orientation, tilt)
+        gnssListeners.forEach {
+            it.onOrientationChanged(orientation, tilt)
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -290,7 +310,9 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
 
     override fun onLocationChanged(location: Location?) {
-        positionFragment.onGnnsDataReceived(location = location)
+        gnssListeners.forEach {
+            it.onLocationReceived(location)
+        }
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -322,5 +344,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     override fun onDestroy() {
         super.onDestroy()
         locationManager?.removeUpdates(this)
+        gnssListeners.clear()
     }
 }

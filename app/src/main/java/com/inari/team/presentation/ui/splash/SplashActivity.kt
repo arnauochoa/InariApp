@@ -73,7 +73,8 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(Mode.BAND_L1),
             arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
             Mode.ALG_LS,
-            true
+            avgTime = 5L,
+            isSelected = true
         )
         val mode2 = Mode(
             1,
@@ -82,7 +83,8 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(Mode.BAND_L1),
             arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
             Mode.ALG_WLS,
-            false
+            avgTime = 5L,
+            isSelected = false
         )
         val mode3 = Mode(
             2,
@@ -91,7 +93,8 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(Mode.BAND_L1, Mode.BAND_L5),
             arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE, Mode.CORR_MULTIPATH),
             Mode.ALG_KALMAN,
-            false
+            avgTime = 5L,
+            isSelected = false
         )
 
         val list = arrayListOf(mode, mode2, mode3)

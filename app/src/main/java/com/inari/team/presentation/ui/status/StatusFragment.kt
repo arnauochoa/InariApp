@@ -1,8 +1,10 @@
 package com.inari.team.presentation.ui.status
 
 
+import android.content.Context
 import android.graphics.Color
 import android.location.GnssMeasurementsEvent
+import android.location.Location
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
@@ -24,6 +26,7 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.model.StatusData
+import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.fragment_status.*
 
 class StatusFragment : BaseFragment(), GnssEventsListener {
@@ -61,6 +64,11 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setFilterTabs()
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        MainActivity.getInstance()?.subscribeToGnssEvents(this)
     }
 
     override fun onResume() {
@@ -176,6 +184,10 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {
+        //no-op
+    }
+
+    override fun onLocationReceived(location: Location?) {
         //no-op
     }
 

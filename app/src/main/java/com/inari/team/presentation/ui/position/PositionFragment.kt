@@ -9,9 +9,7 @@ import android.graphics.drawable.ColorDrawable
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -32,18 +30,19 @@ import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.saveFile
+import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.PositionParameters
 import com.inari.team.presentation.ui.logs.LogsActivity
+import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
-import kotlinx.android.synthetic.main.view_bottom_sheet.*
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import javax.inject.Inject
 
 
-class PositionFragment : BaseFragment(), OnMapReadyCallback {
+class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener {
 
     @Inject
     lateinit var mSharedPreferences: AppSharedPreferences
@@ -64,8 +63,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     private var viewModel: PositionViewModel? = null
 
     private var avgTime: Long = 5
-
-    private var isPositioningStarted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +91,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.save_log -> {
@@ -116,26 +112,22 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
             navigator.navigateToModesActivity()
         }
 
-        fabClose.setOnClickListener {
-
-
-        }
-
         btComputeAction.setOnClickListener {
             if (btComputeAction.text == getString(R.string.start_computing)) {
+                MainActivity.getInstance()?.subscribeToGnssEvents(this)
                 btComputeAction.text = getString(R.string.stop_computing)
 
                 val selectedParameters = getSelectedParameters()
-                if (selectedParameters == null) { // If no constellation or band has been selected
-                    showError("At least one constellation and one band must be selected")
+                if (selectedParameters.isEmpty()) { // If no constellation or band has been selected
+                    //todo change message?
+                    showError("At least one constellation and one band must be selected, go to settings to select one")
                 } else {
-                    isPositioningStarted = true
                     viewModel?.setGnssData(parameters = selectedParameters)
                     startPositioning()
                 }
             } else {
+                MainActivity.getInstance()?.unSubscribeToGnssEvent(this)
                 btComputeAction.text = getString(R.string.start_computing)
-                //todo remove callbacks???
             }
         }
 
@@ -176,41 +168,35 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     }
 
-    private fun getSelectedParameters(): PositionParameters? {
-        val constellations = arrayListOf<String>()
-        val bands = arrayListOf<String>()
-        val corrections = arrayListOf<String>()
-        var algorithm: String? = null
+    private fun getSelectedParameters(): List<PositionParameters> {
+
+        val positionParametersList = arrayListOf<PositionParameters>()
 
         //list with selected modes, get parameters from each mode
-        var selectedModes = mSharedPreferences.getModesList().filter {
+        val selectedModes = mSharedPreferences.getModesList().filter {
             it.isSelected
         }
-//
-//
-//
-//        if (constParam1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
-//        if (constParam2.isChecked) constellations.add(PositionParameters.CONST_GAL)
-//        if (bandsParam1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
-//        if (bandsParam2.isChecked) bands.add(PositionParameters.BAND_L5)
-//        if (correctionsParam1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
-//        if (correctionsParam2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
-//        if (algorithmParam1.isChecked) algorithm = PositionParameters.ALG_LS  // set selected algorithm
-//        if (algorithmParam2.isChecked) algorithm = PositionParameters.ALG_WLS
-//        if (algorithmParam3.isChecked) algorithm = PositionParameters.ALG_KALMAN
-//        if (averagingParam1.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_1 // set selected averaging time
-//        if (averagingParam2.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_2
-//        if (averagingParam3.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_3
 
-        return if (constellations.isEmpty() || bands.isEmpty()) {
-            null
-        } else {
-            PositionParameters(constellations, bands, corrections, algorithm)
+        selectedModes.forEach {
+
+            with(it) {
+                positionParametersList.add(
+                    PositionParameters(
+                        constellations = constellations,
+                        bands = bands,
+                        corrections = corrections,
+                        algorithm = algorithm
+                    )
+                )
+                this@PositionFragment.avgTime = avgTime
+            }
+
         }
+
+        return positionParametersList
     }
 
     private fun startPositioning() {
-        clBottomSheet.visibility = View.GONE
         mMap?.clear()
         showMapLoading()
 
@@ -270,20 +256,18 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         return mMap?.addMarker(markerOptions)
     }
 
-
-    fun onGnnsDataReceived(
-        location: Location? = null,
-        gnssStatus: GnssStatus? = null,
-        gnssMeasurementsEvent: GnssMeasurementsEvent? = null
-    ) {
-        if (isPositioningStarted) {
-            viewModel?.setGnssData(
-                location = location,
-                gnssStatus = gnssStatus,
-                gnssMeasurementsEvent = gnssMeasurementsEvent
-            )
-        }
+    private fun showMapLoading() {
+        pbMap?.visibility = View.VISIBLE
     }
+
+    private fun hideMapLoading() {
+        pbMap?.visibility = View.GONE
+    }
+
+    private fun showError(error: String) {
+        activity?.runOnUiThread { toast(error) }
+    }
+
 
     private fun updatePosition(data: Data<LatLng>?) {
         data?.let {
@@ -296,7 +280,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                 SUCCESS -> {
                     it.data?.let { position ->
                         hideMapLoading()
-//                        mMap?.clear()
                         addMarker(position, "")
                         moveCamera(position)
                     }
@@ -309,16 +292,28 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    private fun showMapLoading() {
-        pbMap?.visibility = View.VISIBLE
+    override fun onSatelliteStatusChanged(status: GnssStatus?) {
+        viewModel?.setGnssData(gnssStatus = status)
     }
 
-    private fun hideMapLoading() {
-        pbMap?.visibility = View.GONE
+    override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {
+        viewModel?.setGnssData(gnssMeasurementsEvent = event)
     }
 
-    private fun showError(error: String) {
-        activity?.runOnUiThread { toast(error) }
+    override fun onLocationReceived(location: Location?) {
+        viewModel?.setGnssData(location = location)
+    }
+
+    override fun onGnssStarted() {
+    }
+
+    override fun onGnssStopped() {
+    }
+
+    override fun onOrientationChanged(orientation: Double, tilt: Double) {
+    }
+
+    override fun onNmeaMessageReceived(message: String?, timestamp: Long) {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

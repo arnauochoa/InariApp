@@ -42,7 +42,8 @@ class ModesActivity : BaseActivity() {
         modesRVList.adapter = mAdapter
 
         fabNewMode.setOnClickListener {
-            navigator.navigateToGnssSettingsActivity()
+            //            navigator.navigateToGnssSettingsActivity()
+            showNewModeDialog()
         }
 
     }
@@ -111,7 +112,8 @@ class ModesActivity : BaseActivity() {
                 bands,
                 corrections,
                 algorithm,
-                false
+                avgTime = 5L,
+                isSelected = false
             )
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")
