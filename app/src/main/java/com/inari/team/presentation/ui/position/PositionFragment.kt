@@ -11,7 +11,6 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.support.design.widget.Snackbar
 import android.view.*
@@ -118,21 +117,29 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         }
 
         fabClose.setOnClickListener {
-            val selectedParameters = getSelectedParameters()
-            if (selectedParameters == null) { // If no constellation or band has been selected
-                showError("At least one constellation and one band must be selected")
-            } else {
-                isPositioningStarted = true
-                viewModel?.setGnssData(parameters = selectedParameters)
-                startPositioning()
-            }
+
 
         }
 
-        //todo change when start and stop button implemented
-        Handler().postDelayed({
-            initMap()
-        }, 1000)
+        btComputeAction.setOnClickListener {
+            if (btComputeAction.text == getString(R.string.start_computing)) {
+                btComputeAction.text = getString(R.string.stop_computing)
+
+                val selectedParameters = getSelectedParameters()
+                if (selectedParameters == null) { // If no constellation or band has been selected
+                    showError("At least one constellation and one band must be selected")
+                } else {
+                    isPositioningStarted = true
+                    viewModel?.setGnssData(parameters = selectedParameters)
+                    startPositioning()
+                }
+            } else {
+                btComputeAction.text = getString(R.string.start_computing)
+                //todo remove callbacks???
+            }
+        }
+
+        initMap()
     }
 
     private fun initMap() {
@@ -167,15 +174,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         mMap?.isMyLocationEnabled = true
         mMap?.uiSettings?.isMyLocationButtonEnabled = false
 
-        //requests the current user location
-        fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
-            location?.let {
-                val latLng = LatLng(it.latitude, it.longitude)
-                animateCamera(latLng)
-                addMarker(latLng, "This is the obtained location")
-            }
-        }
-
     }
 
     private fun getSelectedParameters(): PositionParameters? {
@@ -184,18 +182,25 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         val corrections = arrayListOf<String>()
         var algorithm: String? = null
 
-        if (constParam1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
-        if (constParam2.isChecked) constellations.add(PositionParameters.CONST_GAL)
-        if (bandsParam1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
-        if (bandsParam2.isChecked) bands.add(PositionParameters.BAND_L5)
-        if (correctionsParam1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
-        if (correctionsParam2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
-        if (algorithmParam1.isChecked) algorithm = PositionParameters.ALG_LS  // set selected algorithm
-        if (algorithmParam2.isChecked) algorithm = PositionParameters.ALG_WLS
-        if (algorithmParam3.isChecked) algorithm = PositionParameters.ALG_KALMAN
-        if (averagingParam1.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_1 // set selected averaging time
-        if (averagingParam2.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_2
-        if (averagingParam3.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_3
+        //list with selected modes, get parameters from each mode
+        var selectedModes = mSharedPreferences.getModesList().filter {
+            it.isSelected
+        }
+//
+//
+//
+//        if (constParam1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
+//        if (constParam2.isChecked) constellations.add(PositionParameters.CONST_GAL)
+//        if (bandsParam1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
+//        if (bandsParam2.isChecked) bands.add(PositionParameters.BAND_L5)
+//        if (correctionsParam1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
+//        if (correctionsParam2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
+//        if (algorithmParam1.isChecked) algorithm = PositionParameters.ALG_LS  // set selected algorithm
+//        if (algorithmParam2.isChecked) algorithm = PositionParameters.ALG_WLS
+//        if (algorithmParam3.isChecked) algorithm = PositionParameters.ALG_KALMAN
+//        if (averagingParam1.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_1 // set selected averaging time
+//        if (averagingParam2.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_2
+//        if (averagingParam3.isChecked) avgTime = PositionParameters.AVERAGING_TIME_SEC_3
 
         return if (constellations.isEmpty() || bands.isEmpty()) {
             null
@@ -254,10 +259,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         snackbar.show()
     }
 
-    private fun animateCamera(latLng: LatLng) {
-        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-    }
-
     private fun moveCamera(latLng: LatLng) {
         mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
     }
@@ -288,7 +289,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         data?.let {
             when (it.dataState) {
                 LOADING -> {
-                    activity?.runOnUiThread{
+                    activity?.runOnUiThread {
                         showMapLoading()
                     }
                 }
@@ -322,9 +323,9 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
+        when (requestCode) {
             SETTINGS_RESULT_CODE -> {
-                if (resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     //apply filters
                 }
             }

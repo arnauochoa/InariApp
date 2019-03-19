@@ -55,5 +55,7 @@
         vehicula vel cursus nunc. Curabitur vehicula fermentum arcu, sed pulvinar tortor malesuada quis.
     </string>
     <string name="modes">Modes</string>
+    <string name="start_computing">Start Computing</string>
+    <string name="stop_computing">Stop Computing</string>
 
 </resources>
