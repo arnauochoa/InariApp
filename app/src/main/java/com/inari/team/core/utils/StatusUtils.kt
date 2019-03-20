@@ -35,6 +35,21 @@ fun getCNoString(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.C
     return avgCNoString
 }
 
+fun getCNo(gnssStatus: GnssStatus, selectedConstellation: StatusFragment.Companion.CONSTELLATION): Double {
+    var cno = 0.0
+    val cnosArrayList = arrayListOf<Float>()
+
+    for (sat in 0 until gnssStatus.satelliteCount) {
+        cnosArrayList.add(gnssStatus.getCn0DbHz(sat))
+    }
+
+    if (!cnosArrayList.isNullOrEmpty()) {
+        cno = takeTwoDecimalsToDouble(cnosArrayList.average())
+    }
+
+    return cno
+}
+
 
 /**
  * Returns the string to be printed on the number of satellites field in status views.
@@ -70,6 +85,13 @@ private fun takeTwoDecimals(value: Double): String {
     aux = floor(aux)
     aux /= 100
     return aux.toString()
+}
+
+fun takeTwoDecimalsToDouble(value: Double): Double {
+    var aux = value * 100
+    aux = floor(aux)
+    aux /= 100
+    return aux
 }
 
 fun filterGnssStatus(
