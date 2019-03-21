@@ -3,14 +3,15 @@ package com.inari.team.presentation.ui.status
 
 import android.graphics.Color
 import android.location.GnssMeasurementsEvent
+import android.location.Location
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
+import android.widget.SeekBar
 import android.widget.TextView
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
@@ -19,12 +20,16 @@ import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.filterGnssStatus
+import com.inari.team.core.utils.getCNo
 import com.inari.team.core.utils.skyplot.DilutionOfPrecision
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
+import com.inari.team.core.utils.takeTwoDecimalsToDouble
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.model.StatusData
+import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.fragment_status.*
+import kotlinx.android.synthetic.main.view_cno_indicator.*
 
 class StatusFragment : BaseFragment(), GnssEventsListener {
 
@@ -65,6 +70,7 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
 
     override fun onResume() {
         super.onResume()
+        MainActivity.getInstance()?.subscribeToGnssEvents(this)
         tabLayout?.getTabAt(0)?.select()
     }
 
@@ -134,9 +140,37 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
         }
     }
 
-    //Todo: Funció per mostrar la average CNO sobre la llegenda:
-    // Average CNO es pot obtenir a core/utils/StatusUtils.kt --> getCNoString (retorna un String, pero es pot fer que
-    // retorni un float o el que calgui)
+    private fun setCNo(status: GnssStatus) {
+
+        val cno = takeTwoDecimalsToDouble(getCNo(status, selectedConstellation) * 3)
+
+        if (cno in 10.00..45.00) {
+            seekBar.setProgress(cno.toInt(), true)
+            clIndicator.visibility = VISIBLE
+        } else {
+            clIndicator.visibility = INVISIBLE
+        }
+
+        seekBar.isEnabled = false
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, p: Int, fromUser: Boolean) {
+                seekBar?.let {
+                    tvCnoAvg?.text = "$cno"
+                    clIndicator?.x = it.thumb.bounds.exactCenterX()
+                }
+
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
+
+    }
 
     //callbacks
     private fun updateStatusData(data: Data<StatusData>?) {
@@ -161,6 +195,7 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
 
         viewModel?.obtainStatusParameters(filteredGnssStatus, selectedConstellation)
         skyplot.setGnssStatus(filteredGnssStatus)
+        setCNo(status = filteredGnssStatus)
     }
 
     override fun onOrientationChanged(orientation: Double, tilt: Double) {
@@ -176,6 +211,10 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {
+        //no-op
+    }
+
+    override fun onLocationReceived(location: Location?) {
         //no-op
     }
 

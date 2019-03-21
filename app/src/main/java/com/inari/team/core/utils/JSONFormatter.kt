@@ -34,9 +34,13 @@ fun obtainJson(
     gnssData: GnssData,
     lastEphemerisDate: Date
 ): JSONObject {
+
+    //TODO REMOVE WHEN ALEJANDRO LE DE LA GANA DE IMPLEMENTAR PARSEAR UNA LISTA DE DATOS
+    val firstParameters = gnssData.parameters.isNotEmpty().let { gnssData.parameters[0] }
+
     val mainJson = JSONObject()
     with(gnssData) {
-        mainJson.put(PARAMETERS_KEY, parametersAsJson(parameters))
+        mainJson.put(PARAMETERS_KEY, parametersAsJson(firstParameters))
         mainJson.put(LOCATION_KEY, locationAsJson(location))
         mainJson.put(STATUS_KEY, gnssStatusAsJson(gnssStatus))
         mainJson.put(

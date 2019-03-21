@@ -5,6 +5,7 @@ import android.graphics.*;
 import android.location.GnssMeasurementsEvent;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
+import android.location.Location;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -689,9 +690,13 @@ public class GpsSkyView extends View implements GnssEventsListener {
     public void onGnssStopped() {
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onGnssMeasurementsReceived(GnssMeasurementsEvent event) {
+
+    }
+
+    @Override
+    public void onLocationReceived(Location location) {
 
     }
 

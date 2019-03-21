@@ -10,6 +10,7 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.getModeColor
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import kotlinx.android.synthetic.main.activity_modes.*
@@ -42,7 +43,8 @@ class ModesActivity : BaseActivity() {
         modesRVList.adapter = mAdapter
 
         fabNewMode.setOnClickListener {
-            navigator.navigateToGnssSettingsActivity()
+            //            navigator.navigateToGnssSettingsActivity()
+            showNewModeDialog()
         }
 
     }
@@ -111,7 +113,9 @@ class ModesActivity : BaseActivity() {
                 bands,
                 corrections,
                 algorithm,
-                false
+                avgTime = 5L,
+                isSelected = false,
+                color = getModeColor(modesList.size)
             )
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")

@@ -1,4 +1,4 @@
-package com.inari.team.presentation.ui.statistics
+package com.inari.team.presentation.ui.statisticsdetail
 
 import android.content.Context
 import android.view.LayoutInflater

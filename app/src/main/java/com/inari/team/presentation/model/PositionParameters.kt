@@ -3,10 +3,10 @@ package com.inari.team.presentation.model
 import org.json.JSONObject
 
 data class PositionParameters(
-    val constellations: ArrayList<String>,
-    val bands: ArrayList<String>,
-    val corrections: ArrayList<String>,
-    val algorithm: String?
+    val constellations: ArrayList<Int>,
+    val bands: ArrayList<Int>,
+    val corrections: ArrayList<Int>,
+    val algorithm: Int?
 ) {
     companion object {
 
@@ -48,17 +48,17 @@ data class PositionParameters(
     private fun getConstellationsJson(): JSONObject {
         val constellationsJson = JSONObject()
 
-        if (this.constellations.contains(PositionParameters.CONST_GPS)) {
+        if (this.constellations.contains(Mode.CONST_GPS)) {
             constellationsJson.put(CONST_GPS, true)
         } else {
             constellationsJson.put(CONST_GPS, false)
         }
-        if (this.constellations.contains(PositionParameters.CONST_GAL)) {
+        if (this.constellations.contains(Mode.CONST_GAL)) {
             constellationsJson.put(CONST_GAL, true)
         } else {
             constellationsJson.put(CONST_GAL, false)
         }
-        if (this.constellations.contains(PositionParameters.CONST_GLO)) {
+        if (this.constellations.contains(Mode.CONST_GLO)) {
             constellationsJson.put(CONST_GLO, true)
         } else {
             constellationsJson.put(CONST_GLO, false)
@@ -70,12 +70,12 @@ data class PositionParameters(
     private fun getBandsJson(): JSONObject {
         val bandsJson = JSONObject()
 
-        if (this.bands.contains(PositionParameters.BAND_L1)) {
+        if (this.bands.contains(Mode.BAND_L1)) {
             bandsJson.put(BAND_L1, true)
         } else {
             bandsJson.put(BAND_L1, false)
         }
-        if (this.bands.contains(PositionParameters.BAND_L5)) {
+        if (this.bands.contains(Mode.BAND_L5)) {
             bandsJson.put(BAND_L5, true)
         } else {
             bandsJson.put(BAND_L5, false)
@@ -87,27 +87,27 @@ data class PositionParameters(
     private fun getCorrectionsJson(): JSONObject {
         val correctionsJson = JSONObject()
 
-        if (this.corrections.contains(PositionParameters.CORR_IONOSPHERE)) {
+        if (this.corrections.contains(Mode.CORR_IONOSPHERE)) {
             correctionsJson.put(CORR_IONOSPHERE, true)
         } else {
             correctionsJson.put(CORR_IONOSPHERE, false)
         }
-        if (this.corrections.contains(PositionParameters.CORR_TROPOSPHERE)) {
+        if (this.corrections.contains(Mode.CORR_TROPOSPHERE)) {
             correctionsJson.put(CORR_TROPOSPHERE, true)
         } else {
             correctionsJson.put(CORR_TROPOSPHERE, false)
         }
-        if (this.corrections.contains(PositionParameters.CORR_MULTIPATH)) {
+        if (this.corrections.contains(Mode.CORR_MULTIPATH)) {
             correctionsJson.put(CORR_MULTIPATH, true)
         } else {
             correctionsJson.put(CORR_MULTIPATH, false)
         }
-        if (this.corrections.contains(PositionParameters.CORR_PPP)) {
+        if (this.corrections.contains(Mode.CORR_PPP)) {
             correctionsJson.put(CORR_PPP, true)
         } else {
             correctionsJson.put(CORR_PPP, false)
         }
-        if (this.corrections.contains(PositionParameters.CORR_CAMERA)) {
+        if (this.corrections.contains(Mode.CORR_CAMERA)) {
             correctionsJson.put(CORR_CAMERA, true)
         } else {
             correctionsJson.put(CORR_CAMERA, false)
@@ -123,9 +123,9 @@ data class PositionParameters(
         algorithmJson.put(ALG_KALMAN, false)
 
         when (this.algorithm) {
-            ALG_LS -> algorithmJson.put(ALG_LS, true)
-            ALG_WLS -> algorithmJson.put(ALG_WLS, true)
-            ALG_KALMAN -> algorithmJson.put(ALG_KALMAN, true)
+            Mode.ALG_LS -> algorithmJson.put(ALG_LS, true)
+            Mode.ALG_WLS -> algorithmJson.put(ALG_WLS, true)
+            Mode.ALG_KALMAN -> algorithmJson.put(ALG_KALMAN, true)
             else -> algorithmJson.put(ALG_LS, true) // default value = LS
         }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
@@ -11,229 +11,269 @@
 
 
     <android.support.v7.widget.GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:columnCount="2"
-            app:rowCount="3"
-            android:paddingTop="20dp"
-            android:paddingBottom="10dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        app:columnCount="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:rowCount="3">
 
         <android.support.v7.widget.CardView
-                android:id="@+id/cardRMS"
-                android:layout_height="0dp"
-                android:layout_width="0dp"
-                app:cardElevation="1dp"
-                app:cardCornerRadius="4dp"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true">
+            android:id="@+id/cardRMS"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="1dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
-                    android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/default_gap"
+                    android:text="@string/stats_card_1"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center">
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:gravity="center_vertical"
-                        android:textAlignment="center"
-                        android:text="@string/stats_card_1"
-                        android:paddingBottom="@dimen/default_gap"
-                        android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="3dp"/>
-                <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/graph6"/>
+                    android:src="@drawable/graph6" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
-                android:id="@+id/cardCNO"
-                android:layout_height="0dp"
-                android:layout_width="0dp"
-                app:cardElevation="1dp"
-                app:cardCornerRadius="4dp"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true">
+            android:id="@+id/cardCNO"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="1dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
-                    android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/default_gap"
+                    android:text="@string/stats_card_2"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center">
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="top"
-                        android:textAlignment="center"
-                        android:text="@string/stats_card_2"
-                        android:paddingBottom="@dimen/default_gap"
-                        android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="3dp"/>
-                <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/graph2"/>
+                    android:src="@drawable/graph2" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
-                android:id="@+id/cardMap"
-                android:layout_height="0dp"
-                android:layout_width="0dp"
-                app:cardElevation="1dp"
-                app:cardCornerRadius="4dp"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true">
+            android:id="@+id/cardMap"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="1dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
-                    android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/default_gap"
+                    android:text="@string/stats_card_3"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center">
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="top"
-                        android:textAlignment="center"
-                        android:text="@string/stats_card_3"
-                        android:paddingBottom="@dimen/default_gap"
-                        android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="3dp"/>
-                <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/map1"
-                        android:layout_marginBottom="4dp"/>
+                    android:layout_marginBottom="4dp"
+                    android:src="@drawable/map1" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
-                android:id="@+id/cardGraph4"
-                android:layout_height="0dp"
-                android:layout_width="0dp"
-                app:cardElevation="1dp"
-                app:cardCornerRadius="4dp"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true">
+            android:id="@+id/cardGraph4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="1dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
-                    android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/default_gap"
+                    android:text="@string/stats_card_4"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center">
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="top"
-                        android:textAlignment="center"
-                        android:text="@string/stats_card_4"
-                        android:paddingBottom="@dimen/default_gap"
-                        android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="3dp"/>
-                <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/graph4"/>
+                    android:src="@drawable/graph4" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
-                android:id="@+id/cardGraph5"
-                android:layout_height="0dp"
-                android:layout_width="0dp"
-                app:cardElevation="1dp"
-                app:cardCornerRadius="4dp"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true">
+            android:id="@+id/cardGraph5"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="1dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
-                    android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/default_gap"
+                    android:text="@string/stats_card_5"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center">
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="top"
-                        android:textAlignment="center"
-                        android:text="@string/stats_card_5"
-                        android:paddingBottom="@dimen/default_gap"
-                        android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="3dp"/>
-                <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/graph4"/>
+                    android:src="@drawable/graph4" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
-                android:id="@+id/cardGraph6"
-                android:layout_height="0dp"
-                android:layout_width="0dp"
-                app:cardElevation="1dp"
-                app:cardCornerRadius="4dp"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                android:focusable="true">
+            android:id="@+id/cardGraph6"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="1dp"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1">
 
             <LinearLayout
-                    android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="@dimen/default_gap"
+                    android:text="@string/stats_card_6"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center">
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="top"
-                        android:textAlignment="center"
-                        android:text="@string/stats_card_6"
-                        android:paddingBottom="@dimen/default_gap"
-                        android:textSize="18sp" android:textStyle="bold" android:layout_marginTop="3dp"/>
-                <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/graph1"/>
+                    android:src="@drawable/graph1" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
 
     </android.support.v7.widget.GridLayout>
-</LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

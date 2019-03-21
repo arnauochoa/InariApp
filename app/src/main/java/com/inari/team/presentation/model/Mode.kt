@@ -7,13 +7,16 @@ data class Mode(
     val bands: ArrayList<Int>,
     val corrections: ArrayList<Int>,
     val algorithm: Int,
-    var isSelected: Boolean
+    val avgTime: Long = PositionParameters.AVERAGING_TIME_SEC_1, //s
+    var isSelected: Boolean,
+    val color: Int
 ) {
 
     companion object {
 
         const val CONST_GPS: Int = 1
         const val CONST_GAL: Int = 2
+        const val CONST_GLO: Int = 3
 
         const val BAND_L1: Int = 1
         const val BAND_L5: Int = 2
@@ -22,6 +25,7 @@ data class Mode(
         const val CORR_TROPOSPHERE: Int = 2
         const val CORR_MULTIPATH: Int = 3
         const val CORR_CAMERA: Int = 4
+        const val CORR_PPP: Int = 5
 
         const val ALG_LS: Int = 1
         const val ALG_WLS: Int = 2
