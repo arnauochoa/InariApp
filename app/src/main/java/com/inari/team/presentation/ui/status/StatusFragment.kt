@@ -142,7 +142,7 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
 
     private fun setCNo(status: GnssStatus) {
 
-        val cno = takeTwoDecimalsToDouble(getCNo(status, selectedConstellation) * 3)
+        val cno = takeTwoDecimalsToDouble(getCNo(status, selectedConstellation))
 
         if (cno in 10.00..45.00) {
             seekBar.setProgress(cno.toInt(), true)
