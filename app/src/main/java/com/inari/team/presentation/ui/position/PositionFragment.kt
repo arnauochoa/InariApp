@@ -11,6 +11,7 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -18,9 +19,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.ui.IconGenerator
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
@@ -253,6 +256,16 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         val markerOptions = MarkerOptions()
         markerOptions.position(latLng)
         markerOptions.title(title)
+
+        context?.let {
+
+            val iconGenerator = IconGenerator(it)
+            iconGenerator.setBackground(ContextCompat.getDrawable(it, R.drawable.ic_pos))
+            val bm = iconGenerator.makeIcon()
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bm))
+        }
+
+
         return mMap?.addMarker(markerOptions)
     }
 

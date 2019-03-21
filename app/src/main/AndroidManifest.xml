@@ -44,9 +44,8 @@
             android:required="false" />
 
         <activity
-            android:name=".presentation.ui.statistics.StatisticsActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar" />
+            android:name=".presentation.ui.statisticsdetail.StatisticsDetailActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.ui.logs.LogsDetailActivity"
             android:screenOrientation="portrait" />

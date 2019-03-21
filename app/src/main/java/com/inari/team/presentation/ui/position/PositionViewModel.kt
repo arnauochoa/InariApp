@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.json.JSONArray
-import org.json.JSONObject
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -129,6 +128,14 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
                     obtainEphemerisData()
                 }
                 saveNewGnssData()
+            }?: kotlin.run {
+                if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(avgTime)) {
+                    calculatePositionWithGnss()
+                }
+                if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
+                    obtainEphemerisData()
+                }
+                saveNewGnssData()
             }
         } else {
             position.showError("There is not enough data yet.")
@@ -188,13 +195,29 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
     private fun computePosition(): LatLng? {
         var position: LatLng? = null
 
-        if (gnssDataJson.length() > 0) {
-            val gnssDataString = gnssDataJson.toString(2)
-            val positionJson = JSONObject(obtainPosition(gnssDataString))
-            val latitude = positionJson.get("lat") as Double
-            val longitude = positionJson.get("lng") as Double
-            position = LatLng(latitude, longitude)
-        }
+
+        //todo remove test positions
+        val testPvt = arrayListOf<LatLng>()
+        testPvt.add(LatLng(41.4999067, 2.1236877))
+        testPvt.add(LatLng(41.4998828, 2.1239955))
+        testPvt.add(LatLng(41.4999067, 2.1237777))
+        testPvt.add(LatLng(41.4999000, 2.1236877))
+        testPvt.add(LatLng(41.4999067, 2.1236878))
+        testPvt.add(LatLng(41.4997067, 2.1236874))
+        testPvt.add(LatLng(41.4998027, 2.1236872))
+        testPvt.add(LatLng(41.4999027, 2.1236873))
+        testPvt.add(LatLng(41.4999067, 2.1236874))
+
+        val posIndex = Random().nextInt(9)
+        position = testPvt[posIndex]
+
+//        if (gnssDataJson.length() > 0) {
+//            val gnssDataString = gnssDataJson.toString(2)
+//            val positionJson = JSONObject(obtainPosition(gnssDataString))
+//            val latitude = positionJson.get("lat") as Double
+//            val longitude = positionJson.get("lng") as Double
+//            position = LatLng(latitude, longitude)
+//        }
         return position
     }
 

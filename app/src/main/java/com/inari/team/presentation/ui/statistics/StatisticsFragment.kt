@@ -3,25 +3,28 @@ package com.inari.team.presentation.ui.statistics
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.inari.team.R
+import com.inari.team.core.base.BaseFragment
+import com.inari.team.core.navigator.Navigator
+import com.inari.team.presentation.ui.statisticsdetail.StatisticsDetailActivity
 import kotlinx.android.synthetic.main.fragment_statistics.*
+import javax.inject.Inject
 
 
-class StatisticsFragment : Fragment(), View.OnClickListener {
-    companion object {
-        const val FRAG_TAG = "statistics_fragment"
+class StatisticsFragment : BaseFragment(), View.OnClickListener {
+
+    @Inject
+    lateinit var navigator: Navigator
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        fragmentComponent.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_statistics, container, false)
     }
 
@@ -35,33 +38,36 @@ class StatisticsFragment : Fragment(), View.OnClickListener {
         cardGraph5.setOnClickListener(this)
         cardGraph6.setOnClickListener(this)
 
+        fabOptions.setOnClickListener {
+            navigator.navigateToModesActivity()
+        }
+
     }
 
     override fun onClick(v: View?) {
-        v?.let {view ->
-            val i = Intent(view.context, StatisticsActivity::class.java)
+        v?.let { view ->
+            val i = Intent(view.context, StatisticsDetailActivity::class.java)
 
-            when(view.id){
+            when (view.id) {
 
-                R.id.cardRMS ->{
-                    i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.RMS)
+                R.id.cardRMS -> {
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.RMS)
                 }
-                R.id.cardCNO ->{
-                    i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.CNO)
+                R.id.cardCNO -> {
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.CNO)
                 }
-                R.id.cardMap ->{
-                    i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.MAP)
+                R.id.cardMap -> {
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.MAP)
                 }
-                R.id.cardGraph4 ->{
-                    i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.GRAPH4)
+                R.id.cardGraph4 -> {
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.GRAPH4)
                 }
-                R.id.cardGraph5 ->{
-                    i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.GRAPH5)
+                R.id.cardGraph5 -> {
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.GRAPH5)
                 }
-                R.id.cardGraph6 ->{
-                    i.putExtra(StatisticsActivity.GRAPH_TYPE, StatisticsActivity.GRAPH6)
+                R.id.cardGraph6 -> {
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.GRAPH6)
                 }
-
             }
 
             startActivity(i)

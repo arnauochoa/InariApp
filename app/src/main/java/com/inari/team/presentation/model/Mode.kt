@@ -8,7 +8,8 @@ data class Mode(
     val corrections: ArrayList<Int>,
     val algorithm: Int,
     val avgTime: Long = PositionParameters.AVERAGING_TIME_SEC_1, //s
-    var isSelected: Boolean
+    var isSelected: Boolean,
+    val color: Int
 ) {
 
     companion object {

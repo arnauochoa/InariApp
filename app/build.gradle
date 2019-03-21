@@ -87,6 +87,10 @@ dependencies {
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.android.support:multidex:1.0.3'
 
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+
+    implementation "com.google.maps.android:android-maps-utils:0.5"
+
     implementation "com.squareup.okhttp3:logging-interceptor:3.11.0"
     api project(":suplclient")
 }
