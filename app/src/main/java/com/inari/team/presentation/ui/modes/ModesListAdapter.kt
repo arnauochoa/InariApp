@@ -11,6 +11,7 @@ import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.context
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
+import org.jetbrains.anko.toast
 
 class ModesListAdapter : RecyclerView.Adapter<ModesViewHolder>() {
 
@@ -41,8 +42,9 @@ class ModesListAdapter : RecyclerView.Adapter<ModesViewHolder>() {
             if (holder.deleteButton.visibility == VISIBLE) {
                 holder.deleteButton.visibility = GONE
             } else {
-                mode.isSelected = !mode.isSelected
-                setSelected(holder, mode.isSelected)
+                if (setSelected(holder, !mode.isSelected)) {
+                    mode.isSelected = !mode.isSelected
+                }
             }
         }
 
@@ -54,18 +56,31 @@ class ModesListAdapter : RecyclerView.Adapter<ModesViewHolder>() {
 
     }
 
-    private fun setSelected(holder: ModesViewHolder, selected: Boolean) {
+    private fun setSelected(holder: ModesViewHolder, selected: Boolean): Boolean {
+        val couldSelect: Boolean
+
         if (selected) {
-            holder.modeName.setTextColor(getColor(context, R.color.black))
-            holder.cvMode.elevation = 16f
-            holder.cvMode.setCardBackgroundColor(getColor(context, R.color.colorAccentLight))
-            holder.checkImage.visibility = VISIBLE
+            val selectedModes = getSelectedItems()
+
+            if (selectedModes.size < 5) {
+                holder.modeName.setTextColor(getColor(context, R.color.black))
+                holder.cvMode.elevation = 16f
+                holder.cvMode.setCardBackgroundColor(getColor(context, R.color.colorAccentLight))
+                holder.checkImage.visibility = VISIBLE
+                couldSelect = true
+            } else {
+                holder.checkImage.context.toast("You can not select more than five modes to compare at the same time")
+                couldSelect = false
+            }
         } else {
             holder.modeName.setTextColor(getColor(context, R.color.gray))
             holder.cvMode.elevation = 0f
             holder.cvMode.setCardBackgroundColor(getColor(context, R.color.white))
             holder.checkImage.visibility = GONE
+            couldSelect = true
         }
+
+        return couldSelect
     }
 
     private fun setDescription(holder: ModesViewHolder, mode: Mode) {
@@ -82,5 +97,22 @@ class ModesListAdapter : RecyclerView.Adapter<ModesViewHolder>() {
 
     fun getItems(): List<Mode> {
         return modes
+    }
+
+    fun getSelectedItems(): List<Mode> {
+        val selectedModes = modes.filter {
+            it.isSelected
+        }
+
+        return if (selectedModes.size <= 5) {
+            selectedModes
+        } else {
+            val fiveFirstModes = arrayListOf<Mode>()
+            repeat(5) {
+                fiveFirstModes.add(selectedModes[it])
+            }
+            fiveFirstModes
+        }
+
     }
 }

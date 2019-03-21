@@ -11,7 +11,6 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
 import android.view.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -23,7 +22,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.maps.android.ui.IconGenerator
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
@@ -32,10 +30,12 @@ import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
+import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.saveFile
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.PositionParameters
+import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
@@ -169,8 +169,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         mMap?.isMyLocationEnabled = true
         mMap?.uiSettings?.isMyLocationButtonEnabled = false
 
+
     }
 
+    @SuppressLint("MissingPermission")
     private fun getSelectedParameters(): List<PositionParameters> {
 
         val positionParametersList = arrayListOf<PositionParameters>()
@@ -194,6 +196,12 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                 this@PositionFragment.avgTime = avgTime
             }
 
+        }
+
+        fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
+            location?.let {
+                moveCamera(LatLng(location.latitude, location.longitude))
+            }
         }
 
         return positionParametersList
@@ -249,22 +257,14 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
     private fun moveCamera(latLng: LatLng) {
-        mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
     }
 
-    private fun addMarker(latLng: LatLng, title: String): Marker? {
+    private fun addMarker(latLng: LatLng, title: String, id: Int): Marker? {
         val markerOptions = MarkerOptions()
         markerOptions.position(latLng)
         markerOptions.title(title)
-
-        context?.let {
-
-            val iconGenerator = IconGenerator(it)
-            iconGenerator.setBackground(ContextCompat.getDrawable(it, R.drawable.ic_pos))
-            val bm = iconGenerator.makeIcon()
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bm))
-        }
-
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(getModeIcon(id)))
 
         return mMap?.addMarker(markerOptions)
     }
@@ -282,7 +282,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
 
-    private fun updatePosition(data: Data<LatLng>?) {
+    private fun updatePosition(data: Data<List<ResponsePvtMode>>?) {
         data?.let {
             when (it.dataState) {
                 LOADING -> {
@@ -291,10 +291,11 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     }
                 }
                 SUCCESS -> {
-                    it.data?.let { position ->
+                    it.data?.let { positions ->
+                        positions.forEach { resp ->
+                            addMarker(resp.position, "", resp.modeId)
+                        }
                         hideMapLoading()
-                        addMarker(position, "")
-                        moveCamera(position)
                     }
                 }
                 ERROR -> {

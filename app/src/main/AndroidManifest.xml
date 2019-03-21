@@ -54,8 +54,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.ui.modes.ModesActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.ui.settings.GnssSettingsActivity"
             android:screenOrientation="portrait"

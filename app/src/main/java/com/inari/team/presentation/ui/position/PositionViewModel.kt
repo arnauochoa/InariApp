@@ -14,10 +14,12 @@ import com.inari.team.core.utils.createDirectory
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.updateData
+import com.inari.team.core.utils.getModeColor
 import com.inari.team.core.utils.obtainJson
 import com.inari.team.core.utils.saveFile
 import com.inari.team.presentation.model.GnssData
 import com.inari.team.presentation.model.PositionParameters
+import com.inari.team.presentation.model.ResponsePvtMode
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
@@ -34,7 +36,7 @@ import kotlin.math.roundToLong
 @Singleton
 class PositionViewModel @Inject constructor() : BaseViewModel() {
 
-    val position = MutableLiveData<Data<LatLng>>()
+    val position = MutableLiveData<Data<List<ResponsePvtMode>>>()
 
     companion object {
         const val SUPL_SERVER_HOST = "supl.google.com"
@@ -122,6 +124,7 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
                 gnssData.gnssMeasurements = it.measurements
                 gnssData.gnssClock = it.clock
                 saveNewGnssData()
+
                 if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(avgTime)) {
                     calculatePositionWithGnss()
                 }
@@ -161,7 +164,7 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
 
     private fun calculatePositionWithGnss() {
         //Calculate position and restart averaging
-        saveLogsForPostProcessing()
+//        saveLogsForPostProcessing()
         val coordinates = computePosition()
         gnssDataJson = JSONArray()
         lastDate = Date()
@@ -185,9 +188,9 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
         }
     }
 
-    private fun computePosition(): LatLng? {
-        var position: LatLng? = null
+    private fun computePosition(): List<ResponsePvtMode>? {
 
+        val responses = arrayListOf<ResponsePvtMode>()
 
         //todo remove test positions
         val testPvt = arrayListOf<LatLng>()
@@ -201,8 +204,11 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
         testPvt.add(LatLng(41.4999027, 2.1236873))
         testPvt.add(LatLng(41.4999067, 2.1236874))
 
-        val posIndex = Random().nextInt(9)
-        position = testPvt[posIndex]
+        gnssData.parameters.forEachIndexed { index, _ ->
+            val posIndex = Random().nextInt(9)
+            val position = testPvt[posIndex]
+            responses.add(ResponsePvtMode(position, getModeColor(index), ""))
+        }
 
 //        if (gnssDataJson.length() > 0) {
 //            val gnssDataString = gnssDataJson.toString(2)
@@ -211,7 +217,7 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
 //            val longitude = positionJson.get("lng") as Double
 //            position = LatLng(latitude, longitude)
 //        }
-        return position
+        return responses
     }
 
     /**

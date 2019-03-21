@@ -113,5 +113,4 @@ class AppSharedPreferences {
         return mPrefs.getString(type, "")
     }
 
-
 }
