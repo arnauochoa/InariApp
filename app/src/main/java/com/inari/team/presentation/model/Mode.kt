@@ -1,7 +1,7 @@
 package com.inari.team.presentation.model
 
 data class Mode(
-    val id: Int,
+    var id: Int,
     val name: String = "",
     val constellations: ArrayList<Int>,
     val bands: ArrayList<Int>,
@@ -9,7 +9,7 @@ data class Mode(
     val algorithm: Int,
     val avgTime: Long = PositionParameters.AVERAGING_TIME_SEC_1, //s
     var isSelected: Boolean,
-    val color: Int
+    var color: Int = -1
 ) {
 
     companion object {

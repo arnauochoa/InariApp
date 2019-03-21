@@ -1,6 +1,7 @@
 package com.inari.team.core.utils
 
 import android.widget.Toast
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.inari.team.R
 import com.inari.team.core.App
 import java.io.*
@@ -42,11 +43,27 @@ fun getModeColor(id: Int): Int {
         2 -> R.color.colorLegend3
         3 -> R.color.colorLegend4
         4 -> R.color.colorLegend5
-        5 -> R.color.colorLegend6
-        6 -> R.color.colorLegend7
-        7 -> R.color.colorLegend8
-        8 -> R.color.colorLegend9
-        9 -> R.color.colorLegend10
         else -> R.color.colorLegend1
+    }
+}
+
+fun getModeIcon(color: Int): Float{
+    return when(color){
+        R.color.colorLegend1 -> {
+            BitmapDescriptorFactory.HUE_RED
+        }
+        R.color.colorLegend2 -> {
+            BitmapDescriptorFactory.HUE_BLUE
+        }
+        R.color.colorLegend3 -> {
+            BitmapDescriptorFactory.HUE_ORANGE
+        }
+        R.color.colorLegend4 -> {
+            BitmapDescriptorFactory.HUE_CYAN
+        }
+        R.color.colorLegend5 -> {
+            BitmapDescriptorFactory.HUE_YELLOW
+        }
+        else -> BitmapDescriptorFactory.HUE_RED
     }
 }

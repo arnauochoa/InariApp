@@ -6,6 +6,9 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.widget.SeekBar
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
@@ -38,6 +41,11 @@ class ModesActivity : BaseActivity() {
 
         setToolbar()
 
+        setViews()
+
+    }
+
+    private fun setViews() {
         modesRVList.layoutManager = LinearLayoutManager(this)
 
         modesRVList.adapter = mAdapter
@@ -47,17 +55,54 @@ class ModesActivity : BaseActivity() {
             showNewModeDialog()
         }
 
+        apply_gnss_modes.setOnClickListener {
+            val selectedModes = mAdapter.getSelectedItems()
+
+            selectedModes.forEachIndexed { index, mode ->
+                mode.id = index
+                mode.color = getModeColor(index)
+            }
+
+            mPrefs.saveModes(selectedModes)
+            finish()
+        }
+
+        switchAvg.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                clAvgValue.visibility = VISIBLE
+            } else {
+                clAvgValue.visibility = GONE
+            }
+        }
+
+        tvModesTitle.setOnClickListener {
+            if (modesRVList.visibility == VISIBLE){
+                modesRVList.visibility = GONE
+            } else {
+                modesRVList.visibility = VISIBLE
+            }
+            ivModesTitle.rotation = ivModesTitle.rotation + 180f
+        }
+
+        seekBarTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+
+                tvAvgValue.text = "$progress s"
+
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
     }
 
     private fun setToolbar() {
-        setSupportActionBar(gnssModesToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.modes)
-
-        apply_gnss_modes.setOnClickListener {
-            mPrefs.saveModes(mAdapter.getItems())
-            finish()
-        }
     }
 
 
@@ -71,9 +116,7 @@ class ModesActivity : BaseActivity() {
 
         val dialog = AlertDialog.Builder(this).create()
         val layout = View.inflate(this, R.layout.dialog_new_mode, null)
-        dialog.window?.let { wind ->
-            wind.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setView(layout)
         layout.createButton.setOnClickListener {
             createMode(layout, dialog)
@@ -114,8 +157,7 @@ class ModesActivity : BaseActivity() {
                 corrections,
                 algorithm,
                 avgTime = 5L,
-                isSelected = false,
-                color = getModeColor(modesList.size)
+                isSelected = false
             )
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")

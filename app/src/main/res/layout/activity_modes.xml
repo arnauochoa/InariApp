@@ -4,49 +4,147 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorLightGrayBackground"
     tools:context=".presentation.ui.modes.ModesActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/gnssModesToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:theme="@style/ToolbarTheme"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/clAvg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@android:color/white">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/applyGnssSettings"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical|end"
+            android:id="@+id/tvAvgTitle"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:clickable="true"
+            android:layout_marginEnd="8dp"
             android:gravity="center_vertical"
-            android:text="@string/apply"
-            android:textAllCaps="true"
-            android:textColor="@color/colorAccentLight"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:text="Average"
+            android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/switchAvg"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </android.support.v7.widget.Toolbar>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/modesRVList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/colorLightGrayBackground"
-        app:layout_constraintBottom_toTopOf="@+id/clApply"
+        <Switch
+            android:id="@+id/switchAvg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:checked="true"
+            app:layout_constraintBottom_toBottomOf="@+id/tvAvgTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvAvgTitle" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/clAvgValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gnssModesToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/clAvg">
+
+        <TextView
+            android:id="@+id/tvAvgValueTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:text="Average Time:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvAvgValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="5s"
+            app:layout_constraintBottom_toBottomOf="@+id/tvAvgValueTitle"
+            app:layout_constraintStart_toEndOf="@+id/tvAvgValueTitle"
+            app:layout_constraintTop_toTopOf="@+id/tvAvgValueTitle" />
+
+        <SeekBar
+            android:id="@+id/seekBarTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:min="5"
+            android:max="60"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvAvgValueTitle" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/clAvgValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/clApply">
+
+        <TextView
+            android:id="@+id/tvModesTitle"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:text="Modes"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageView
+            android:id="@+id/ivModesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_arrow_down_grey"
+            app:layout_constraintBottom_toBottomOf="@+id/tvModesTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvModesTitle" />
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/modesRVList"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:paddingBottom="32dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvModesTitle" />
+
+    </android.support.constraint.ConstraintLayout>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabNewMode"
