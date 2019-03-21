@@ -128,13 +128,6 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
                 if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
                     obtainEphemerisData()
                 }
-            }?: kotlin.run {
-                if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(avgTime)) {
-                    calculatePositionWithGnss()
-                }
-                if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
-                    obtainEphemerisData()
-                }
             }
         } else {
             position.showError("There is not enough data yet.")
