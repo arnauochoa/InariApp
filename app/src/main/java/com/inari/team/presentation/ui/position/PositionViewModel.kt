@@ -175,12 +175,13 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
     }
 
     //Function used for testing
+    //todo compute position should look like this function
     private fun saveLogsForPostProcessing() {
         val current = Date()
         val fileName = "$startTimeString/${formatter.format(current)}.txt"
         val pvtInfoString = gnssDataJson.toString(2)
-        pvtInfoString?.let {
-            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
+        if (!pvtInfoString.isNullOrEmpty()) {
+            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
         }
     }
 

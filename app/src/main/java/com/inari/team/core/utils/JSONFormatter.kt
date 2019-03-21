@@ -62,7 +62,6 @@ fun obtainJson(
     return mainJson
 }
 
-//Todo Remove function if works
 private fun parametersAsJson(parameters: List<PositionParameters>): JSONArray {
     val parametersJsonArray = JSONArray()
     parameters.forEach {
