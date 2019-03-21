@@ -121,13 +121,13 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
             gnssMeasurementsEvent?.let {
                 gnssData.gnssMeasurements = it.measurements
                 gnssData.gnssClock = it.clock
+                saveNewGnssData()
                 if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(avgTime)) {
                     calculatePositionWithGnss()
                 }
                 if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
                     obtainEphemerisData()
                 }
-                saveNewGnssData()
             }?: kotlin.run {
                 if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(avgTime)) {
                     calculatePositionWithGnss()
@@ -135,7 +135,6 @@ class PositionViewModel @Inject constructor() : BaseViewModel() {
                 if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
                     obtainEphemerisData()
                 }
-                saveNewGnssData()
             }
         } else {
             position.showError("There is not enough data yet.")
