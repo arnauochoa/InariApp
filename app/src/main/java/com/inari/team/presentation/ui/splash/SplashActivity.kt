@@ -9,6 +9,7 @@ import com.inari.team.R
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.*
 import com.inari.team.presentation.model.Mode
+import com.inari.team.presentation.model.PositionParameters
 import com.inari.team.presentation.ui.main.MainActivity
 import java.io.File
 import java.io.IOException
@@ -69,30 +70,30 @@ class SplashActivity : AppCompatActivity() {
         val mode = Mode(
             0,
             "GPS LS",
-            arrayListOf(Mode.CONST_GPS),
-            arrayListOf(Mode.BAND_L1),
-            arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
-            Mode.ALG_LS,
+            arrayListOf(PositionParameters.CONST_GPS),
+            arrayListOf(PositionParameters.BAND_L1),
+            arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
+            PositionParameters.ALG_LS,
             avgTime = 5L,
             isSelected = false
         )
         val mode2 = Mode(
             1,
             "Galileo WLS",
-            arrayListOf(Mode.CONST_GAL),
-            arrayListOf(Mode.BAND_L1),
-            arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
-            Mode.ALG_WLS,
+            arrayListOf(PositionParameters.CONST_GAL),
+            arrayListOf(PositionParameters.BAND_L1),
+            arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
+            PositionParameters.ALG_WLS,
             avgTime = 5L,
             isSelected = false
         )
         val mode3 = Mode(
             2,
             "Multiconst Iono-Free",
-            arrayListOf(Mode.CONST_GPS, Mode.CONST_GAL),
-            arrayListOf(Mode.BAND_L1, Mode.BAND_L5),
-            arrayListOf(Mode.CORR_TROPOSPHERE, Mode.CORR_IONOFREE),
-            Mode.ALG_WLS,
+            arrayListOf(PositionParameters.CONST_GPS, PositionParameters.CONST_GAL),
+            arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_L5),
+            arrayListOf(PositionParameters.CORR_TROPOSPHERE, PositionParameters.CORR_IONOFREE),
+            PositionParameters.ALG_WLS,
             avgTime = 5L,
             isSelected = false
         )
