@@ -22,7 +22,7 @@ data class PositionParameters(
         const val CORRECTIONS_KEY = "corrections"
         const val CORR_IONOSPHERE = "ionosphere"
         const val CORR_TROPOSPHERE = "troposphere"
-        const val CORR_MULTIPATH = "multipath"
+        const val CORR_IONOFREE = "ionofree"
 
         const val ALGORITHM_KEY = "algorithm"
         const val ALG_LS = "LS"
@@ -96,9 +96,9 @@ data class PositionParameters(
             correctionsJson.put(CORR_TROPOSPHERE, false)
         }
         if (this.corrections.contains(Mode.CORR_IONOFREE)) {
-            correctionsJson.put(CORR_MULTIPATH, true)
+            correctionsJson.put(CORR_IONOFREE, true)
         } else {
-            correctionsJson.put(CORR_MULTIPATH, false)
+            correctionsJson.put(CORR_IONOFREE, false)
         }
 
         return correctionsJson

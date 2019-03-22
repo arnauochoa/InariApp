@@ -13,7 +13,6 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.getModeColor
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import kotlinx.android.synthetic.main.activity_modes.*
@@ -35,6 +34,8 @@ class ModesActivity : BaseActivity() {
 
     private val mAdapter = ModesListAdapter()
 
+    private var avg: Long = 5L
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modes)
@@ -52,19 +53,15 @@ class ModesActivity : BaseActivity() {
         modesRVList.adapter = mAdapter
 
         fabNewMode.setOnClickListener {
-            //            navigator.navigateToGnssSettingsActivity()
             showNewModeDialog()
         }
 
+        seekBarTime.progress = mPrefs.getAverage().toInt()
+        tvAvgValue.text = "${mPrefs.getAverage()} s"
+
         apply_gnss_modes.setOnClickListener {
-            val selectedModes = mAdapter.getSelectedItems()
-
-            selectedModes.forEachIndexed { index, mode ->
-                mode.id = index
-                mode.color = getModeColor(index)
-            }
-
-            mPrefs.saveModes(selectedModes)
+            mPrefs.saveModes(mAdapter.getItems())
+            mPrefs.setAverage(avg)
             finish()
         }
 
@@ -77,7 +74,7 @@ class ModesActivity : BaseActivity() {
         }
 
         tvModesTitle.setOnClickListener {
-            if (modesRVList.visibility == VISIBLE){
+            if (modesRVList.visibility == VISIBLE) {
                 modesRVList.visibility = GONE
             } else {
                 modesRVList.visibility = VISIBLE
@@ -85,9 +82,10 @@ class ModesActivity : BaseActivity() {
             ivModesTitle.rotation = ivModesTitle.rotation + 180f
         }
 
-        seekBarTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        seekBarTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
+                avg = progress.toLong()
                 tvAvgValue.text = "$progress s"
 
             }

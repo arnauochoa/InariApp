@@ -34,7 +34,7 @@ import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.saveFile
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.toast
-import com.inari.team.presentation.model.PositionParameters
+import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
@@ -64,8 +64,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     private var mapFragment: SupportMapFragment? = null
 
     private var viewModel: PositionViewModel? = null
-
-    private var avgTime: Long = 5
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,12 +118,12 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                 MainActivity.getInstance()?.subscribeToGnssEvents(this)
                 btComputeAction.text = getString(R.string.stop_computing)
 
-                val selectedParameters = getSelectedParameters()
-                if (selectedParameters.isEmpty()) { // If no constellation or band has been selected
+                val selectedModes = getSelectedModes()
+                if (selectedModes.isEmpty()) { // If no constellation or band has been selected
                     //todo change message?
                     showError("At least one constellation and one band must be selected, go to settings to select one")
                 } else {
-                    viewModel?.setGnssData(parameters = selectedParameters)
+                    viewModel?.setGnssData(modes = selectedModes)
                     startPositioning()
                 }
             } else {
@@ -173,30 +171,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
     @SuppressLint("MissingPermission")
-    private fun getSelectedParameters(): List<PositionParameters> {
-
-        val positionParametersList = arrayListOf<PositionParameters>()
-
-        //list with selected modes, get parameters from each mode
-        val selectedModes = mSharedPreferences.getModesList().filter {
-            it.isSelected
-        }
-
-        selectedModes.forEach {
-
-            with(it) {
-                positionParametersList.add(
-                    PositionParameters(
-                        constellations = constellations,
-                        bands = bands,
-                        corrections = corrections,
-                        algorithm = algorithm
-                    )
-                )
-                this@PositionFragment.avgTime = avgTime
-            }
-
-        }
+    private fun getSelectedModes(): List<Mode> {
 
         fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
             location?.let {
@@ -204,14 +179,17 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
             }
         }
 
-        return positionParametersList
+        return mSharedPreferences.getModesList().filter {
+            it.isSelected
+        }
+
     }
 
     private fun startPositioning() {
         mMap?.clear()
         showMapLoading()
 
-        viewModel?.setStartTime(avgTime)
+        viewModel?.setStartTime()
         viewModel?.obtainEphemerisData()
 
     }
@@ -257,7 +235,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
     private fun moveCamera(latLng: LatLng) {
-        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
     }
 
     private fun addMarker(latLng: LatLng, title: String, id: Int): Marker? {

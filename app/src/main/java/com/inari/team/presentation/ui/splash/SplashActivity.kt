@@ -34,6 +34,7 @@ class SplashActivity : AppCompatActivity() {
 
             if (AppSharedPreferences.getInstance().getModesList().isEmpty()) {
                 addDefaultModes()
+                AppSharedPreferences.getInstance().saveColors()
                 try {
                     val dir =
                         File(root.absolutePath + APP_ROOT)
@@ -41,7 +42,6 @@ class SplashActivity : AppCompatActivity() {
                 } catch (e: IOException) {
                 }
             }
-
 
 
             if (checkPermissionsList(
@@ -74,7 +74,7 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE),
             Mode.ALG_LS,
             avgTime = 5L,
-            isSelected = true
+            isSelected = false
         )
         val mode2 = Mode(
             1,

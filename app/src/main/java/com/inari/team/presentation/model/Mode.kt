@@ -1,5 +1,6 @@
 package com.inari.team.presentation.model
 
+import org.json.JSONObject
 
 data class Mode(
     var id: Int,
@@ -29,6 +30,98 @@ data class Mode(
         const val ALG_LS: Int = 1
         const val ALG_WLS: Int = 2
     }
+
+
+    fun toJSONObject(): JSONObject {
+        val modeJson = JSONObject()
+        modeJson.put(PositionParameters.CONSTELLATIONS_KEY, getConstellationsJson())
+        modeJson.put(PositionParameters.BANDS_KEY, getBandsJson())
+        modeJson.put(PositionParameters.CORRECTIONS_KEY, getCorrectionsJson())
+        modeJson.put(PositionParameters.ALGORITHM_KEY, getAlgorithmJson())
+        return modeJson
+    }
+
+    private fun getConstellationsJson(): JSONObject {
+        val constellationsJson = JSONObject()
+
+        if (this.constellations.contains(Mode.CONST_GPS)) {
+            constellationsJson.put(PositionParameters.CONST_GPS, true)
+        } else {
+            constellationsJson.put(PositionParameters.CONST_GPS, false)
+        }
+        if (this.constellations.contains(Mode.CONST_GAL)) {
+            constellationsJson.put(PositionParameters.CONST_GAL, true)
+        } else {
+            constellationsJson.put(PositionParameters.CONST_GAL, false)
+        }
+        if (this.constellations.contains(Mode.CONST_GLO)) {
+            constellationsJson.put(PositionParameters.CONST_GLO, true)
+        } else {
+            constellationsJson.put(PositionParameters.CONST_GLO, false)
+        }
+
+        return constellationsJson
+    }
+
+    private fun getBandsJson(): JSONObject {
+        val bandsJson = JSONObject()
+
+        if (this.bands.contains(Mode.BAND_L1)) {
+            bandsJson.put(PositionParameters.BAND_L1, true)
+        } else {
+            bandsJson.put(PositionParameters.BAND_L1, false)
+        }
+        if (this.bands.contains(Mode.BAND_L5)) {
+            bandsJson.put(PositionParameters.BAND_L5, true)
+        } else {
+            bandsJson.put(PositionParameters.BAND_L5, false)
+        }
+
+        return bandsJson
+    }
+
+    private fun getCorrectionsJson(): JSONObject {
+        val correctionsJson = JSONObject()
+
+        if (this.corrections.contains(Mode.CORR_IONOSPHERE)) {
+            correctionsJson.put(PositionParameters.CORR_IONOSPHERE, true)
+        } else {
+            correctionsJson.put(PositionParameters.CORR_IONOSPHERE, false)
+        }
+        if (this.corrections.contains(Mode.CORR_TROPOSPHERE)) {
+            correctionsJson.put(PositionParameters.CORR_TROPOSPHERE, true)
+        } else {
+            correctionsJson.put(PositionParameters.CORR_TROPOSPHERE, false)
+        }
+        if (this.corrections.contains(Mode.CORR_IONOFREE)) {
+            correctionsJson.put(PositionParameters.CORR_IONOFREE, true)
+        } else {
+            correctionsJson.put(PositionParameters.CORR_IONOFREE, false)
+        }
+
+
+        return correctionsJson
+    }
+
+    private fun getAlgorithmJson(): JSONObject {
+        val algorithmJson = JSONObject()
+        algorithmJson.put(PositionParameters.ALG_LS, false)
+        algorithmJson.put(PositionParameters.ALG_WLS, false)
+        algorithmJson.put(PositionParameters.ALG_KALMAN, false)
+
+        when (this.algorithm) {
+            Mode.ALG_LS -> algorithmJson.put(PositionParameters.ALG_LS, true)
+            Mode.ALG_WLS -> algorithmJson.put(PositionParameters.ALG_WLS, true)
+            else -> algorithmJson.put(PositionParameters.ALG_LS, true) // default value = LS
+        }
+
+        return algorithmJson
+    }
+
+
+    /**
+     * STRING GETTERS
+     */
 
     fun constellationsAsString(): CharSequence? {
         var constellationsString = ""
