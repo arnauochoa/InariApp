@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "621679450317",
+    "firebase_url": "https://inari-3fa27.firebaseio.com",
+    "project_id": "inari-3fa27",
+    "storage_bucket": "inari-3fa27.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:621679450317:android:51e60ce7ff3b660f",
+        "android_client_info": {
+          "package_name": "com.inari.team"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "621679450317-25ur0jtul2h0eetopp54imofbtb3alad.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH60mFT0oz4_j1ZDoXiKMnWWdsrxP0Gb0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

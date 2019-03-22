@@ -7,10 +7,9 @@ import android.location.Location
 import com.google.gson.Gson
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.ephemeris.GalEphemeris
-import com.google.location.suplclient.ephemeris.GloEphemeris
 import com.google.location.suplclient.ephemeris.GpsEphemeris
 import com.inari.team.presentation.model.GnssData
-import com.inari.team.presentation.model.PositionParameters
+import com.inari.team.presentation.model.Mode
 import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -43,14 +42,17 @@ fun obtainJson(
     val mainJson = JSONObject()
     with(gnssData) {
         val clockJson = gnssClockAsJson(gnssClock)
-        if (clockJson.length() > 0) { // If clock measurements has enough information
-            mainJson.put(PARAMETERS_KEY, parametersAsJson(parameters))
+        val statusJson = gnssStatusAsJson(gnssStatus)
+        val measurementsJson = gnssMeasurementsAsJson(gnssMeasurements)
+        // If clock measurements has enough information
+        if (clockJson.length() > 0 && statusJson.length() > 0 && measurementsJson.length() > 0) {
+            //todo remove after testing
+//            mainJson.put(PARAMETERS_KEY, parametersAsJson(parameters))
+
+            mainJson.put(PARAMETERS_KEY, modeAsJson(modes[0]))
             mainJson.put(LOCATION_KEY, locationAsJson(location))
-            mainJson.put(STATUS_KEY, gnssStatusAsJson(gnssStatus))
-            mainJson.put(
-                MEASUREMENTS_KEY,
-                gnssMeasurementsAsJson(gnssMeasurements)
-            )
+            mainJson.put(STATUS_KEY, statusJson)
+            mainJson.put(MEASUREMENTS_KEY, measurementsJson)
             mainJson.put(CLOCK_KEY, clockJson)
             mainJson.put(
                 EPHEMERIS_DATA_KEY,
@@ -62,12 +64,17 @@ fun obtainJson(
     return mainJson
 }
 
-private fun parametersAsJson(parameters: List<PositionParameters>): JSONArray {
-    val parametersJsonArray = JSONArray()
-    parameters.forEach {
-        parametersJsonArray.put(it.toJSONObject())
+//todo remove
+private fun modeAsJson(mode: Mode): JSONObject {
+    return mode.toJSONObject()
+}
+
+private fun parametersAsJson(modes: List<Mode>): JSONArray {
+    val modesJsonArray = JSONArray()
+    modes.forEach {
+        modesJsonArray.put(it.toJSONObject())
     }
-    return parametersJsonArray
+    return modesJsonArray
 }
 
 private fun locationAsJson(location: Location?): JSONObject {
@@ -104,7 +111,8 @@ private fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>
     gnssMeasurements?.let { measurements ->
         measurements.forEach { measurement ->
             if (measurement.hasCarrierFrequencyHz() &&
-                measurement.receivedSvTimeUncertaintyNanos < MAX_TIME_UNCERTAINTY) {
+                measurement.receivedSvTimeUncertaintyNanos < MAX_TIME_UNCERTAINTY
+            ) {
                 val childJson = JSONObject()
                 childJson.put("svid", measurement.svid)
                 childJson.put("constellationType", measurement.constellationType)
@@ -183,5 +191,6 @@ fun isEphemerisValid(ephemeris: GalEphemeris): Boolean {
 fun isEphemerisValid(ephemeris: GpsEphemeris): Boolean {
     var validity = true
     //TODO: Implement validity check
-    return validity}
+    return validity
+}
 
