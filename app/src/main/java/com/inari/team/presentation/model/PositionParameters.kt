@@ -23,8 +23,6 @@ data class PositionParameters(
         const val CORR_IONOSPHERE = "ionosphere"
         const val CORR_TROPOSPHERE = "troposphere"
         const val CORR_MULTIPATH = "multipath"
-        const val CORR_PPP = "PPP"
-        const val CORR_CAMERA = "camera"
 
         const val ALGORITHM_KEY = "algorithm"
         const val ALG_LS = "LS"
@@ -97,20 +95,10 @@ data class PositionParameters(
         } else {
             correctionsJson.put(CORR_TROPOSPHERE, false)
         }
-        if (this.corrections.contains(Mode.CORR_MULTIPATH)) {
+        if (this.corrections.contains(Mode.CORR_IONOFREE)) {
             correctionsJson.put(CORR_MULTIPATH, true)
         } else {
             correctionsJson.put(CORR_MULTIPATH, false)
-        }
-        if (this.corrections.contains(Mode.CORR_PPP)) {
-            correctionsJson.put(CORR_PPP, true)
-        } else {
-            correctionsJson.put(CORR_PPP, false)
-        }
-        if (this.corrections.contains(Mode.CORR_CAMERA)) {
-            correctionsJson.put(CORR_CAMERA, true)
-        } else {
-            correctionsJson.put(CORR_CAMERA, false)
         }
 
         return correctionsJson
@@ -125,7 +113,6 @@ data class PositionParameters(
         when (this.algorithm) {
             Mode.ALG_LS -> algorithmJson.put(ALG_LS, true)
             Mode.ALG_WLS -> algorithmJson.put(ALG_WLS, true)
-            Mode.ALG_KALMAN -> algorithmJson.put(ALG_KALMAN, true)
             else -> algorithmJson.put(ALG_LS, true) // default value = LS
         }
 
