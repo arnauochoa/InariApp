@@ -1,5 +1,6 @@
 package com.inari.team.presentation.model
 
+
 data class Mode(
     var id: Int,
     val name: String = "",
@@ -23,14 +24,10 @@ data class Mode(
 
         const val CORR_IONOSPHERE: Int = 1
         const val CORR_TROPOSPHERE: Int = 2
-        const val CORR_MULTIPATH: Int = 3
-        const val CORR_CAMERA: Int = 4
-        const val CORR_PPP: Int = 5
+        const val CORR_IONOFREE: Int = 3
 
         const val ALG_LS: Int = 1
         const val ALG_WLS: Int = 2
-        const val ALG_KALMAN: Int = 3
-
     }
 
     fun constellationsAsString(): CharSequence? {
@@ -69,13 +66,9 @@ data class Mode(
             if (correctionsString.isNotBlank()) correctionsString += ", "
             correctionsString += "Troposphere"
         }
-        if (corrections.contains(CORR_MULTIPATH)) {
+        if (corrections.contains(CORR_IONOFREE)) {
             if (correctionsString.isNotBlank()) correctionsString += ", "
-            correctionsString += "Multipath"
-        }
-        if (corrections.contains(CORR_CAMERA)) {
-            if (correctionsString.isNotBlank()) correctionsString += ", "
-            correctionsString += "Camera"
+            correctionsString += "Iono-free"
         }
         if (correctionsString.isBlank()) correctionsString = "None"
         return correctionsString
@@ -87,7 +80,6 @@ data class Mode(
         when (algorithm) {
             ALG_LS -> algorithmString = "Least Squares"
             ALG_WLS -> algorithmString = "Weighted Least Squares"
-            ALG_KALMAN -> algorithmString = "Kalman Filter"
         }
         return algorithmString
     }

@@ -17,6 +17,7 @@ import com.inari.team.core.utils.getModeColor
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import kotlinx.android.synthetic.main.activity_modes.*
+import kotlinx.android.synthetic.main.dialog_new_mode.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
 import javax.inject.Inject
 
@@ -121,6 +122,19 @@ class ModesActivity : BaseActivity() {
         layout.createButton.setOnClickListener {
             createMode(layout, dialog)
         }
+
+        layout?.let {
+            // Ionosphere and iono-free can't be selected at the same time
+            it.correctionsOption3.isEnabled = !it.correctionsOption1.isChecked
+            it.correctionsOption1.isEnabled = !it.correctionsOption3.isChecked
+
+            it.correctionsOption1.setOnClickListener { l ->
+                it.correctionsOption3.isEnabled = !l.correctionsOption1.isChecked
+            }
+            it.correctionsOption3.setOnClickListener { l ->
+                it.correctionsOption1.isEnabled = !l.correctionsOption3.isChecked
+            }
+        }
         dialog.show()
 
     }
@@ -140,11 +154,9 @@ class ModesActivity : BaseActivity() {
             if (it.bandsOption2.isChecked) bands.add(Mode.BAND_L5)
             if (it.correctionsOption1.isChecked) corrections.add(Mode.CORR_IONOSPHERE)  // set selected corrections
             if (it.correctionsOption2.isChecked) corrections.add(Mode.CORR_TROPOSPHERE)
-            if (it.correctionsOption3.isChecked) corrections.add(Mode.CORR_MULTIPATH)
-            if (it.correctionsOption4.isChecked) corrections.add(Mode.CORR_CAMERA)
+            if (it.correctionsOption3.isChecked) corrections.add(Mode.CORR_IONOFREE)
             if (it.algorithm1.isChecked) algorithm = Mode.ALG_LS  // set selected algorithm
             if (it.algorithm2.isChecked) algorithm = Mode.ALG_WLS
-            if (it.algorithm3.isChecked) algorithm = Mode.ALG_KALMAN
         }
 
         val modesList = AppSharedPreferences.getInstance().getModesList()
@@ -164,7 +176,6 @@ class ModesActivity : BaseActivity() {
             dialog.dismiss()
             mAdapter.update()
         }
-
     }
 
     private fun modeCanBeAdded(

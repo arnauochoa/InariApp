@@ -88,11 +88,11 @@ class SplashActivity : AppCompatActivity() {
         )
         val mode3 = Mode(
             2,
-            "Multiconst Kalman",
+            "Multiconst Iono-Free",
             arrayListOf(Mode.CONST_GPS, Mode.CONST_GAL),
             arrayListOf(Mode.BAND_L1, Mode.BAND_L5),
-            arrayListOf(Mode.CORR_IONOSPHERE, Mode.CORR_TROPOSPHERE, Mode.CORR_MULTIPATH),
-            Mode.ALG_KALMAN,
+            arrayListOf(Mode.CORR_TROPOSPHERE, Mode.CORR_IONOFREE),
+            Mode.ALG_WLS,
             avgTime = 5L,
             isSelected = false
         )
