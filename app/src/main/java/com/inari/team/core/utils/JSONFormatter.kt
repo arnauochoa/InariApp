@@ -24,7 +24,7 @@ const val CLOCK_KEY = "Clock"
 const val EPHEMERIS_DATA_KEY = "ephData"
 const val GALILEO_KEY = "Galileo"
 const val GPS_KEY = "GPS"
-const val GLONASS_KEY = "GLONASS"
+//const val GLONASS_KEY = "GLONASS"
 const val KLOBUCHAR_KEY = "Klobuchar"
 const val NEQUICK_KEY = "NeQuick"
 
@@ -46,10 +46,7 @@ fun obtainJson(
         val measurementsJson = gnssMeasurementsAsJson(gnssMeasurements)
         // If clock measurements has enough information
         if (clockJson.length() > 0 && statusJson.length() > 0 && measurementsJson.length() > 0) {
-            //todo remove after testing
-//            mainJson.put(PARAMETERS_KEY, parametersAsJson(parameters))
-
-            mainJson.put(PARAMETERS_KEY, modeAsJson(modes[0]))
+            mainJson.put(PARAMETERS_KEY, modesAsJson(modes))
             mainJson.put(LOCATION_KEY, locationAsJson(location))
             mainJson.put(STATUS_KEY, statusJson)
             mainJson.put(MEASUREMENTS_KEY, measurementsJson)
@@ -64,12 +61,7 @@ fun obtainJson(
     return mainJson
 }
 
-//todo remove
-private fun modeAsJson(mode: Mode): JSONObject {
-    return mode.toJSONObject()
-}
-
-private fun parametersAsJson(modes: List<Mode>): JSONArray {
+private fun modesAsJson(modes: List<Mode>): JSONArray {
     val modesJsonArray = JSONArray()
     modes.forEach {
         modesJsonArray.put(it.toJSONObject())

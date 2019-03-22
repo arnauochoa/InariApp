@@ -74,7 +74,6 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(PositionParameters.BAND_L1),
             arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
             PositionParameters.ALG_LS,
-            avgTime = 5L,
             isSelected = false
         )
         val mode2 = Mode(
@@ -84,7 +83,6 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(PositionParameters.BAND_L1),
             arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
             PositionParameters.ALG_WLS,
-            avgTime = 5L,
             isSelected = false
         )
         val mode3 = Mode(
@@ -94,7 +92,6 @@ class SplashActivity : AppCompatActivity() {
             arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_L5),
             arrayListOf(PositionParameters.CORR_TROPOSPHERE, PositionParameters.CORR_IONOFREE),
             PositionParameters.ALG_WLS,
-            avgTime = 5L,
             isSelected = false
         )
 
@@ -120,6 +117,9 @@ class SplashActivity : AppCompatActivity() {
             ) {
                 goToMainActivity()
             } else {
+                if (shouldShowRequestPermissionRationale(PERMISSION_ACCESS_FINE_LOCATION)){
+                    //show dialog
+                }
                 finish()
             }
         } else {

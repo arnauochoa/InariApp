@@ -57,6 +57,8 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
             observe(status, ::updateStatusData)
         }
 
+        setHasOptionsMenu(false)
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
