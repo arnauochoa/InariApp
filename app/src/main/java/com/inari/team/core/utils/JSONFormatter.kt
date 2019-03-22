@@ -130,12 +130,18 @@ private fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>
 private fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
     val clockJson = JSONObject()
     gnssClock?.let { clock ->
-        if (clock.hasBiasNanos() && clock.hasBiasUncertaintyNanos() && clock.hasFullBiasNanos()) {
-            clockJson.put("timeNanos", clock.timeNanos)
+        clockJson.put("timeNanos", clock.timeNanos)
+        clockJson.put("hasBiasNanos", clock.hasBiasNanos())
+        if (clock.hasBiasNanos()) {
             clockJson.put("biasNanos", clock.biasNanos)
+        }
+        if (clock.hasBiasUncertaintyNanos()) {
             clockJson.put("biasUncertaintyNanos", clock.biasUncertaintyNanos)
+        }
+        if (clock.hasFullBiasNanos()) {
             clockJson.put("fullBiasNanos", clock.fullBiasNanos)
         }
+
     }
     return clockJson
 }
