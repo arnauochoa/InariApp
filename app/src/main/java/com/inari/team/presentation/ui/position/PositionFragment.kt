@@ -12,6 +12,8 @@ import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.view.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -55,8 +57,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
     companion object {
         const val FRAG_TAG = "position_fragment"
-
         const val SETTINGS_RESULT_CODE = 99
+
+        const val SHOW_ALERT_ERROR = "show alert error"
+        const val HIDE_ALERT_ERROR = "hide alert error"
     }
 
     private var mMap: GoogleMap? = null
@@ -120,15 +124,15 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
                 val selectedModes = getSelectedModes()
                 if (selectedModes.isEmpty()) { // If no constellation or band has been selected
-                    //todo change message?
-                    showError("At least one constellation and one band must be selected, go to settings to select one")
+                    showError("At least one Positioning Mode must be selected, ")
                 } else {
-                    viewModel?.setGnssData(modes = selectedModes)
+                    viewModel?.setSelectedModes(selectedModes)
                     startPositioning()
                 }
             } else {
                 MainActivity.getInstance()?.unSubscribeToGnssEvent(this)
                 btComputeAction.text = getString(R.string.start_computing)
+                viewModel?.stopComputingPosition()
             }
         }
 
@@ -256,7 +260,9 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
     private fun showError(error: String) {
-        activity?.runOnUiThread { toast(error) }
+        activity?.runOnUiThread {
+            toast(error)
+        }
     }
 
 
@@ -271,29 +277,41 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                 SUCCESS -> {
                     it.data?.let { positions ->
                         positions.forEach { resp ->
-                            addMarker(resp.position, "", resp.modeId)
+                            addMarker(resp.position, "", resp.modeColor)
                         }
                         hideMapLoading()
                     }
                 }
                 ERROR -> {
                     hideMapLoading()
-                    it.message?.let { msg -> showError(msg) }
+                    it.message?.let { msg ->
+                        when (msg) {
+                            SHOW_ALERT_ERROR -> {
+                                ivAlert.visibility = VISIBLE
+                            }
+                            HIDE_ALERT_ERROR -> {
+                                ivAlert.visibility = GONE
+                            }
+                            else -> showError(msg)
+
+                        }
+
+                    }
                 }
             }
         }
     }
 
     override fun onSatelliteStatusChanged(status: GnssStatus?) {
-        viewModel?.setGnssData(gnssStatus = status)
+        viewModel?.setGnssStatus(status)
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {
-        viewModel?.setGnssData(gnssMeasurementsEvent = event)
+        viewModel?.setGnssMeasurementsEvent(event)
     }
 
     override fun onLocationReceived(location: Location?) {
-        viewModel?.setGnssData(location = location)
+        viewModel?.setLocation(location)
     }
 
     override fun onGnssStarted() {

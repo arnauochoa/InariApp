@@ -18,7 +18,6 @@ data class Mode(
     val bands: ArrayList<Int>,
     val corrections: ArrayList<Int>,
     val algorithm: Int,
-    val avgTime: Long = PositionParameters.AVERAGING_TIME_SEC_1, //s
     var isSelected: Boolean,
     var color: Int = -1
 ) {

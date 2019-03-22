@@ -17,7 +17,6 @@ import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
 import kotlinx.android.synthetic.main.activity_modes.*
-import kotlinx.android.synthetic.main.dialog_new_mode.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
 import javax.inject.Inject
 
@@ -42,13 +41,14 @@ class ModesActivity : BaseActivity() {
         setContentView(R.layout.activity_modes)
         activityComponent.inject(this)
 
-        setToolbar()
-
         setViews()
 
     }
 
     private fun setViews() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = getString(R.string.modes)
+
         modesRVList.layoutManager = LinearLayoutManager(this)
 
         modesRVList.adapter = mAdapter
@@ -58,7 +58,8 @@ class ModesActivity : BaseActivity() {
         }
 
         seekBarTime.progress = mPrefs.getAverage().toInt()
-        tvAvgValue.text = "${mPrefs.getAverage()} s"
+        val avgText = "${mPrefs.getAverage()} s"
+        tvAvgValue.text = avgText
 
         apply_gnss_modes.setOnClickListener {
             mPrefs.saveModes(mAdapter.getItems())
@@ -87,7 +88,8 @@ class ModesActivity : BaseActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
 
                 avg = progress.toLong()
-                tvAvgValue.text = "$progress s"
+                val avgProgressText = "$progress s"
+                tvAvgValue.text = avgProgressText
 
             }
 
@@ -99,12 +101,6 @@ class ModesActivity : BaseActivity() {
 
         })
     }
-
-    private fun setToolbar() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.modes)
-    }
-
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
@@ -167,7 +163,6 @@ class ModesActivity : BaseActivity() {
                 bands,
                 corrections,
                 algorithm,
-                avgTime = 5L,
                 isSelected = false
             )
             AppSharedPreferences.getInstance().saveMode(mode)

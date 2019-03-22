@@ -2,9 +2,11 @@ package com.inari.team.presentation.ui.main
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.*
 import android.location.*
+import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Build
 import android.os.Bundle
 import android.view.Surface
@@ -12,6 +14,7 @@ import android.widget.Toast
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.utils.BarAdapter
+import com.inari.team.core.utils.connectivity.ConnectivityReceiver
 import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
 import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.checkPermissionsList
@@ -26,7 +29,8 @@ import com.inari.team.presentation.ui.statistics.StatisticsFragment
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
+class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
+    ConnectivityReceiver.ConnectivityReceiverListener {
 
     companion object {
         private const val MIN_TIME = 1L
@@ -48,6 +52,8 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     private var positionFragment = PositionFragment()
     private var statusFragment = StatusFragment()
     private var statisticsFragment = StatisticsFragment()
+
+    private var connectivityReceiver = ConnectivityReceiver()
 
     private var gnssListeners = arrayListOf<GnssEventsListener>()
 
@@ -74,6 +80,8 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
         setContentView(R.layout.activity_main)
         activityComponent.inject(this)
 
+        registerReceiver(connectivityReceiver, IntentFilter(CONNECTIVITY_ACTION))
+
         mActivity = this
 
         setViewPager()
@@ -85,6 +93,11 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
         addOrientationSensorListener()
 
         startGnss()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ConnectivityReceiver.connectivityReceiverListener = this
     }
 
     private fun setViewPager() {
@@ -324,6 +337,12 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     override fun onProviderDisabled(provider: String?) {
     }
 
+    override fun onNetworkConnectionChanged(isConnected: Boolean) {
+        if (!isConnected) {
+            toast("Connection was lost")
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -343,6 +362,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(connectivityReceiver)
         locationManager?.removeUpdates(this)
         gnssListeners.clear()
     }
