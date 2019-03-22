@@ -1,5 +1,14 @@
 package com.inari.team.presentation.model
 
+import com.inari.team.presentation.model.PositionParameters.ALG_LS
+import com.inari.team.presentation.model.PositionParameters.ALG_WLS
+import com.inari.team.presentation.model.PositionParameters.BAND_L1
+import com.inari.team.presentation.model.PositionParameters.BAND_L5
+import com.inari.team.presentation.model.PositionParameters.CONST_GAL
+import com.inari.team.presentation.model.PositionParameters.CONST_GPS
+import com.inari.team.presentation.model.PositionParameters.CORR_IONOFREE
+import com.inari.team.presentation.model.PositionParameters.CORR_IONOSPHERE
+import com.inari.team.presentation.model.PositionParameters.CORR_TROPOSPHERE
 import org.json.JSONObject
 
 data class Mode(
@@ -14,23 +23,6 @@ data class Mode(
     var color: Int = -1
 ) {
 
-    companion object {
-
-        const val CONST_GPS: Int = 1
-        const val CONST_GAL: Int = 2
-        const val CONST_GLO: Int = 3
-
-        const val BAND_L1: Int = 1
-        const val BAND_L5: Int = 2
-
-        const val CORR_IONOSPHERE: Int = 1
-        const val CORR_TROPOSPHERE: Int = 2
-        const val CORR_IONOFREE: Int = 3
-
-        const val ALG_LS: Int = 1
-        const val ALG_WLS: Int = 2
-    }
-
 
     fun toJSONObject(): JSONObject {
         val modeJson = JSONObject()
@@ -44,20 +36,20 @@ data class Mode(
     private fun getConstellationsJson(): JSONObject {
         val constellationsJson = JSONObject()
 
-        if (this.constellations.contains(Mode.CONST_GPS)) {
-            constellationsJson.put(PositionParameters.CONST_GPS, true)
+        if (this.constellations.contains(PositionParameters.CONST_GPS)) {
+            constellationsJson.put(PositionParameters.CONST_GPS_STR, true)
         } else {
-            constellationsJson.put(PositionParameters.CONST_GPS, false)
+            constellationsJson.put(PositionParameters.CONST_GPS_STR, false)
         }
-        if (this.constellations.contains(Mode.CONST_GAL)) {
-            constellationsJson.put(PositionParameters.CONST_GAL, true)
+        if (this.constellations.contains(PositionParameters.CONST_GAL)) {
+            constellationsJson.put(PositionParameters.CONST_GAL_STR, true)
         } else {
-            constellationsJson.put(PositionParameters.CONST_GAL, false)
+            constellationsJson.put(PositionParameters.CONST_GAL_STR, false)
         }
-        if (this.constellations.contains(Mode.CONST_GLO)) {
-            constellationsJson.put(PositionParameters.CONST_GLO, true)
+        if (this.constellations.contains(PositionParameters.CONST_GLO)) {
+            constellationsJson.put(PositionParameters.CONST_GLO_STR, true)
         } else {
-            constellationsJson.put(PositionParameters.CONST_GLO, false)
+            constellationsJson.put(PositionParameters.CONST_GLO_STR, false)
         }
 
         return constellationsJson
@@ -66,15 +58,15 @@ data class Mode(
     private fun getBandsJson(): JSONObject {
         val bandsJson = JSONObject()
 
-        if (this.bands.contains(Mode.BAND_L1)) {
-            bandsJson.put(PositionParameters.BAND_L1, true)
+        if (this.bands.contains(PositionParameters.BAND_L1)) {
+            bandsJson.put(PositionParameters.BAND_L1_STR, true)
         } else {
-            bandsJson.put(PositionParameters.BAND_L1, false)
+            bandsJson.put(PositionParameters.BAND_L1_STR, false)
         }
-        if (this.bands.contains(Mode.BAND_L5)) {
-            bandsJson.put(PositionParameters.BAND_L5, true)
+        if (this.bands.contains(PositionParameters.BAND_L5)) {
+            bandsJson.put(PositionParameters.BAND_L5_STR, true)
         } else {
-            bandsJson.put(PositionParameters.BAND_L5, false)
+            bandsJson.put(PositionParameters.BAND_L5_STR, false)
         }
 
         return bandsJson
@@ -83,20 +75,20 @@ data class Mode(
     private fun getCorrectionsJson(): JSONObject {
         val correctionsJson = JSONObject()
 
-        if (this.corrections.contains(Mode.CORR_IONOSPHERE)) {
-            correctionsJson.put(PositionParameters.CORR_IONOSPHERE, true)
+        if (this.corrections.contains(PositionParameters.CORR_IONOSPHERE)) {
+            correctionsJson.put(PositionParameters.CORR_IONOSPHERE_STR, true)
         } else {
-            correctionsJson.put(PositionParameters.CORR_IONOSPHERE, false)
+            correctionsJson.put(PositionParameters.CORR_IONOSPHERE_STR, false)
         }
-        if (this.corrections.contains(Mode.CORR_TROPOSPHERE)) {
-            correctionsJson.put(PositionParameters.CORR_TROPOSPHERE, true)
+        if (this.corrections.contains(PositionParameters.CORR_TROPOSPHERE)) {
+            correctionsJson.put(PositionParameters.CORR_TROPOSPHERE_STR, true)
         } else {
-            correctionsJson.put(PositionParameters.CORR_TROPOSPHERE, false)
+            correctionsJson.put(PositionParameters.CORR_TROPOSPHERE_STR, false)
         }
-        if (this.corrections.contains(Mode.CORR_IONOFREE)) {
-            correctionsJson.put(PositionParameters.CORR_IONOFREE, true)
+        if (this.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+            correctionsJson.put(PositionParameters.CORR_IONOFREE_STR, true)
         } else {
-            correctionsJson.put(PositionParameters.CORR_IONOFREE, false)
+            correctionsJson.put(PositionParameters.CORR_IONOFREE_STR, false)
         }
 
 
@@ -105,14 +97,14 @@ data class Mode(
 
     private fun getAlgorithmJson(): JSONObject {
         val algorithmJson = JSONObject()
-        algorithmJson.put(PositionParameters.ALG_LS, false)
-        algorithmJson.put(PositionParameters.ALG_WLS, false)
-        algorithmJson.put(PositionParameters.ALG_KALMAN, false)
+        algorithmJson.put(PositionParameters.ALG_LS_STR, false)
+        algorithmJson.put(PositionParameters.ALG_WLS_STR, false)
+        algorithmJson.put(PositionParameters.ALG_KALMAN_STR, false)
 
         when (this.algorithm) {
-            Mode.ALG_LS -> algorithmJson.put(PositionParameters.ALG_LS, true)
-            Mode.ALG_WLS -> algorithmJson.put(PositionParameters.ALG_WLS, true)
-            else -> algorithmJson.put(PositionParameters.ALG_LS, true) // default value = LS
+            PositionParameters.ALG_LS -> algorithmJson.put(PositionParameters.ALG_LS_STR, true)
+            PositionParameters.ALG_WLS -> algorithmJson.put(PositionParameters.ALG_WLS_STR, true)
+            else -> algorithmJson.put(PositionParameters.ALG_LS_STR, true) // default value = LS
         }
 
         return algorithmJson

@@ -1,121 +1,38 @@
 package com.inari.team.presentation.model
 
-import org.json.JSONObject
+object PositionParameters {
+    const val CONSTELLATIONS_KEY = "constellations"
+    const val CONST_GPS_STR: String = "GPS"
+    const val CONST_GAL_STR: String = "Galileo"
+    const val CONST_GLO_STR: String = "GLONASS"
 
-data class PositionParameters(
-    val constellations: ArrayList<Int>,
-    val bands: ArrayList<Int>,
-    val corrections: ArrayList<Int>,
-    val algorithm: Int?
-) {
-    companion object {
+    const val BANDS_KEY = "bands"
+    const val BAND_L1_STR = "L1"
+    const val BAND_L5_STR = "L5"
 
-        const val CONSTELLATIONS_KEY = "constellations"
-        const val CONST_GPS: String = "GPS"
-        const val CONST_GAL: String = "Galileo"
-        const val CONST_GLO: String = "GLONASS"
+    const val CORRECTIONS_KEY = "corrections"
+    const val CORR_IONOSPHERE_STR = "ionosphere"
+    const val CORR_TROPOSPHERE_STR = "troposphere"
+    const val CORR_IONOFREE_STR = "ionofree"
 
-        const val BANDS_KEY = "bands"
-        const val BAND_L1 = "L1"
-        const val BAND_L5 = "L5"
+    const val ALGORITHM_KEY = "algorithm"
+    const val ALG_LS_STR = "LS"
+    const val ALG_WLS_STR = "WLS"
+    const val ALG_KALMAN_STR = "KAL"
 
-        const val CORRECTIONS_KEY = "corrections"
-        const val CORR_IONOSPHERE = "ionosphere"
-        const val CORR_TROPOSPHERE = "troposphere"
-        const val CORR_IONOFREE = "ionofree"
+    const val AVERAGING_TIME_SEC_1 = 5L
 
-        const val ALGORITHM_KEY = "algorithm"
-        const val ALG_LS = "LS"
-        const val ALG_WLS = "WLS"
-        const val ALG_KALMAN = "KAL"
+    const val CONST_GPS: Int = 1
+    const val CONST_GAL: Int = 2
+    const val CONST_GLO: Int = 3
 
-        const val AVERAGING_TIME_SEC_1 = 5L
-        const val AVERAGING_TIME_SEC_2 = 10L
-        const val AVERAGING_TIME_SEC_3 = 20L
-    }
+    const val BAND_L1: Int = 1
+    const val BAND_L5: Int = 2
 
-    fun toJSONObject(): JSONObject {
-        val parametersJson = JSONObject()
-        parametersJson.put(CONSTELLATIONS_KEY, getConstellationsJson())
-        parametersJson.put(BANDS_KEY, getBandsJson())
-        parametersJson.put(CORRECTIONS_KEY, getCorrectionsJson())
-        parametersJson.put(ALGORITHM_KEY, getAlgorithmJson())
-        return parametersJson
-    }
+    const val CORR_IONOSPHERE: Int = 1
+    const val CORR_TROPOSPHERE: Int = 2
+    const val CORR_IONOFREE: Int = 3
 
-    private fun getConstellationsJson(): JSONObject {
-        val constellationsJson = JSONObject()
-
-        if (this.constellations.contains(Mode.CONST_GPS)) {
-            constellationsJson.put(CONST_GPS, true)
-        } else {
-            constellationsJson.put(CONST_GPS, false)
-        }
-        if (this.constellations.contains(Mode.CONST_GAL)) {
-            constellationsJson.put(CONST_GAL, true)
-        } else {
-            constellationsJson.put(CONST_GAL, false)
-        }
-        if (this.constellations.contains(Mode.CONST_GLO)) {
-            constellationsJson.put(CONST_GLO, true)
-        } else {
-            constellationsJson.put(CONST_GLO, false)
-        }
-
-        return constellationsJson
-    }
-
-    private fun getBandsJson(): JSONObject {
-        val bandsJson = JSONObject()
-
-        if (this.bands.contains(Mode.BAND_L1)) {
-            bandsJson.put(BAND_L1, true)
-        } else {
-            bandsJson.put(BAND_L1, false)
-        }
-        if (this.bands.contains(Mode.BAND_L5)) {
-            bandsJson.put(BAND_L5, true)
-        } else {
-            bandsJson.put(BAND_L5, false)
-        }
-
-        return bandsJson
-    }
-
-    private fun getCorrectionsJson(): JSONObject {
-        val correctionsJson = JSONObject()
-
-        if (this.corrections.contains(Mode.CORR_IONOSPHERE)) {
-            correctionsJson.put(CORR_IONOSPHERE, true)
-        } else {
-            correctionsJson.put(CORR_IONOSPHERE, false)
-        }
-        if (this.corrections.contains(Mode.CORR_TROPOSPHERE)) {
-            correctionsJson.put(CORR_TROPOSPHERE, true)
-        } else {
-            correctionsJson.put(CORR_TROPOSPHERE, false)
-        }
-        if (this.corrections.contains(Mode.CORR_IONOFREE)) {
-            correctionsJson.put(CORR_IONOFREE, true)
-        } else {
-            correctionsJson.put(CORR_IONOFREE, false)
-        }
-
-        return correctionsJson
-    }
-
-    private fun getAlgorithmJson(): JSONObject {
-        val algorithmJson = JSONObject()
-        algorithmJson.put(ALG_LS, false)
-        algorithmJson.put(ALG_WLS, false)
-        algorithmJson.put(ALG_KALMAN, false)
-
-        when (this.algorithm) {
-            Mode.ALG_LS -> algorithmJson.put(ALG_LS, true)
-            Mode.ALG_WLS -> algorithmJson.put(ALG_WLS, true)
-            else -> algorithmJson.put(ALG_LS, true) // default value = LS
-        }
-
-        return algorithmJson
-    }
+    const val ALG_LS: Int = 1
+    const val ALG_WLS: Int = 2
 }

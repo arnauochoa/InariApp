@@ -15,6 +15,7 @@ import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
+import com.inari.team.presentation.model.PositionParameters
 import kotlinx.android.synthetic.main.activity_modes.*
 import kotlinx.android.synthetic.main.dialog_new_mode.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
@@ -146,15 +147,15 @@ class ModesActivity : BaseActivity() {
 
         layout?.let {
             name = it.modeNameTextEdit.text.toString() // set the name
-            if (it.constOption1.isChecked) constellations.add(Mode.CONST_GPS) // set selected constellations
-            if (it.constOption2.isChecked) constellations.add(Mode.CONST_GAL)
-            if (it.bandsOption1.isChecked) bands.add(Mode.BAND_L1) // set selected bands
-            if (it.bandsOption2.isChecked) bands.add(Mode.BAND_L5)
-            if (it.correctionsOption1.isChecked) corrections.add(Mode.CORR_IONOSPHERE)  // set selected corrections
-            if (it.correctionsOption2.isChecked) corrections.add(Mode.CORR_TROPOSPHERE)
-            if (it.correctionsOption3.isChecked) corrections.add(Mode.CORR_IONOFREE)
-            if (it.algorithm1.isChecked) algorithm = Mode.ALG_LS  // set selected algorithm
-            if (it.algorithm2.isChecked) algorithm = Mode.ALG_WLS
+            if (it.constOption1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
+            if (it.constOption2.isChecked) constellations.add(PositionParameters.CONST_GAL)
+            if (it.bandsOption1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
+            if (it.bandsOption2.isChecked) bands.add(PositionParameters.BAND_L5)
+            if (it.correctionsOption1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
+            if (it.correctionsOption2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
+            if (it.correctionsOption3.isChecked) corrections.add(PositionParameters.CORR_IONOFREE)
+            if (it.algorithm1.isChecked) algorithm = PositionParameters.ALG_LS  // set selected algorithm
+            if (it.algorithm2.isChecked) algorithm = PositionParameters.ALG_WLS
         }
 
         val modesList = AppSharedPreferences.getInstance().getModesList()
