@@ -25,13 +25,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
-import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.*
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
-import com.inari.team.core.utils.getModeIcon
-import com.inari.team.core.utils.saveFile
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
