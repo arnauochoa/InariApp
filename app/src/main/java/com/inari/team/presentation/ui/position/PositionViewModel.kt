@@ -211,14 +211,15 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     private fun computePosition(): List<ResponsePvtMode>? {
         val responses = arrayListOf<ResponsePvtMode>()
 
-        val gnssJson = JSONObject(obtainPosition(Gson().toJson(gnssData)))
+        val gnssJson = JSONObject(Gson().toJson(gnssData))
         gnssJson.put("MeasData", gnssMeasurementsListAsJson(gnssData.measurements))
 
+        val a = obtainPosition(gnssJson.toString(2))
         val positionJson = JSONObject(obtainPosition(gnssJson.toString(2)))
         val latitude = positionJson.get("lat") as? Double
         val longitude = positionJson.get("lng") as? Double
-        val modeId = positionJson.get("id") as? Int ?: 0
-        val modeName = positionJson.get("name") as? String ?: ""
+        val modeId = 0
+        val modeName = ""
 
         latitude?.let { lat ->
             longitude?.let { lon ->
