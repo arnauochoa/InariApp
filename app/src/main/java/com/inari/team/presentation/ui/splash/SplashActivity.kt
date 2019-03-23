@@ -1,9 +1,14 @@
 package com.inari.team.presentation.ui.splash
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.provider.Settings
+import android.support.v4.app.ActivityCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import com.inari.team.R
 import com.inari.team.core.utils.AppSharedPreferences
@@ -117,13 +122,33 @@ class SplashActivity : AppCompatActivity() {
             ) {
                 goToMainActivity()
             } else {
-                if (shouldShowRequestPermissionRationale(PERMISSION_ACCESS_FINE_LOCATION)){
-                    //show dialog
+                val showRationale =
+                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (!showRationale) {
+                    //"never ask again" box checked
+
+                    val dialog = AlertDialog.Builder(this)
+                        .setTitle("Turn on the permissions to proceed")
+                        .setMessage("In order to activate the permissions, go to settings...")
+                        .setCancelable(false)
+                        .setPositiveButton("OK") { _, _ ->
+                            goToSettings()
+                        }
+                        .create()
+
+                    dialog.show()
+
                 }
-                finish()
             }
         } else {
             finish()
         }
+    }
+
+    private fun goToSettings() {
+        val myAppSettings = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
+        myAppSettings.addCategory(Intent.CATEGORY_DEFAULT)
+        myAppSettings.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(myAppSettings)
     }
 }
