@@ -1,6 +1,5 @@
 package com.inari.team.presentation.ui.position
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
@@ -29,6 +28,7 @@ import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.*
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
+import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.skyplot.GnssEventsListener
@@ -138,11 +138,12 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
 
-    @SuppressLint("MissingPermission")
     override fun onMapReady(map: GoogleMap?) {
         mMap = map
 
-        mMap?.isMyLocationEnabled = true
+        if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+            mMap?.isMyLocationEnabled = true
+        }
         mMap?.uiSettings?.isMyLocationButtonEnabled = false
     }
 
@@ -310,23 +311,24 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun updateGooglePosition(data: Data<String>?) {
         data?.let {
             when (it.dataState) {
                 LOADING -> {
-                    fusedLocationClient?.lastLocation?.addOnCompleteListener { result ->
-                        result.result?.let { location ->
-                            mSharedPreferences.getSelectedModesList().forEach { mode ->
-                                val pvt = ResponsePvtMode(
-                                    LatLng(location.latitude, location.longitude),
-                                    mode.color,
-                                    mode.name
-                                )
-                                addMarker(pvt.position, "", pvt.modeColor)
-                                toast("SHOWING LOCATION FROM GOOGLE")
-                            }
+                    if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        fusedLocationClient?.lastLocation?.addOnCompleteListener { result ->
+                            result.result?.let { location ->
+                                mSharedPreferences.getSelectedModesList().forEach { mode ->
+                                    val pvt = ResponsePvtMode(
+                                        LatLng(location.latitude, location.longitude),
+                                        mode.color,
+                                        mode.name
+                                    )
+                                    addMarker(pvt.position, "", pvt.modeColor)
+                                    toast("SHOWING LOCATION FROM GOOGLE")
+                                }
 
+                            }
                         }
                     }
                 }

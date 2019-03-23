@@ -128,8 +128,8 @@ class SplashActivity : AppCompatActivity() {
                     //"never ask again" box checked
 
                     val dialog = AlertDialog.Builder(this)
-                        .setTitle("Activa los permisos para continuar")
-                        .setMessage("Para activar los permisos dirígete a settings...")
+                        .setTitle("Turn on the permissions to proceed")
+                        .setMessage("In order to activate the permissions, go to settings...")
                         .setCancelable(false)
                         .setPositiveButton("OK") { _, _ ->
                             goToSettings()
