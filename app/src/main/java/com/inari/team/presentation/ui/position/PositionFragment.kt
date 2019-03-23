@@ -27,15 +27,12 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
-import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.*
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
-import com.inari.team.core.utils.getModeIcon
-import com.inari.team.core.utils.saveFile
 import com.inari.team.core.utils.skyplot.GnssEventsListener
-import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.logs.LogsActivity
@@ -68,6 +65,8 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     private var mapFragment: SupportMapFragment? = null
 
     private var viewModel: PositionViewModel? = null
+
+    private var errorMessage: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,20 +118,27 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
         btComputeAction.setOnClickListener {
             if (btComputeAction.text == getString(R.string.start_computing)) {
-                MainActivity.getInstance()?.subscribeToGnssEvents(this)
-                btComputeAction.text = getString(R.string.stop_computing)
-
                 val selectedModes = getSelectedModes()
                 if (selectedModes.isEmpty()) { // If no constellation or band has been selected
-                    showError("At least one Positioning Mode must be selected, ")
+                    showAlert(
+                        it.context,
+                        "Select Parameters",
+                        "At least one Positioning Mode must be selected",
+                        "go to settings",
+                        positiveAction = {
+                            navigator.navigateToModesActivity()
+
+                        },
+                        isCancelable = true
+                    )
                 } else {
+                    MainActivity.getInstance()?.subscribeToGnssEvents(this)
+                    btComputeAction.text = getString(R.string.stop_computing)
                     viewModel?.setSelectedModes(selectedModes)
                     startPositioning()
                 }
             } else {
-                MainActivity.getInstance()?.unSubscribeToGnssEvent(this)
-                btComputeAction.text = getString(R.string.start_computing)
-                viewModel?.stopComputingPosition()
+                stopComputing()
             }
         }
 
@@ -197,6 +203,13 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         viewModel?.obtainEphemerisData()
 
     }
+
+    private fun stopComputing() {
+        MainActivity.getInstance()?.unSubscribeToGnssEvent(this)
+        btComputeAction.text = getString(R.string.start_computing)
+        viewModel?.stopComputingPosition()
+    }
+
 
     private fun showSaveDialog() {
         context?.let {
@@ -265,6 +278,24 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         }
     }
 
+    private fun showEphemerisAlert(show: Boolean) {
+        if (show) {
+            ivAlert.visibility = VISIBLE
+            ivAlert.setOnClickListener {
+                showAlert(
+                    ivAlert.context, "Something went wrong",
+                    "Ephemeris data could not be obtained, check your connection",
+                    "Stop Computing", {
+                        stopComputing()
+                    }, true
+                )
+            }
+        } else {
+            ivAlert.visibility = GONE
+        }
+
+    }
+
 
     private fun updatePosition(data: Data<List<ResponsePvtMode>>?) {
         data?.let {
@@ -287,10 +318,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     it.message?.let { msg ->
                         when (msg) {
                             SHOW_ALERT_ERROR -> {
-                                ivAlert.visibility = VISIBLE
+                                showEphemerisAlert(true)
                             }
                             HIDE_ALERT_ERROR -> {
-                                ivAlert.visibility = GONE
+                                showEphemerisAlert(false)
                             }
                             else -> showError(msg)
 

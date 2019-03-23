@@ -6,7 +6,6 @@ import com.inari.team.core.di.scopes.PerFragment
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.modes.ModesActivity
-import com.inari.team.presentation.ui.modes.ModesActivity.Companion.COMPARING_EXTRA
 import com.inari.team.presentation.ui.position.PositionFragment
 import com.inari.team.presentation.ui.settings.GnssSettingsActivity
 import javax.inject.Inject
@@ -35,13 +34,10 @@ class FragmentNavigator @Inject constructor(private val fragment: Fragment) : Na
         }
     }
 
-    override fun navigateToModesActivity(isComparing: Boolean) {
+    override fun navigateToModesActivity() {
         with(fragment) {
-            val i = Intent(context, ModesActivity::class.java)
-            i.putExtra(COMPARING_EXTRA, isComparing)
-            startActivity(i)
+            startActivity(Intent(context, ModesActivity::class.java))
         }
     }
-
 
 }

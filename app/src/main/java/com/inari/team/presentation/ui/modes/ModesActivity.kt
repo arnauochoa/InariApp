@@ -22,19 +22,16 @@ import javax.inject.Inject
 
 class ModesActivity : BaseActivity() {
 
-    companion object {
-        const val COMPARING_EXTRA: String = "comparing"
-    }
-
     @Inject
     lateinit var navigator: Navigator
 
     @Inject
     lateinit var mPrefs: AppSharedPreferences
 
-    private val mAdapter = ModesListAdapter()
+    private var mAdapter: ModesListAdapter? = null
 
     private var avg: Long = 5L
+    private var mask: Int = 5
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,32 +46,9 @@ class ModesActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.modes)
 
+        mAdapter = ModesListAdapter { setSelectedModes() }
         modesRVList.layoutManager = LinearLayoutManager(this)
-
         modesRVList.adapter = mAdapter
-
-        fabNewMode.setOnClickListener {
-            showNewModeDialog()
-        }
-
-        seekBarTime.progress = mPrefs.getAverage().toInt()
-        val avgText = "${mPrefs.getAverage()} s"
-        tvAvgValue.text = avgText
-
-        apply_gnss_modes.setOnClickListener {
-            mPrefs.saveModes(mAdapter.getItems())
-            mPrefs.setAverage(avg)
-            finish()
-        }
-
-        switchAvg.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                clAvgValue.visibility = VISIBLE
-            } else {
-                clAvgValue.visibility = GONE
-            }
-        }
-
         tvModesTitle.setOnClickListener {
             if (modesRVList.visibility == VISIBLE) {
                 modesRVList.visibility = GONE
@@ -82,6 +56,40 @@ class ModesActivity : BaseActivity() {
                 modesRVList.visibility = VISIBLE
             }
             ivModesTitle.rotation = ivModesTitle.rotation + 180f
+        }
+
+        setSelectedModes()
+
+        fabNewMode.setOnClickListener {
+            showNewModeDialog()
+        }
+
+        apply_gnss_modes.setOnClickListener {
+            mAdapter?.let {
+                mPrefs.saveModes(it.getItems())
+            }
+            mPrefs.setAverage(avg)
+            mPrefs.setSelectedMask(mask)
+            finish()
+        }
+
+        avg = mPrefs.getAverage()
+        seekBarTime.progress = avg.toInt()
+        val avgText = "$avg s"
+        tvAvgValue.text = avgText
+
+        mask = mPrefs.getSelectedMask()
+        seekBarMask.progress = mask
+        val maskText = "${mask}º"
+        tvMaskValue.text = maskText
+
+
+        switchAvg.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                clAvgValue.visibility = VISIBLE
+            } else {
+                clAvgValue.visibility = GONE
+            }
         }
 
         seekBarTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -100,6 +108,21 @@ class ModesActivity : BaseActivity() {
             }
 
         })
+
+        seekBarMask.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                mask = progress
+                val maskProgressText = "${mask}º"
+                tvMaskValue.text = maskProgressText
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -107,6 +130,12 @@ class ModesActivity : BaseActivity() {
         return true
     }
 
+    private fun setSelectedModes() {
+        val selectedItems = mAdapter?.getSelectedItems() ?: arrayListOf()
+        val selectedModesText = "${selectedItems.size} selected"
+        tvSelectedModesTitle.text = selectedModesText
+
+    }
 
     private fun showNewModeDialog() {
 
@@ -168,7 +197,7 @@ class ModesActivity : BaseActivity() {
             AppSharedPreferences.getInstance().saveMode(mode)
             toast("Mode created")
             dialog.dismiss()
-            mAdapter.update()
+            mAdapter?.update()
         }
     }
 
