@@ -6,19 +6,18 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.StrictMode
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.createDirectory
+import com.inari.team.core.utils.*
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
-import com.inari.team.core.utils.obtainJson
-import com.inari.team.core.utils.saveFile
 import com.inari.team.presentation.model.GnssData
+import com.inari.team.presentation.model.MeasurementData
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.ResponsePvtMode
 import kotlinx.coroutines.GlobalScope
@@ -26,6 +25,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -46,6 +46,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     private var isComputing = false
 
     private var gnssData = GnssData()
+    private var lastGnssStatus: GnssStatus? = null
 
     private var gnssDataJson = JSONArray()
 
@@ -79,6 +80,9 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         GlobalScope.launch {
             // Delete previous measurements
             gnssDataJson = JSONArray()
+            gnssData.avg = mPrefs.getAverage()
+            gnssData.mask = mPrefs.getSelectedMask()
+            gnssData.avgEnabled = mPrefs.isAverageEnabled()
             lastDate = Date()
             try {
                 startTimeString = formatter.format(lastDate)
@@ -105,9 +109,9 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
                 lastEphemerisDate = Date()
                 StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
                 suplController?.sendSuplRequest(latE7, lngE7)
-                ephResponse = suplController?.generateEphResponse(latE7, lngE7)
-                setEphemerisResponse(ephResponse)
                 ephemeris.updateData(PositionFragment.HIDE_ALERT_ERROR)
+                ephResponse = suplController?.generateEphResponse(latE7, lngE7)
+                gnssData.ephemerisResponse = ephResponse
             }
             if (ephResponse == null) {
                 if (isComputing) {
@@ -126,24 +130,31 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     }
 
     fun setLocation(location: Location?) {
-        gnssData.location = location
         location?.let {
+            gnssData.location = LatLng(it.latitude, it.longitude)
             refPos = LatLng(it.latitude, it.longitude)
         }
     }
 
     fun setGnssStatus(status: GnssStatus?) {
-        gnssData.gnssStatus = status
+        lastGnssStatus = status
     }
 
     fun setGnssMeasurementsEvent(gnssMeasurementsEvent: GnssMeasurementsEvent?) {
-        gnssData.gnssMeasurements = gnssMeasurementsEvent?.measurements
-        gnssData.gnssClock = gnssMeasurementsEvent?.clock
-        setGnssData()
-    }
+        val measurements = gnssMeasurementsEvent?.measurements
+        val clock = gnssMeasurementsEvent?.clock
 
-    private fun setEphemerisResponse(ephemerisResponse: EphemerisResponse?) {
-        gnssData.ephemerisResponse = ephemerisResponse
+        measurements?.let {
+            if (it.isNotEmpty() && clock != null && lastGnssStatus != null) {
+                val measurementData = MeasurementData(
+                    lastGnssStatus,
+                    it,
+                    clock
+                )
+                gnssData.measurements.add(measurementData)
+            }
+        }
+        setGnssData()
     }
 
     //compute position
@@ -151,28 +162,23 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
         if (gnssData.modes.isNotEmpty() &&
             gnssData.location != null &&
-            gnssData.gnssStatus != null &&
+            gnssData.measurements.isNotEmpty() &&
             gnssData.ephemerisResponse != null
         ) {
-            gnssData.gnssMeasurements?.isNotEmpty()?.let {
-                saveNewGnssData()
 
-                if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(mPrefs.getAverage())) {
+            if (gnssData.avgEnabled) {
+                if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(mPrefs.getAverage().toLong())) {
                     calculatePositionWithGnss()
                 }
-                if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
-                    obtainEphemerisData()
+            } else {
+                if (Date().time - lastDate.time >= TimeUnit.SECONDS.toMillis(AVG_RATING_DEFAULT)) {
+                    calculatePositionWithGnss()
                 }
-
             }
-
-
+            if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
+                obtainEphemerisData()
+            }
         }
-    }
-
-    private fun saveNewGnssData() {
-        val mainJson = obtainJson(gnssData, lastEphemerisDate)
-        gnssDataJson.put(mainJson)
     }
 
     private fun calculatePositionWithGnss() {
@@ -203,19 +209,25 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     }
 
     private fun computePosition(): List<ResponsePvtMode>? {
-
         val responses = arrayListOf<ResponsePvtMode>()
 
-        googlePosition.showLoading()
+        val gnssJson = JSONObject(obtainPosition(Gson().toJson(gnssData)))
+        gnssJson.put("MeasData", gnssMeasurementsListAsJson(gnssData.measurements))
 
-//        if (gnssDataJson.length() > 0) {
-//            val gnssDataString = gnssDataJson.toString(2)
-//            val positionJson = JSONObject(obtainPosition(gnssDataString))
-//            val latitude = positionJson.get("lat") as Double
-//            val longitude = positionJson.get("lng") as Double
-//
-//            responses.add(ResponsePvtMode(LatLng(latitude, longitude), getModeColor(0), ""))
-//        }
+        val positionJson = JSONObject(obtainPosition(gnssJson.toString(2)))
+        val latitude = positionJson.get("lat") as? Double
+        val longitude = positionJson.get("lng") as? Double
+        val modeId = positionJson.get("id") as? Int ?: 0
+        val modeName = positionJson.get("name") as? String ?: ""
+
+        latitude?.let { lat ->
+            longitude?.let { lon ->
+                responses.add(ResponsePvtMode(LatLng(lat, lon), getModeColor(modeId), modeName))
+            }
+        } ?: kotlin.run {
+            googlePosition.showLoading()
+        }
+
 
         return responses
     }
@@ -232,7 +244,8 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         const val SUPL_SSL_ENABLED = true
         const val SUPL_MESSAGE_LOGGING_ENABLED = true
         const val SUPL_LOGGING_ENABLED = true
-        const val EPHEMERIS_UPDATE_TIME_HOURS = 1L
+        const val EPHEMERIS_UPDATE_TIME_HOURS = 1L //h
+        const val AVG_RATING_DEFAULT = 1L //s
     }
 
 

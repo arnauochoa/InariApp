@@ -1,7 +1,8 @@
 //
 // Created by Arnau Ochoa Bañuelos on 17/03/2019.
 //
-
+#include <iomanip> // setprecision
+#include <sstream> // stringstream
 #include <string>
 #include <jni.h>
 
@@ -48,16 +49,30 @@ Java_com_inari_team_presentation_ui_position_PositionViewModel_obtainPosition(JN
     double PVT[4];    //  PVT solution
     double posllh[3];      //  Position in Latitude, Longitude and Height
 
-    PVT_recls(acqInfo, eph, ephN, ephM, iono, Nit, PVT0, enabCorr, PVT);
+    std::string lat;
+    std::string lng;
 
-    xyz2llh(PVT, posllh);     // Getting position in Latitude, Longitude, Height format
+    try
+    {
+        PVT_recls(acqInfo, eph, ephN, ephM, iono, Nit, PVT0, enabCorr, PVT);
+        xyz2llh(PVT, posllh);     // Getting position in Latitude, Longitude, Height format
 
-    posllh[0] = rad2deg(posllh[0]);
-    posllh[1] = rad2deg(posllh[1]);
+        posllh[0] = rad2deg(posllh[0]);
+        posllh[1] = rad2deg(posllh[1]);
 
-    // Return parameters
-    std::string lat = std::to_string(posllh[0]);
-    std::string lng = std::to_string(posllh[1]);
+        // Return parameters
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(10) << posllh[0];
+        lat = stream.str();
+
+        stream << std::fixed << std::setprecision(10) << posllh[1];
+        lng = stream.str();
+    }
+    catch(const std::exception& e)
+    {
+        lat = "";
+        lng = "";
+    }
 
     std::string position = "{ \"lat\":" + lat + ", \"lng\": " + lng + " }";
     return env->NewStringUTF(position.c_str());

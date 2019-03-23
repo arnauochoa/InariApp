@@ -18,6 +18,7 @@ class AppSharedPreferences {
         const val MODES: String = "modes"
         const val PVT_INFO: String = "PVT_INFO"
         const val COLORS: String = "colors"
+        const val AVG_ENABLED: String = "avgenabled"
         const val AVGTIME: String = "avgtime"
         const val MASK: String = "mask"
 
@@ -121,10 +122,17 @@ class AppSharedPreferences {
         return mPrefs.getString(type, "")
     }
 
-    fun getAverage(): Long = mPrefs.getLong(AVGTIME, 5L)
-    fun setAverage(avg: Long) {
+    fun isAverageEnabled(): Boolean = mPrefs.getBoolean(AVG_ENABLED, true)
+    fun setAverageEnabled(enabled: Boolean) {
         mPrefs.edit()
-            .putLong(AVGTIME, avg)
+            .putBoolean(AVG_ENABLED, enabled)
+            .apply()
+    }
+
+    fun getAverage(): Int = mPrefs.getInt(AVGTIME, 5)
+    fun setAverage(avg: Int) {
+        mPrefs.edit()
+            .putInt(AVGTIME, avg)
             .apply()
     }
 
