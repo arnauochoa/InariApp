@@ -30,7 +30,7 @@ class ModesActivity : BaseActivity() {
 
     private var mAdapter: ModesListAdapter? = null
 
-    private var avg: Long = 5L
+    private var avg: Int = 5
     private var mask: Int = 5
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,13 +68,14 @@ class ModesActivity : BaseActivity() {
             mAdapter?.let {
                 mPrefs.saveModes(it.getItems())
             }
+            mPrefs.setAverageEnabled(switchAvg.isChecked)
             mPrefs.setAverage(avg)
             mPrefs.setSelectedMask(mask)
             finish()
         }
 
         avg = mPrefs.getAverage()
-        seekBarTime.progress = avg.toInt()
+        seekBarTime.progress = avg
         val avgText = "$avg s"
         tvAvgValue.text = avgText
 
@@ -83,6 +84,7 @@ class ModesActivity : BaseActivity() {
         val maskText = "${mask}º"
         tvMaskValue.text = maskText
 
+        switchAvg.isChecked = mPrefs.isAverageEnabled()
 
         switchAvg.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -94,8 +96,7 @@ class ModesActivity : BaseActivity() {
 
         seekBarTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-
-                avg = progress.toLong()
+                avg = progress
                 val avgProgressText = "$progress s"
                 tvAvgValue.text = avgProgressText
 
