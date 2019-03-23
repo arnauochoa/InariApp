@@ -339,7 +339,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
 
     override fun onNetworkConnectionChanged(isConnected: Boolean) {
         if (!isConnected) {
-            toast("Connection was lost")
+            toast("No network connection")
         }
     }
 

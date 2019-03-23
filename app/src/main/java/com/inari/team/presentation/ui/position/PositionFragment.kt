@@ -1,7 +1,6 @@
 package com.inari.team.presentation.ui.position
 
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
@@ -33,7 +32,6 @@ import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.skyplot.GnssEventsListener
-import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
@@ -52,21 +50,13 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     @Inject
     lateinit var navigator: Navigator
 
-    companion object {
-        const val FRAG_TAG = "position_fragment"
-        const val SETTINGS_RESULT_CODE = 99
-
-        const val SHOW_ALERT_ERROR = "show alert error"
-        const val HIDE_ALERT_ERROR = "hide alert error"
-    }
-
     private var mMap: GoogleMap? = null
     private var fusedLocationClient: FusedLocationProviderClient? = null
     private var mapFragment: SupportMapFragment? = null
 
-    private var viewModel: PositionViewModel? = null
+    private var positionsList = arrayListOf<ResponsePvtMode>()
 
-    private var errorMessage: String = ""
+    private var viewModel: PositionViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +64,8 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
         viewModel = withViewModel(viewModelFactory) {
             observe(position, ::updatePosition)
+            observe(ephemeris, ::updateEphemeris)
+            observe(googlePosition, ::updateGooglePosition)
         }
     }
 
@@ -118,25 +110,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
         btComputeAction.setOnClickListener {
             if (btComputeAction.text == getString(R.string.start_computing)) {
-                val selectedModes = getSelectedModes()
-                if (selectedModes.isEmpty()) { // If no constellation or band has been selected
-                    showAlert(
-                        it.context,
-                        "Select Parameters",
-                        "At least one Positioning Mode must be selected",
-                        "go to settings",
-                        positiveAction = {
-                            navigator.navigateToModesActivity()
-
-                        },
-                        isCancelable = true
-                    )
-                } else {
-                    MainActivity.getInstance()?.subscribeToGnssEvents(this)
-                    btComputeAction.text = getString(R.string.stop_computing)
-                    viewModel?.setSelectedModes(selectedModes)
-                    startPositioning()
-                }
+                startComputing(it)
             } else {
                 stopComputing()
             }
@@ -164,50 +138,48 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
 
-    override fun onMapReady(map: GoogleMap?) {
-        hideMapLoading()
-        setMap(map)
-    }
-
     @SuppressLint("MissingPermission")
-    fun setMap(map: GoogleMap?) {
-
+    override fun onMapReady(map: GoogleMap?) {
         mMap = map
 
         mMap?.isMyLocationEnabled = true
         mMap?.uiSettings?.isMyLocationButtonEnabled = false
-
-
     }
 
-    @SuppressLint("MissingPermission")
-    private fun getSelectedModes(): List<Mode> {
+    private fun startComputing(it: View) {
+        val selectedModes = mSharedPreferences.getSelectedModesList()
+        if (selectedModes.isEmpty()) { // If no constellation or band has been selected
+            showAlert(
+                it.context,
+                "Select Parameters",
+                "At least one Positioning Mode must be selected",
+                "go to settings",
+                positiveAction = {
+                    navigator.navigateToModesActivity()
 
-        fusedLocationClient?.lastLocation?.addOnSuccessListener { location ->
-            location?.let {
-                moveCamera(LatLng(location.latitude, location.longitude))
-            }
+                },
+                isCancelable = true
+            )
+        } else {
+            MainActivity.getInstance()?.subscribeToGnssEvents(this)
+            btComputeAction.text = getString(R.string.stop_computing)
+            viewModel?.setSelectedModes(selectedModes)
+            startPositioning()
         }
-
-        return mSharedPreferences.getModesList().filter {
-            it.isSelected
-        }
-
     }
 
     private fun startPositioning() {
         mMap?.clear()
-        showMapLoading()
-
-        viewModel?.setStartTime()
+        viewModel?.startComputingPosition()
         viewModel?.obtainEphemerisData()
 
     }
 
     private fun stopComputing() {
+        viewModel?.stopComputingPosition()
         MainActivity.getInstance()?.unSubscribeToGnssEvent(this)
         btComputeAction.text = getString(R.string.start_computing)
-        viewModel?.stopComputingPosition()
+        showSaveDialog()
     }
 
 
@@ -226,6 +198,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     }
                     saveLog(fileName + format)
                     dialog.dismiss()
+                    positionsList.clear()
                 } else showError("File name can not be empty")
             }
             dialog.show()
@@ -273,9 +246,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
     private fun showError(error: String) {
-        activity?.runOnUiThread {
-            toast(error)
-        }
+        toast(error)
     }
 
     private fun showEphemerisAlert(show: Boolean) {
@@ -293,7 +264,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         } else {
             ivAlert.visibility = GONE
         }
-
     }
 
 
@@ -301,37 +271,73 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         data?.let {
             when (it.dataState) {
                 LOADING -> {
-                    activity?.runOnUiThread {
-                        showMapLoading()
-                    }
+                    showMapLoading()
                 }
                 SUCCESS -> {
+                    hideMapLoading()
                     it.data?.let { positions ->
-                        positions.forEach { resp ->
-                            addMarker(resp.position, "", resp.modeColor)
+                        if (positions.isNotEmpty()) {
+                            positions.forEach { resp ->
+                                addMarker(resp.position, "", resp.modeColor)
+                            }
+                            moveCamera(positions[0].position)
+                            positionsList.addAll(positions)
                         }
-                        hideMapLoading()
                     }
                 }
                 ERROR -> {
                     hideMapLoading()
                     it.message?.let { msg ->
-                        when (msg) {
-                            SHOW_ALERT_ERROR -> {
-                                showEphemerisAlert(true)
-                            }
-                            HIDE_ALERT_ERROR -> {
-                                showEphemerisAlert(false)
-                            }
-                            else -> showError(msg)
-
-                        }
-
+                        showError(msg)
                     }
                 }
             }
         }
     }
+
+    private fun updateEphemeris(data: Data<String>?) {
+        data?.let {
+            when (it.dataState) {
+                LOADING -> {
+                }
+                SUCCESS -> {
+                    showEphemerisAlert(false)
+                }
+                ERROR -> {
+                    showEphemerisAlert(true)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun updateGooglePosition(data: Data<String>?) {
+        data?.let {
+            when (it.dataState) {
+                LOADING -> {
+                    fusedLocationClient?.lastLocation?.addOnCompleteListener { result ->
+                        result.result?.let { location ->
+                            mSharedPreferences.getSelectedModesList().forEach { mode ->
+                                val pvt = ResponsePvtMode(
+                                    LatLng(location.latitude, location.longitude),
+                                    mode.color,
+                                    mode.name
+                                )
+                                addMarker(pvt.position, "", pvt.modeColor)
+                                toast("SHOWING LOCATION FROM GOOGLE")
+                            }
+
+                        }
+                    }
+                }
+                SUCCESS -> {
+                }
+                ERROR -> {
+                }
+            }
+        }
+    }
+
 
     override fun onSatelliteStatusChanged(status: GnssStatus?) {
         viewModel?.setGnssStatus(status)
@@ -357,14 +363,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     override fun onNmeaMessageReceived(message: String?, timestamp: Long) {
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            SETTINGS_RESULT_CODE -> {
-                if (resultCode == RESULT_OK) {
-                    //apply filters
-                }
-            }
-        }
+    companion object {
+        const val FRAG_TAG = "position_fragment"
+
+        const val SHOW_ALERT_ERROR = "show alert error"
+        const val HIDE_ALERT_ERROR = "hide alert error"
     }
 }

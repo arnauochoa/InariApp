@@ -44,6 +44,10 @@ class AppSharedPreferences {
         }
     }
 
+    fun getSelectedModesList(): List<Mode> {
+        return getModesList().filter { it.isSelected }
+    }
+
     fun getModesNames(): ArrayList<String> {
         val gson = Gson()
         val type = object : TypeToken<List<Mode>>() {}.type
