@@ -23,24 +23,25 @@
         android:indeterminate="true"
         android:progressBackgroundTint="@android:color/white"
         android:progressTint="@color/colorAccent"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
     <!--<android.support.constraint.ConstraintLayout-->
-        <!--android:id="@+id/clComputeAction"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="40dp"-->
-        <!--android:background="@drawable/bg_corners_accent"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginTop="24dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent">-->
-        <!---->
-        <!---->
+    <!--android:id="@+id/clComputeAction"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:background="@drawable/bg_corners_accent"-->
+    <!--android:layout_marginStart="8dp"-->
+    <!--android:layout_marginTop="24dp"-->
+    <!--android:layout_marginEnd="8dp"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent">-->
+    <!---->
+    <!---->
     <!--</android.support.constraint.ConstraintLayout>-->
 
     <Button
@@ -62,12 +63,12 @@
         android:id="@+id/ivAlert"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_alert"
+        android:layout_marginEnd="16dp"
         android:elevation="16dp"
+        android:src="@drawable/ic_alert"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/btComputeAction"
-        app:layout_constraintEnd_toEndOf="@+id/btComputeAction"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btComputeAction" />
 
 

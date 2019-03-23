@@ -14,6 +14,7 @@ import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.createDirectory
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
+import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
 import com.inari.team.core.utils.obtainJson
 import com.inari.team.core.utils.saveFile
@@ -36,15 +37,8 @@ import kotlin.math.roundToLong
 class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPreferences) : BaseViewModel() {
 
     val position = MutableLiveData<Data<List<ResponsePvtMode>>>()
-
-    companion object {
-        const val SUPL_SERVER_HOST = "supl.google.com"
-        const val SUPL_SERVER_PORT = 7275
-        const val SUPL_SSL_ENABLED = true
-        const val SUPL_MESSAGE_LOGGING_ENABLED = true
-        const val SUPL_LOGGING_ENABLED = true
-        const val EPHEMERIS_UPDATE_TIME_HOURS = 1L
-    }
+    val ephemeris = MutableLiveData<Data<String>>()
+    val googlePosition = MutableLiveData<Data<String>>()
 
     private var lastDate = Date()
     private var startTimeString: String? = null
@@ -61,12 +55,11 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
     private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
 
-    var obtainEphemerisIntentsPendingBeforShowError = 2
+    private var obtainEphemerisIntentsPendingBeforeShowError = 2
 
     init {
         // Add C++ library
         System.loadLibrary("pvtEngine-lib")
-
         buildSuplController()
     }
 
@@ -81,7 +74,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         suplController = SuplController(request)
     }
 
-    fun setStartTime() {
+    fun startComputingPosition() {
         isComputing = true
         GlobalScope.launch {
             // Delete previous measurements
@@ -98,9 +91,36 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
     fun stopComputingPosition() {
         isComputing = false
-        position.showError(PositionFragment.HIDE_ALERT_ERROR)
+        ephemeris.updateData(PositionFragment.HIDE_ALERT_ERROR)
     }
 
+    fun obtainEphemerisData() {
+        obtainEphemerisIntentsPendingBeforeShowError--
+        GlobalScope.launch {
+            var ephResponse: EphemerisResponse? = null
+            refPos?.let {
+                val latE7 = (it.latitude * 1e7).roundToLong()
+                val lngE7 = (it.longitude * 1e7).roundToLong()
+
+                lastEphemerisDate = Date()
+                StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
+                suplController?.sendSuplRequest(latE7, lngE7)
+                ephResponse = suplController?.generateEphResponse(latE7, lngE7)
+                setEphemerisResponse(ephResponse)
+                ephemeris.updateData(PositionFragment.HIDE_ALERT_ERROR)
+            }
+            if (ephResponse == null) {
+                if (isComputing) {
+                    if (obtainEphemerisIntentsPendingBeforeShowError < 1) {
+                        ephemeris.showError(PositionFragment.SHOW_ALERT_ERROR)
+                    }
+                    obtainEphemerisData()
+                }
+            }
+        }
+    }
+
+    //setters
     fun setSelectedModes(modes: List<Mode>) {
         gnssData.modes = modes
     }
@@ -126,6 +146,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         gnssData.ephemerisResponse = ephemerisResponse
     }
 
+    //compute position
     private fun setGnssData() {
 
         if (gnssData.modes.isNotEmpty() &&
@@ -146,32 +167,6 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
             }
 
 
-        }
-    }
-
-    fun obtainEphemerisData() {
-        obtainEphemerisIntentsPendingBeforShowError--
-        GlobalScope.launch {
-            var ephResponse: EphemerisResponse? = null
-            refPos?.let {
-                val latE7 = (it.latitude * 1e7).roundToLong()
-                val lngE7 = (it.longitude * 1e7).roundToLong()
-
-                lastEphemerisDate = Date()
-                StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
-                suplController?.sendSuplRequest(latE7, lngE7)
-                ephResponse = suplController?.generateEphResponse(latE7, lngE7)
-                setEphemerisResponse(ephResponse)
-                position.showError(PositionFragment.HIDE_ALERT_ERROR)
-            }
-            if (ephResponse == null) {
-                if (isComputing) {
-                    if (obtainEphemerisIntentsPendingBeforShowError < 1) {
-                        position.showError(PositionFragment.SHOW_ALERT_ERROR)
-                    }
-                    obtainEphemerisData()
-                }
-            }
         }
     }
 
@@ -211,23 +206,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
         val responses = arrayListOf<ResponsePvtMode>()
 
-        //todo remove test positions
-        val testPvt = arrayListOf<LatLng>()
-        testPvt.add(LatLng(41.4999067, 2.1236877))
-        testPvt.add(LatLng(41.4998828, 2.1239955))
-        testPvt.add(LatLng(41.4999067, 2.1237777))
-        testPvt.add(LatLng(41.4999000, 2.1236877))
-        testPvt.add(LatLng(41.4999067, 2.1236878))
-        testPvt.add(LatLng(41.4997067, 2.1236874))
-        testPvt.add(LatLng(41.4998027, 2.1236872))
-        testPvt.add(LatLng(41.4999027, 2.1236873))
-        testPvt.add(LatLng(41.4999067, 2.1236874))
-
-        gnssData.modes.forEachIndexed { _, mode ->
-            val posIndex = Random().nextInt(9)
-            val position = testPvt[posIndex]
-            responses.add(ResponsePvtMode(position, mode.color, mode.name))
-        }
+        googlePosition.showLoading()
 
 //        if (gnssDataJson.length() > 0) {
 //            val gnssDataString = gnssDataJson.toString(2)
@@ -246,6 +225,15 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
      * /app/src/main/cpp/pvtEngine-lib.cpp
      */
     private external fun obtainPosition(gnssData: String): String
+
+    companion object {
+        const val SUPL_SERVER_HOST = "supl.google.com"
+        const val SUPL_SERVER_PORT = 7275
+        const val SUPL_SSL_ENABLED = true
+        const val SUPL_MESSAGE_LOGGING_ENABLED = true
+        const val SUPL_LOGGING_ENABLED = true
+        const val EPHEMERIS_UPDATE_TIME_HOURS = 1L
+    }
 
 
 }

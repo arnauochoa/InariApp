@@ -6,7 +6,6 @@ import com.inari.team.core.di.scopes.PerFragment
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.modes.ModesActivity
-import com.inari.team.presentation.ui.position.PositionFragment
 import com.inari.team.presentation.ui.settings.GnssSettingsActivity
 import javax.inject.Inject
 
@@ -27,10 +26,7 @@ class FragmentNavigator @Inject constructor(private val fragment: Fragment) : Na
 
     override fun navigateToGnssSettingsActivity() {
         with(fragment) {
-            startActivityForResult(
-                Intent(context, GnssSettingsActivity::class.java),
-                PositionFragment.SETTINGS_RESULT_CODE
-            )
+            startActivity(Intent(context, GnssSettingsActivity::class.java))
         }
     }
 

@@ -5,7 +5,6 @@ import com.inari.team.core.di.scopes.PerActivity
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.modes.ModesActivity
-import com.inari.team.presentation.ui.position.PositionFragment
 import com.inari.team.presentation.ui.settings.GnssSettingsActivity
 import org.jetbrains.anko.intentFor
 import javax.inject.Inject
@@ -27,7 +26,7 @@ class ActivityNavigator @Inject constructor(private var activity: Activity) : Na
 
     override fun navigateToGnssSettingsActivity() {
         with(activity) {
-            startActivityForResult(intentFor<GnssSettingsActivity>(), PositionFragment.SETTINGS_RESULT_CODE)
+            startActivity(intentFor<GnssSettingsActivity>())
         }
     }
 

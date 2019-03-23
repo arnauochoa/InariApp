@@ -150,7 +150,7 @@
                     android:layout_marginTop="12dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="0dp"
-                    android:text="Selected Mask:"
+                    android:text="Selected Elevation Mask:"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
