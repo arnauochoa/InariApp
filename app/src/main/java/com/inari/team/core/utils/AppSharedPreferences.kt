@@ -19,6 +19,7 @@ class AppSharedPreferences {
         const val PVT_INFO: String = "PVT_INFO"
         const val COLORS: String = "colors"
         const val AVGTIME: String = "avgtime"
+        const val MASK: String = "mask"
 
 
         private var INSTANCE: AppSharedPreferences? = null
@@ -120,6 +121,13 @@ class AppSharedPreferences {
     fun setAverage(avg: Long) {
         mPrefs.edit()
             .putLong(AVGTIME, avg)
+            .apply()
+    }
+
+    fun getSelectedMask(): Int = mPrefs.getInt(MASK, 10)
+    fun setSelectedMask(mask: Int) {
+        mPrefs.edit()
+            .putInt(MASK, mask)
             .apply()
     }
 

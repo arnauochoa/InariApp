@@ -5,7 +5,6 @@ import com.inari.team.core.di.scopes.PerActivity
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.modes.ModesActivity
-import com.inari.team.presentation.ui.modes.ModesActivity.Companion.COMPARING_EXTRA
 import com.inari.team.presentation.ui.position.PositionFragment
 import com.inari.team.presentation.ui.settings.GnssSettingsActivity
 import org.jetbrains.anko.intentFor
@@ -32,15 +31,10 @@ class ActivityNavigator @Inject constructor(private var activity: Activity) : Na
         }
     }
 
-    override fun navigateToModesActivity(isComparing: Boolean) {
+    override fun navigateToModesActivity() {
         with(activity) {
-            startActivity(
-                intentFor<ModesActivity>(
-                    COMPARING_EXTRA to isComparing
-                )
-            )
+            startActivity(intentFor<ModesActivity>())
         }
-
     }
 
 }

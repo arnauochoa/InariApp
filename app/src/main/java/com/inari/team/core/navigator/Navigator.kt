@@ -11,6 +11,6 @@ interface Navigator {
 
     fun navigateToGnssSettingsActivity()
 
-    fun navigateToModesActivity(isComparing: Boolean = false)
+    fun navigateToModesActivity()
 
 }
