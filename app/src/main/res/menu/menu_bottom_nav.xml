@@ -6,17 +6,24 @@
         android:enabled="true"
         android:icon="@drawable/ic_position"
         android:title="@string/position_bottom"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_status"
         android:enabled="true"
         android:icon="@drawable/ic_satellite"
         android:title="@string/gnss_state_bottom"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_statistics"
         android:enabled="true"
         android:icon="@drawable/ic_statistics"
         android:title="@string/statistics_bottom"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_about"
+        android:enabled="true"
+        android:icon="@drawable/ic_info"
+        android:title="@string/statistics_bottom"
+        app:showAsAction="always" />
 </menu>

@@ -9,8 +9,10 @@ import android.location.*
 import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.view.Surface
 import android.widget.Toast
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.utils.BarAdapter
@@ -23,6 +25,8 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
 import com.inari.team.core.utils.toast
+import com.inari.team.core.utils.view.CustomAHBottomNavigationItem
+import com.inari.team.presentation.ui.about.AboutFragment
 import com.inari.team.presentation.ui.position.PositionFragment
 import com.inari.team.presentation.ui.splash.SplashActivity
 import com.inari.team.presentation.ui.statistics.StatisticsFragment
@@ -49,9 +53,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
     private var gnssMeasurementsEventListener: GnssMeasurementsEvent.Callback? = null
     private var gnssNmeaMessageListener: OnNmeaMessageListener? = null
 
-    private var positionFragment = PositionFragment()
-    private var statusFragment = StatusFragment()
-    private var statisticsFragment = StatisticsFragment()
 
     private var connectivityReceiver = ConnectivityReceiver()
 
@@ -85,7 +86,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         mActivity = this
 
         setViewPager()
-        setBottomNavigation()
+        setupBottomNavigation()
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -103,31 +104,39 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
     private fun setViewPager() {
         val pagerAdapter = BarAdapter(supportFragmentManager)
 
-        pagerAdapter.addFragments(positionFragment, "Position")
-        pagerAdapter.addFragments(statusFragment, "GNSS state")
-        pagerAdapter.addFragments(statisticsFragment, "Statistics")
+        pagerAdapter.addFragments(PositionFragment(), "Position")
+        pagerAdapter.addFragments(StatusFragment(), "GNSS state")
+        pagerAdapter.addFragments(StatisticsFragment(), "Statistics")
+        pagerAdapter.addFragments(AboutFragment(), "About")
 
         viewPager.setPagingEnabled(false)
-        viewPager.offscreenPageLimit = 2
+        viewPager.offscreenPageLimit = 3
         viewPager.adapter = pagerAdapter
         viewPager.currentItem = 0
     }
 
-    private fun setBottomNavigation() {
-        bottomNavigation.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.action_position -> {
-                    viewPager.setCurrentItem(0, false)
-                }
-                R.id.action_status -> {
-                    viewPager.setCurrentItem(1, false)
-                }
-                R.id.action_statistics -> {
-                    viewPager.setCurrentItem(2, false)
-                }
+    private fun setupBottomNavigation() {
+
+        val position = CustomAHBottomNavigationItem(getString(R.string.position_bottom), R.drawable.ic_position)
+        val status = CustomAHBottomNavigationItem(getString(R.string.gnss_state_bottom), R.drawable.ic_satellite)
+        val statistics = CustomAHBottomNavigationItem(getString(R.string.statistics_bottom), R.drawable.ic_statistics)
+        val info = CustomAHBottomNavigationItem(getString(R.string.about_bottom), R.drawable.ic_info)
+
+
+        val itemList = arrayListOf(position, status, statistics, info)
+        bottomNavigation.addItems(itemList)
+        bottomNavigation.titleState = AHBottomNavigation.TitleState.ALWAYS_SHOW
+
+        bottomNavigation.defaultBackgroundColor = ContextCompat.getColor(this, R.color.white)
+        bottomNavigation.accentColor = ContextCompat.getColor(this, R.color.colorPrimary)
+
+        bottomNavigation.setOnTabSelectedListener { position, wasSelected ->
+            if (!wasSelected) {
+                viewPager.currentItem = position
             }
             true
         }
+
     }
 
     private fun startGnss() {

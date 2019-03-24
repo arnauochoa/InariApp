@@ -135,7 +135,6 @@ class ModesActivity : BaseActivity() {
         val selectedItems = mAdapter?.getSelectedItems() ?: arrayListOf()
         val selectedModesText = "${selectedItems.size} selected"
         tvSelectedModesTitle.text = selectedModesText
-
     }
 
     private fun showNewModeDialog() {
