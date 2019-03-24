@@ -187,6 +187,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         MainActivity.getInstance()?.unSubscribeToGnssEvent(this)
         btComputeAction.text = getString(R.string.start_computing)
         showSaveDialog()
+        hideMapLoading()
     }
 
     private fun showMapTypeDialog() {
