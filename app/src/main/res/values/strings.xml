@@ -66,6 +66,7 @@
     <string name="sky_legend_shape_galileo">Galileo (EU)</string>
     <string name="band_l1">L1/E1</string>
     <string name="band_l5">L5/E5a</string>
+    <string name="about_bottom">About</string>
     >>>>>>> 26834d9... GNSS STATE data and legend added
 
 </resources>

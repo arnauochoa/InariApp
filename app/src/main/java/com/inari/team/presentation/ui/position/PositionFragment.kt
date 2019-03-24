@@ -320,7 +320,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
     private fun moveCameraWithZoom(latLng: LatLng) {
-        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5f))
+        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
     }
 
     private fun addMarker(latLng: LatLng, title: String, id: Int): Marker? {
