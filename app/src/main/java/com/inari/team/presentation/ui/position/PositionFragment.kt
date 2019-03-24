@@ -35,6 +35,7 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
+import kotlinx.android.synthetic.main.dialog_map_terrain.view.*
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
 import okhttp3.MediaType
@@ -58,6 +59,8 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
     private var viewModel: PositionViewModel? = null
 
+    private var isStartedComputing = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fragmentComponent.inject(this)
@@ -65,7 +68,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         viewModel = withViewModel(viewModelFactory) {
             observe(position, ::updatePosition)
             observe(ephemeris, ::updateEphemeris)
-            observe(googlePosition, ::updateGooglePosition)
         }
     }
 
@@ -108,6 +110,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
             navigator.navigateToModesActivity()
         }
 
+        fabMapTerrain.setOnClickListener {
+            showMapTypeDialog()
+        }
+
         btComputeAction.setOnClickListener {
             if (btComputeAction.text == getString(R.string.start_computing)) {
                 startComputing(it)
@@ -137,7 +143,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         }
     }
 
-
     override fun onMapReady(map: GoogleMap?) {
         mMap = map
 
@@ -162,6 +167,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                 isCancelable = true
             )
         } else {
+            isStartedComputing = true
             MainActivity.getInstance()?.subscribeToGnssEvents(this)
             btComputeAction.text = getString(R.string.stop_computing)
             viewModel?.setSelectedModes(selectedModes)
@@ -183,6 +189,89 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         showSaveDialog()
     }
 
+    private fun showMapTypeDialog() {
+
+        context?.let {
+
+            val dialog = AlertDialog.Builder(it).create()
+            val layout = View.inflate(it, R.layout.dialog_map_terrain, null)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.setView(layout)
+
+            layout?.let {
+
+                mMap?.let { gMap ->
+                    when (gMap.mapType) {
+                        GoogleMap.MAP_TYPE_NORMAL -> {
+                            it.ivNormalTick.visibility = VISIBLE
+                            it.ivTerrainTick.visibility = GONE
+                            it.ivHybridTick.visibility = GONE
+                            it.ivSatelliteTick.visibility = GONE
+                        }
+                        GoogleMap.MAP_TYPE_TERRAIN -> {
+                            it.ivTerrainTick.visibility = VISIBLE
+                            it.ivNormalTick.visibility = GONE
+                            it.ivHybridTick.visibility = GONE
+                            it.ivSatelliteTick.visibility = GONE
+                        }
+                        GoogleMap.MAP_TYPE_HYBRID -> {
+                            it.ivHybridTick.visibility = VISIBLE
+                            it.ivNormalTick.visibility = GONE
+                            it.ivTerrainTick.visibility = GONE
+                            it.ivSatelliteTick.visibility = GONE
+                        }
+                        GoogleMap.MAP_TYPE_SATELLITE -> {
+                            it.ivSatelliteTick.visibility = VISIBLE
+                            it.ivHybridTick.visibility = GONE
+                            it.ivNormalTick.visibility = GONE
+                            it.ivTerrainTick.visibility = GONE
+                        }
+                    }
+                }
+
+                it.clNormal.setOnClickListener { _ ->
+                    it.ivNormalTick.visibility = VISIBLE
+                    it.ivTerrainTick.visibility = GONE
+                    it.ivHybridTick.visibility = GONE
+                    it.ivSatelliteTick.visibility = GONE
+
+                    mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+                    dialog.dismiss()
+                }
+                it.clTerrain.setOnClickListener { _ ->
+                    it.ivTerrainTick.visibility = VISIBLE
+                    it.ivNormalTick.visibility = GONE
+                    it.ivHybridTick.visibility = GONE
+                    it.ivSatelliteTick.visibility = GONE
+
+                    mMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                    dialog.dismiss()
+
+                }
+                it.clHybrid.setOnClickListener { _ ->
+                    it.ivHybridTick.visibility = VISIBLE
+                    it.ivNormalTick.visibility = GONE
+                    it.ivTerrainTick.visibility = GONE
+                    it.ivSatelliteTick.visibility = GONE
+
+                    mMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
+                    dialog.dismiss()
+                }
+                it.clSatellite.setOnClickListener { _ ->
+                    it.ivSatelliteTick.visibility = VISIBLE
+                    it.ivHybridTick.visibility = GONE
+                    it.ivNormalTick.visibility = GONE
+                    it.ivTerrainTick.visibility = GONE
+
+                    mMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                    dialog.dismiss()
+                }
+
+            }
+            dialog.show()
+        }
+
+    }
 
     private fun showSaveDialog() {
         context?.let {
@@ -226,7 +315,11 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     }
 
     private fun moveCamera(latLng: LatLng) {
-        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+        mMap?.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+    }
+
+    private fun moveCameraWithZoom(latLng: LatLng) {
+        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5f))
     }
 
     private fun addMarker(latLng: LatLng, title: String, id: Int): Marker? {
@@ -252,15 +345,17 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
     private fun showEphemerisAlert(show: Boolean) {
         if (show) {
-            ivAlert.visibility = VISIBLE
-            ivAlert.setOnClickListener {
-                showAlert(
-                    ivAlert.context, "Something went wrong",
-                    "Ephemeris data could not be obtained, check your connection",
-                    "Stop Computing", {
-                        stopComputing()
-                    }, true
-                )
+            if (ivAlert.visibility == GONE) {
+                ivAlert.visibility = VISIBLE
+                ivAlert.setOnClickListener {
+                    showAlert(
+                        ivAlert.context, "Something went wrong",
+                        "Ephemeris data could not be obtained, check your connection",
+                        "Stop Computing", {
+                            stopComputing()
+                        }, true
+                    )
+                }
             }
         } else {
             ivAlert.visibility = GONE
@@ -281,7 +376,12 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                             positions.forEach { resp ->
                                 addMarker(resp.position, "", resp.modeColor)
                             }
-                            moveCamera(positions[0].position)
+                            if (isStartedComputing) {
+                                moveCameraWithZoom(positions[0].position)
+                                isStartedComputing = false
+                            } else {
+                                moveCamera(positions[0].position)
+                            }
                             positionsList.addAll(positions)
                         }
                     }
@@ -310,36 +410,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
             }
         }
     }
-
-    private fun updateGooglePosition(data: Data<String>?) {
-        data?.let {
-            when (it.dataState) {
-                LOADING -> {
-                    if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        fusedLocationClient?.lastLocation?.addOnCompleteListener { result ->
-                            result.result?.let { location ->
-                                mSharedPreferences.getSelectedModesList().forEach { mode ->
-                                    val pvt = ResponsePvtMode(
-                                        LatLng(location.latitude, location.longitude),
-                                        mode.color,
-                                        mode.name
-                                    )
-                                    addMarker(pvt.position, "", pvt.modeColor)
-                                    toast("SHOWING LOCATION FROM GOOGLE")
-                                }
-
-                            }
-                        }
-                    }
-                }
-                SUCCESS -> {
-                }
-                ERROR -> {
-                }
-            }
-        }
-    }
-
 
     override fun onSatelliteStatusChanged(status: GnssStatus?) {
         viewModel?.setGnssStatus(status)

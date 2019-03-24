@@ -3,32 +3,42 @@ package com.inari.team.core.utils
 import android.location.GnssClock
 import android.location.GnssMeasurement
 import android.location.GnssStatus
+import com.google.gson.Gson
 import com.google.location.suplclient.ephemeris.GalEphemeris
 import com.google.location.suplclient.ephemeris.GpsEphemeris
+import com.inari.team.presentation.model.GnssData
 import com.inari.team.presentation.model.MeasurementData
 import org.json.JSONArray
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.*
 
 // JSON keys
-const val PARAMETERS_KEY = "Params"
-const val LOCATION_KEY = "Location"
 const val STATUS_KEY = "Status"
+const val MEASUREMENTS_DATA_KEY = "MeasData"
 const val MEASUREMENTS_KEY = "Meas"
 const val CLOCK_KEY = "Clock"
-const val EPHEMERIS_DATA_KEY = "ephData"
-const val GALILEO_KEY = "Galileo"
-const val GPS_KEY = "GPS"
-//const val GLONASS_KEY = "GLONASS"
-const val KLOBUCHAR_KEY = "Klobuchar"
-const val NEQUICK_KEY = "NeQuick"
 
 // Others
-const val MAX_TIME_UNCERTAINTY = 1000
 const val DEFAULT_FREQUENCY_HZ = 1575450000
 
-private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
+fun getGnssJson(gnssData: GnssData): JSONObject {
+    val gnssJson = JSONObject(Gson().toJson(gnssData))
+    gnssJson.put(MEASUREMENTS_DATA_KEY, gnssMeasurementsListAsJson(gnssData.measurements))
+    return gnssJson
+}
+
+fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
+    val measurementsJsonArray = JSONArray()
+    measurements.forEach {
+        val measurementsJson = JSONObject()
+        measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
+        measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
+        measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
+        measurementsJsonArray.put(measurementsJson)
+    }
+
+    return measurementsJsonArray
+
+}
 
 fun gnssStatusAsJsonString(gnssStatus: GnssStatus?): JSONArray {
     val statusJsonArray = JSONArray()
@@ -52,19 +62,6 @@ fun gnssStatusAsJsonString(gnssStatus: GnssStatus?): JSONArray {
     return statusJsonArray
 }
 
-fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
-    val measurementsJsonArray = JSONArray()
-    measurements.forEach {
-        val measurementsJson = JSONObject()
-        measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
-        measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
-        measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
-        measurementsJsonArray.put(measurementsJson)
-    }
-
-    return measurementsJsonArray
-
-}
 
 fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSONArray {
     val measurementsJsonArray = JSONArray()
