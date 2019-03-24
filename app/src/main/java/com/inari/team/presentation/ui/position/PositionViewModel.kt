@@ -15,10 +15,7 @@ import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
-import com.inari.team.presentation.model.GnssData
-import com.inari.team.presentation.model.MeasurementData
-import com.inari.team.presentation.model.Mode
-import com.inari.team.presentation.model.ResponsePvtMode
+import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
@@ -107,6 +104,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
                 ephemeris.updateData(PositionFragment.HIDE_ALERT_ERROR)
                 ephResponse = suplController?.generateEphResponse(latE7, lngE7)
                 gnssData.ephemerisResponse = ephResponse
+                gnssData.lastEphemerisDate = Date()
             }
             if (ephResponse == null) {
                 if (isComputing) {
@@ -129,8 +127,8 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
     fun setLocation(location: Location?) {
         location?.let {
-            gnssData.location = LatLng(it.latitude, it.longitude)
             refPos = LatLng(it.latitude, it.longitude)
+            gnssData.location = RefLocation(it.latitude, it.longitude, it.altitude)
         }
     }
 
