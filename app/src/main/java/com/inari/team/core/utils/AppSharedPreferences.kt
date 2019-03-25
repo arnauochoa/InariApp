@@ -21,6 +21,7 @@ class AppSharedPreferences {
         const val AVG_ENABLED: String = "avgenabled"
         const val AVGTIME: String = "avgtime"
         const val MASK: String = "mask"
+        const val TUTORIAL_SHOWN = "tutorial shown"
 
 
         private var INSTANCE: AppSharedPreferences? = null
@@ -29,6 +30,13 @@ class AppSharedPreferences {
             if (INSTANCE == null) INSTANCE = AppSharedPreferences()
             return INSTANCE!!
         }
+    }
+
+    fun isTutorialShown() = mPrefs.getBoolean(TUTORIAL_SHOWN, false)
+    fun setTutorialShown() {
+        mPrefs.edit()
+            .putBoolean(TUTORIAL_SHOWN, true)
+            .apply()
     }
 
     fun getModesList(): ArrayList<Mode> {
@@ -124,7 +132,7 @@ class AppSharedPreferences {
             .apply()
     }
 
-    fun getSelectedMask(): Int = mPrefs.getInt(MASK, 10)
+    fun getSelectedMask(): Int = mPrefs.getInt(MASK, 15)
     fun setSelectedMask(mask: Int) {
         mPrefs.edit()
             .putInt(MASK, mask)

@@ -50,15 +50,16 @@
             android:name=".presentation.ui.logs.LogsDetailActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".presentation.ui.logs.LogsActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".presentation.ui.modes.ModesActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.ui.settings.GnssSettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar" />
+        <activity android:name=".presentation.ui.tutorial.TutorialActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
+
 
         <receiver
             android:name=".core.utils.connectivity.ConnectivityReceiver"
@@ -67,7 +68,6 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

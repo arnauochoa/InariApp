@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import com.inari.team.R;
+import com.inari.team.core.utils.AppSharedPreferences;
 import com.inari.team.core.utils.skyplot.*;
 import com.inari.team.data.GnssStatus;
 
@@ -54,11 +55,12 @@ public class GpsSkyView extends View implements GnssEventsListener {
 
     private Paint mHorizonActiveFillPaint, mHorizonInactiveFillPaint, mHorizonStrokePaint,
             mGridStrokePaint, mSatelliteFillPaint, mSatelliteStrokePaint, mSatelliteUsedStrokePaint,
-            mNorthPaint, mNorthFillPaint, mPrnIdPaint, mNotInViewPaint;
+            mNorthPaint, mNorthFillPaint, mPrnIdPaint, mNotInViewPaint, mMaskStrokePaint;
 
     private double mOrientation = 0.0;
 
     private boolean mStarted;
+    private float selectedMask = 15f;
 
     private float mSnrCn0s[], mElevs[], mAzims[];  // Holds either SNR or C/N0 - see #65
 
@@ -90,6 +92,7 @@ public class GpsSkyView extends View implements GnssEventsListener {
         mContext = context;
         mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         SAT_RADIUS = UIUtils.dpToPixels(context, 5);
+        selectedMask = (float) AppSharedPreferences.Companion.getInstance().getSelectedMask();
 
         mHorizonActiveFillPaint = new Paint();
         mHorizonActiveFillPaint.setColor(Color.WHITE);
@@ -111,6 +114,16 @@ public class GpsSkyView extends View implements GnssEventsListener {
         mGridStrokePaint.setColor(ContextCompat.getColor(mContext, R.color.gray));
         mGridStrokePaint.setStyle(Paint.Style.STROKE);
         mGridStrokePaint.setAntiAlias(true);
+
+        float[] intervals = new float[]{50.0f, 20.0f};
+        float phase = 0;
+        DashPathEffect path = new DashPathEffect(intervals,phase);
+        mMaskStrokePaint = new Paint();
+        mMaskStrokePaint.setColor(ContextCompat.getColor(mContext, R.color.red));
+        mMaskStrokePaint.setStyle(Paint.Style.STROKE);
+        mMaskStrokePaint.setStrokeWidth(5);
+        mMaskStrokePaint.setPathEffect(path);
+        mMaskStrokePaint.setAntiAlias(true);
 
         mSatelliteFillPaint = new Paint();
         mSatelliteFillPaint.setColor(ContextCompat.getColor(mContext, R.color.yellow));
@@ -363,6 +376,18 @@ public class GpsSkyView extends View implements GnssEventsListener {
         c.drawCircle(radius, radius, elevationToRadius(s, 0.0f), mGridStrokePaint);
         c.drawCircle(radius, radius, radius, mHorizonStrokePaint);
     }
+
+    private void drawHorizonSelected(Canvas c, int s) {
+        float radius = s / 2;
+
+        c.drawCircle(radius, radius, elevationToRadius(s, selectedMask), mMaskStrokePaint);
+    }
+
+    public synchronized void setHorizonSelected(float mask){
+        this.selectedMask = mask;
+        invalidate();
+    }
+
 
     private void drawNorthIndicator(Canvas c, int s) {
         float radius = s / 2;
@@ -658,6 +683,10 @@ public class GpsSkyView extends View implements GnssEventsListener {
                 }
             }
         }
+
+
+        drawHorizonSelected(canvas, minScreenDimen);
+
     }
 
     @Override

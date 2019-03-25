@@ -1,7 +1,6 @@
 package com.inari.team.presentation.ui.position
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.GnssMeasurementsEvent
@@ -9,9 +8,11 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -33,7 +34,6 @@ import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.model.ResponsePvtMode
-import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.dialog_map_terrain.view.*
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
@@ -80,30 +80,9 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
 
-        setHasOptionsMenu(true)
         setViews()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.menu_position, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.save_log -> {
-                showSaveDialog()
-            }
-            R.id.see_log -> {
-                context?.let {
-                    navigator.navigateToLogsActivity()
-                }
-            }
-            else -> {
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     private fun setViews() {
         fabOptions.setOnClickListener {
@@ -308,9 +287,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
     private fun showSavedSnackBar() {
         val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
         snackbar.setAction("OPEN") {
-            context?.let {
-                startActivity(Intent(it, LogsActivity::class.java))
-            }
+            //todo move to logs fragment
         }
         snackbar.show()
     }
@@ -346,7 +323,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
     private fun showEphemerisAlert(show: Boolean) {
         if (show) {
-            if (ivAlert.visibility == GONE) {
+            if (ivAlert.visibility != VISIBLE) {
                 ivAlert.visibility = VISIBLE
                 ivAlert.setOnClickListener {
                     showAlert(

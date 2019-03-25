@@ -5,9 +5,9 @@ import javax.inject.Singleton
 @Singleton
 interface Navigator {
 
-    fun navigateToMainActivity()
+    fun navigateToTutorialActivtiy()
 
-    fun navigateToLogsActivity()
+    fun navigateToMainActivity()
 
     fun navigateToGnssSettingsActivity()
 

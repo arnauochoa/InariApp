@@ -9,17 +9,28 @@ import android.os.Handler
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import com.inari.team.R
+import com.inari.team.core.base.BaseActivity
+import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.*
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
-import com.inari.team.presentation.ui.main.MainActivity
 import java.io.File
 import java.io.IOException
+import javax.inject.Inject
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
+import kotlinx.android.synthetic.main.activity_splash.*
 
-class SplashActivity : AppCompatActivity() {
+
+class SplashActivity : BaseActivity() {
+
+    @Inject
+    lateinit var navigator: Navigator
+
+    @Inject
+    lateinit var mPrefs: AppSharedPreferences
 
     private val root: File =
         android.os.Environment.getExternalStorageDirectory()
@@ -35,12 +46,18 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+        activityComponent.inject(this)
 
         enableFullScreen(window)
 
-        if (AppSharedPreferences.getInstance().getModesList().isEmpty()) {
+        val fadeIn = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        fadeIn.duration = 1000     // animation duration in milliseconds
+        fadeIn.fillAfter = true
+        tvTitle.startAnimation(fadeIn)
+
+        if (mPrefs.getModesList().isEmpty()) {
             addDefaultModes()
-            AppSharedPreferences.getInstance().saveColors()
+            mPrefs.saveColors()
             try {
                 val dir =
                     File(root.absolutePath + APP_ROOT)
@@ -131,16 +148,17 @@ class SplashActivity : AppCompatActivity() {
 
         val list = arrayListOf(mode, mode2, mode3)
 
-        AppSharedPreferences.getInstance().saveModes(list)
+        mPrefs.saveModes(list)
     }
 
     private fun goToMainActivity() {
-        startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+        navigator.navigateToMainActivity()
         finish()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (checkPermissionsList(
                     arrayOf(
@@ -152,7 +170,10 @@ class SplashActivity : AppCompatActivity() {
                 goToMainActivity()
             } else {
                 val showRationale =
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
                 if (!showRationale) {
                     //"never ask again" box checked
 
@@ -172,7 +193,10 @@ class SplashActivity : AppCompatActivity() {
         } else {
 
             val showRationale =
-                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
             if (!showRationale) {
                 //"never ask again" box checked
 
@@ -206,6 +230,8 @@ class SplashActivity : AppCompatActivity() {
                 dialog.show()
             }
         }
+
+
     }
 
     private fun goToSettings() {

@@ -2,6 +2,7 @@ package com.inari.team.presentation.ui.main
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.*
@@ -15,6 +16,8 @@ import android.widget.Toast
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
+import com.inari.team.core.navigator.Navigator
+import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.BarAdapter
 import com.inari.team.core.utils.connectivity.ConnectivityReceiver
 import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
@@ -27,11 +30,13 @@ import com.inari.team.core.utils.skyplot.MathUtils
 import com.inari.team.core.utils.toast
 import com.inari.team.core.utils.view.CustomAHBottomNavigationItem
 import com.inari.team.presentation.ui.about.AboutFragment
+import com.inari.team.presentation.ui.logs.LogsFragment
 import com.inari.team.presentation.ui.position.PositionFragment
 import com.inari.team.presentation.ui.splash.SplashActivity
 import com.inari.team.presentation.ui.statistics.StatisticsFragment
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
     ConnectivityReceiver.ConnectivityReceiverListener {
@@ -39,6 +44,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
     companion object {
         private const val MIN_TIME = 1L
         private const val MIN_DISTANCE = 0.0F
+        const val TUTORIAL_CODE = 88
 
         private var mActivity: MainActivity? = null
 
@@ -46,6 +52,12 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
             return mActivity
         }
     }
+
+    @Inject
+    lateinit var mPrefs: AppSharedPreferences
+
+    @Inject
+    lateinit var navigator: Navigator
 
     private var locationManager: LocationManager? = null
 
@@ -81,6 +93,13 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         setContentView(R.layout.activity_main)
         activityComponent.inject(this)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_logo)
+
+        if (!mPrefs.isTutorialShown()) {
+            navigator.navigateToTutorialActivtiy()
+        }
+
         registerReceiver(connectivityReceiver, IntentFilter(CONNECTIVITY_ACTION))
 
         mActivity = this
@@ -107,10 +126,11 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         pagerAdapter.addFragments(PositionFragment(), "Position")
         pagerAdapter.addFragments(StatusFragment(), "GNSS state")
         pagerAdapter.addFragments(StatisticsFragment(), "Statistics")
+        pagerAdapter.addFragments(LogsFragment(), "Logs")
         pagerAdapter.addFragments(AboutFragment(), "About")
 
         viewPager.setPagingEnabled(false)
-        viewPager.offscreenPageLimit = 3
+        viewPager.offscreenPageLimit = 5
         viewPager.adapter = pagerAdapter
         viewPager.currentItem = 0
     }
@@ -120,19 +140,20 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         val position = CustomAHBottomNavigationItem(getString(R.string.position_bottom), R.drawable.ic_position)
         val status = CustomAHBottomNavigationItem(getString(R.string.gnss_state_bottom), R.drawable.ic_satellite)
         val statistics = CustomAHBottomNavigationItem(getString(R.string.statistics_bottom), R.drawable.ic_statistics)
+        val logs = CustomAHBottomNavigationItem(getString(R.string.logs_bottom), R.drawable.ic_log)
         val info = CustomAHBottomNavigationItem(getString(R.string.about_bottom), R.drawable.ic_info)
 
 
-        val itemList = arrayListOf(position, status, statistics, info)
+        val itemList = arrayListOf(position, status, statistics, logs, info)
         bottomNavigation.addItems(itemList)
         bottomNavigation.titleState = AHBottomNavigation.TitleState.ALWAYS_SHOW
 
         bottomNavigation.defaultBackgroundColor = ContextCompat.getColor(this, R.color.white)
         bottomNavigation.accentColor = ContextCompat.getColor(this, R.color.colorPrimary)
 
-        bottomNavigation.setOnTabSelectedListener { position, wasSelected ->
+        bottomNavigation.setOnTabSelectedListener { pos, wasSelected ->
             if (!wasSelected) {
-                viewPager.currentItem = position
+                viewPager.setCurrentItem(pos, false)
             }
             true
         }
@@ -349,6 +370,16 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
     override fun onNetworkConnectionChanged(isConnected: Boolean) {
         if (!isConnected) {
             toast("No network connection")
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            TUTORIAL_CODE -> {
+                navigator.navigateToMainActivity()
+                mPrefs.setTutorialShown()
+            }
         }
     }
 

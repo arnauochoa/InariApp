@@ -88,14 +88,15 @@ dependencies {
 
     // Other Libraries
     implementation 'com.jakewharton.timber:timber:4.7.1'
-
     implementation 'com.android.support:multidex:1.0.3'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
+    implementation 'com.ryanjeffreybrooks:indefinitepagerindicator:1.0.10'
+    implementation 'com.aurelhubert:ahbottomnavigation:2.1.0'
+
 
     implementation "com.google.maps.android:android-maps-utils:0.5"
 
-    implementation 'com.aurelhubert:ahbottomnavigation:2.1.0'
 
 
     implementation 'com.google.firebase:firebase-core:16.0.8'

@@ -85,6 +85,7 @@ class ModesActivity : BaseActivity() {
         tvMaskValue.text = maskText
 
         switchAvg.isChecked = mPrefs.isAverageEnabled()
+        clAvgValue.visibility = if (mPrefs.isAverageEnabled()) VISIBLE else GONE
 
         switchAvg.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
