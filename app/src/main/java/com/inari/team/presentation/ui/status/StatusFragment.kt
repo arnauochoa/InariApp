@@ -15,6 +15,8 @@ import android.widget.SeekBar
 import android.widget.TextView
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
+import com.inari.team.core.navigator.Navigator
+import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.observe
@@ -30,8 +32,15 @@ import com.inari.team.presentation.model.StatusData
 import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.fragment_status.*
 import kotlinx.android.synthetic.main.view_cno_indicator.*
+import javax.inject.Inject
 
 class StatusFragment : BaseFragment(), GnssEventsListener {
+
+    @Inject
+    lateinit var mPrefs: AppSharedPreferences
+
+    @Inject
+    lateinit var navigator: Navigator
 
     companion object {
         const val GPS_DOP_TAG = "\$GPGSA"
@@ -56,9 +65,6 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
         viewModel = withViewModel(viewModelFactory) {
             observe(status, ::updateStatusData)
         }
-
-        setHasOptionsMenu(false)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -67,16 +73,17 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setFilterTabs()
+        setViews()
     }
 
     override fun onResume() {
         super.onResume()
         MainActivity.getInstance()?.subscribeToGnssEvents(this)
         tabLayout?.getTabAt(0)?.select()
+        skyplot.setHorizonSelected(mPrefs.getSelectedMask().toFloat())
     }
 
-    private fun setFilterTabs() {
+    private fun setViews() {
 
         tvLegend.setOnClickListener {
             clLegend.visibility = if (clLegend.visibility == VISIBLE) {
@@ -85,6 +92,11 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
                 VISIBLE
             }
         }
+
+        fabOptions.setOnClickListener {
+            navigator.navigateToModesActivity()
+        }
+
 
         tabLayout.setSelectedTabIndicatorColor(Color.TRANSPARENT)
 

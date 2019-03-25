@@ -2,25 +2,26 @@ package com.inari.team.core.navigator
 
 import android.app.Activity
 import com.inari.team.core.di.scopes.PerActivity
-import com.inari.team.presentation.ui.logs.LogsActivity
 import com.inari.team.presentation.ui.main.MainActivity
+import com.inari.team.presentation.ui.main.MainActivity.Companion.TUTORIAL_CODE
 import com.inari.team.presentation.ui.modes.ModesActivity
 import com.inari.team.presentation.ui.settings.GnssSettingsActivity
+import com.inari.team.presentation.ui.tutorial.TutorialActivity
 import org.jetbrains.anko.intentFor
 import javax.inject.Inject
 
 @PerActivity
 class ActivityNavigator @Inject constructor(private var activity: Activity) : Navigator {
 
-    override fun navigateToMainActivity() {
+    override fun navigateToTutorialActivtiy() {
         with(activity) {
-            startActivity(intentFor<MainActivity>())
+            startActivityForResult(intentFor<TutorialActivity>(), TUTORIAL_CODE)
         }
     }
 
-    override fun navigateToLogsActivity() {
+    override fun navigateToMainActivity() {
         with(activity) {
-            startActivity(intentFor<LogsActivity>())
+            startActivity(intentFor<MainActivity>())
         }
     }
 

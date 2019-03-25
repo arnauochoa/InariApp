@@ -20,7 +20,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".presentation.ui.tutorial.TutorialActivity"></activity>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
@@ -51,15 +50,16 @@
             android:name=".presentation.ui.logs.LogsDetailActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".presentation.ui.logs.LogsActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".presentation.ui.modes.ModesActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.ui.settings.GnssSettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar" />
+        <activity android:name=".presentation.ui.tutorial.TutorialActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar" />
+
 
         <receiver
             android:name=".core.utils.connectivity.ConnectivityReceiver"
