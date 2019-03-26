@@ -27,6 +27,8 @@
 
     <color name="transparentWhite">#B2FFFFFF</color>
 
+    <color name="stopButton">#ffff4444</color>
+
 
     <!-- GPSTest Theme -->
     <!--<color name="colorPrimary">#3F51B5</color>-->

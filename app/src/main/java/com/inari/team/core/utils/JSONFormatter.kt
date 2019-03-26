@@ -17,7 +17,6 @@ import java.util.*
 
 // JSON keys
 const val STATUS_KEY = "Status"
-const val LOCATION_KEY = "Location"
 const val MEASUREMENTS_DATA_KEY = "MeasData"
 const val MEASUREMENTS_KEY = "Meas"
 const val CLOCK_KEY = "Clock"
@@ -88,7 +87,7 @@ fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSON
             childJson.put("accumulatedDeltaRangeMeters", measurement.accumulatedDeltaRangeMeters)
             childJson.put("accumulatedDeltaRangeState", measurement.accumulatedDeltaRangeState)
             childJson.put("accumulatedDeltaRangeUncertaintyMeters", measurement.accumulatedDeltaRangeUncertaintyMeters)
-            childJson.put("cn0DbHz", if (measurement.hasSnrInDb()) measurement.cn0DbHz else 0.0)
+            childJson.put("cn0DbHz", measurement.cn0DbHz)
             childJson.put("multipathIndicator", measurement.multipathIndicator)
             childJson.put("pseudorangeRateMetersPerSecond", measurement.pseudorangeRateMetersPerSecond)
             childJson.put(
@@ -107,10 +106,8 @@ fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSON
                 if (measurement.hasCarrierFrequencyHz()) measurement.carrierFrequencyHz
                 else childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
             )
-
             measurementsJsonArray.put(childJson)
         }
-//        }
     }
     return measurementsJsonArray
 }
@@ -148,9 +145,6 @@ fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
             "leapSecond",
             if (clock.hasLeapSecond()) clock.leapSecond else 0.0
         )
-
-
-
     }
     return clockJson
 }

@@ -187,6 +187,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         } ?: kotlin.run {
             position.showError("Position could not be obtained.")
         }
+        gnssData.measurements = arrayListOf()
 
     }
 

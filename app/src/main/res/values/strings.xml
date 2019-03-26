@@ -2,8 +2,8 @@
     <string name="app_name">Inari</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="stats_card_1">Elevation vs CNo</string>
-    <string name="stats_card_2">C/N0</string>
+    <string name="stats_card_1">Elevation vs C/No</string>
+    <string name="stats_card_2">AGC vs C/No</string>
     <string name="stats_card_3">Map</string>
     <string name="stats_card_4">Number of\nsatellites</string>
     <string name="stats_card_5">Code minus\nCarrier</string>
@@ -16,7 +16,7 @@
     <string name="save">save</string>
     <string name="new_mode">New mode</string>
     <string name="mode_name">Mode name</string>
-    <string name="compare_button">compare</string>
+    <string name="stop_button">Stop</string>
     <string name="save_button">save</string>
     <string name="see_modes_button">see modes</string>
     <string name="constellations_subtitle">Constellations:</string>
@@ -68,6 +68,6 @@
     <string name="band_l5">L5/E5a</string>
     <string name="about_bottom">About</string>
     <string name="logs_bottom">logs</string>
-    >>>>>>> 26834d9... GNSS STATE data and legend added
+    <string name="clear_button">Clear</string>
 
 </resources>
