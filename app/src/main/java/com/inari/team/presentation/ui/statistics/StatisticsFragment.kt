@@ -51,10 +51,10 @@ class StatisticsFragment : BaseFragment(), View.OnClickListener {
             when (view.id) {
 
                 R.id.cardRMS -> {
-                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.RMS)
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.ELEVATION_CNO)
                 }
                 R.id.cardCNO -> {
-                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.CNO)
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.CNO_AGC)
                 }
                 R.id.cardMap -> {
                     i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.MAP)

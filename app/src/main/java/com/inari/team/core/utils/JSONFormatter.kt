@@ -89,6 +89,7 @@ fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSON
             } else {
                 childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
             }
+
             measurementsJsonArray.put(childJson)
         }
     }
@@ -150,7 +151,6 @@ fun gnssStatusAsJsonString(gnssStatus: GnssStatus?): JSONArray {
             childJson.put("elevationDegrees", status.getElevationDegrees(sat))
             statusJsonArray.put(childJson)
         }
-
     }
     return statusJsonArray
 }
