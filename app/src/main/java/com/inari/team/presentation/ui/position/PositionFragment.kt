@@ -26,20 +26,21 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
-import com.inari.team.core.utils.*
+import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.DataState.*
 import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
+import com.inari.team.core.utils.getModeIcon
+import com.inari.team.core.utils.showAlert
 import com.inari.team.core.utils.skyplot.GnssEventsListener
+import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.dialog_map_terrain.view.*
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 import javax.inject.Inject
 
 
@@ -68,6 +69,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         viewModel = withViewModel(viewModelFactory) {
             observe(position, ::updatePosition)
             observe(ephemeris, ::updateEphemeris)
+            observe(saveLogs, ::updateSavedLogs)
         }
     }
 
@@ -266,7 +268,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     if (layout.radioGroupFormat.checkedRadioButtonId != R.id.rinex) {
                         format = ".nma"
                     }
-                    saveLog(fileName + format)
+                    viewModel?.saveLastLogs(fileName + format)
                     dialog.dismiss()
                     positionsList.clear()
                 } else showError("File name can not be empty")
@@ -275,19 +277,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         }
     }
 
-    private fun saveLog(fileName: String) {
-        val pvtInfoString = mSharedPreferences.getData(AppSharedPreferences.PVT_INFO)
-
-        pvtInfoString?.let {
-            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), it))
-            showSavedSnackBar()
-        }
-    }
-
     private fun showSavedSnackBar() {
         val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
         snackbar.setAction("OPEN") {
-            //todo move to logs fragment
+            MainActivity.getInstance()?.navigateToLogs()
         }
         snackbar.show()
     }
@@ -384,6 +377,21 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                 }
                 ERROR -> {
                     showEphemerisAlert(true)
+                }
+            }
+        }
+    }
+
+    private fun updateSavedLogs(data: Data<Any>?) {
+        data?.let {
+            when (data.dataState) {
+                LOADING -> {
+                }
+                SUCCESS -> {
+                    showSavedSnackBar()
+                }
+                ERROR -> {
+                    showError("An error occurred saving logs")
                 }
             }
         }

@@ -51,9 +51,10 @@ class SplashActivity : BaseActivity() {
         enableFullScreen(window)
 
         val fadeIn = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        fadeIn.duration = 1000     // animation duration in milliseconds
+        fadeIn.duration = 1500     // animation duration in milliseconds
         fadeIn.fillAfter = true
         tvTitle.startAnimation(fadeIn)
+        ivLogo.startAnimation(fadeIn)
 
         if (mPrefs.getModesList().isEmpty()) {
             addDefaultModes()

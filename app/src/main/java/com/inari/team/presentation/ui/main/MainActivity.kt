@@ -3,11 +3,9 @@ package com.inari.team.presentation.ui.main
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.hardware.*
 import android.location.*
-import android.net.ConnectivityManager.CONNECTIVITY_ACTION
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -65,8 +63,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
     private var gnssMeasurementsEventListener: GnssMeasurementsEvent.Callback? = null
     private var gnssNmeaMessageListener: OnNmeaMessageListener? = null
 
-
-    private var connectivityReceiver = ConnectivityReceiver()
+    private val logsFragment = LogsFragment()
 
     private var gnssListeners = arrayListOf<GnssEventsListener>()
 
@@ -94,13 +91,11 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         activityComponent.inject(this)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_logo)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_logo_small)
 
         if (!mPrefs.isTutorialShown()) {
             navigator.navigateToTutorialActivtiy()
         }
-
-        registerReceiver(connectivityReceiver, IntentFilter(CONNECTIVITY_ACTION))
 
         mActivity = this
 
@@ -126,7 +121,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         pagerAdapter.addFragments(PositionFragment(), "Position")
         pagerAdapter.addFragments(StatusFragment(), "GNSS state")
         pagerAdapter.addFragments(StatisticsFragment(), "Statistics")
-        pagerAdapter.addFragments(LogsFragment(), "Logs")
+        pagerAdapter.addFragments(logsFragment, "Logs")
         pagerAdapter.addFragments(AboutFragment(), "About")
 
         viewPager.setPagingEnabled(false)
@@ -140,7 +135,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         val position = CustomAHBottomNavigationItem(getString(R.string.position_bottom), R.drawable.ic_position)
         val status = CustomAHBottomNavigationItem(getString(R.string.gnss_state_bottom), R.drawable.ic_satellite)
         val statistics = CustomAHBottomNavigationItem(getString(R.string.statistics_bottom), R.drawable.ic_statistics)
-        val logs = CustomAHBottomNavigationItem(getString(R.string.logs_bottom), R.drawable.ic_log)
+        val logs = CustomAHBottomNavigationItem(getString(R.string.logs_bottom), R.drawable.ic_file)
         val info = CustomAHBottomNavigationItem(getString(R.string.about_bottom), R.drawable.ic_info)
 
 
@@ -164,10 +159,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             gnssStatusListener = object : GnssStatus.Callback() {
                 override fun onSatelliteStatusChanged(status: GnssStatus) {
-                    //once gnss status received, notice position fragments
-//                    positionFragment.onGnnsDataReceived(gnssStatus = status)
-//                    statusFragment.onSatelliteStatusChanged(status = status)
-
                     gnssListeners.forEach {
                         it.onSatelliteStatusChanged(status)
                     }
@@ -175,18 +166,13 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
 
                 override fun onStarted() {
                     super.onStarted()
-//                    statusFragment.onGnssStarted()
-
                     gnssListeners.forEach {
                         it.onGnssStarted()
                     }
-
                 }
 
                 override fun onStopped() {
                     super.onStopped()
-//                    statusFragment.onGnssStopped()
-
                     gnssListeners.forEach {
                         it.onGnssStopped()
                     }
@@ -255,6 +241,11 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
 
     fun unSubscribeToGnssEvent(listener: GnssEventsListener) {
         gnssListeners.remove(listener)
+    }
+
+    fun navigateToLogs() {
+        viewPager.currentItem = 3
+        logsFragment.setFiles()
     }
 
     //callbacks
@@ -402,7 +393,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(connectivityReceiver)
         locationManager?.removeUpdates(this)
         gnssListeners.clear()
     }

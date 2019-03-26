@@ -10,16 +10,19 @@ import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.*
+import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
+import com.inari.team.core.utils.getGnssJson
+import com.inari.team.core.utils.saveFile
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,6 +36,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
     val position = MutableLiveData<Data<List<ResponsePvtMode>>>()
     val ephemeris = MutableLiveData<Data<String>>()
+    val saveLogs = MutableLiveData<Data<Any>>()
 
     private var lastDate = Date()
     private var startTimeString: String? = null
@@ -79,7 +83,8 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
             try {
                 startTimeString = formatter.format(lastDate)
                 val directoryName = "$startTimeString/"
-                createDirectory(directoryName)
+                //todo remove
+//                createDirectory(directoryName)
             } catch (e: Exception) {
             }
         }
@@ -153,6 +158,22 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         setGnssData()
     }
 
+    //getters
+    fun saveLastLogs(fileName: String) {
+        val pvtInfoString: String = try {
+            getGnssJson(gnssData).toString(2) ?: ""
+        } catch (e: JSONException) {
+            ""
+        }
+        if (pvtInfoString.isNotBlank()) {
+            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
+            saveLogs.updateData("")
+        } else {
+            saveLogs.showError("")
+        }
+
+    }
+
     //compute position
     private fun setGnssData() {
 
@@ -176,7 +197,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
     private fun calculatePositionWithGnss() {
         //Calculate position and restart averaging
-        saveLogsForPostProcessing()
+//        saveLogsForPostProcessing()
 
         val coordinates = computePosition()
 
@@ -205,18 +226,20 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
         val positionJson = JSONObject(obtainPosition(getGnssJson(gnssData).toString(2)))
 
-        gnssData.modes.forEach {
+        gnssData.modes.forEachIndexed { index, it ->
             val latitude = positionJson.get("lat") as? Double
             val longitude = positionJson.get("lng") as? Double
             latitude?.let { lat ->
                 longitude?.let { lon ->
-                    responses.add(ResponsePvtMode(LatLng(lat, lon), getModeColor(it.color), it.name))
+                    responses.add(ResponsePvtMode(LatLng(lat, lon), it.color, it.name))
                 }
             } ?: kotlin.run {
                 refPos?.let { latlng ->
+                    //in order to test colors
+                    val ltln = LatLng(latlng.latitude + 0.000020 * index, latlng.longitude + 0.000020 * index)
                     responses.add(
                         ResponsePvtMode(
-                            latlng, getModeColor(it.color), it.name
+                            ltln, it.color, it.name
                         )
                     )
                 }

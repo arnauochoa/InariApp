@@ -2,6 +2,7 @@ package com.inari.team.core.di.component
 
 import com.inari.team.core.di.FragmentModule
 import com.inari.team.core.di.scopes.PerFragment
+import com.inari.team.presentation.ui.about.AboutFragment
 import com.inari.team.presentation.ui.logs.LogsFragment
 import com.inari.team.presentation.ui.position.PositionFragment
 import com.inari.team.presentation.ui.statistics.StatisticsFragment
@@ -16,5 +17,6 @@ interface FragmentComponent {
     fun inject(statusFragment: StatusFragment)
     fun inject(statisticsFragment: StatisticsFragment)
     fun inject(logsFragment: LogsFragment)
+    fun inject(aboutFragment: AboutFragment)
 
 }

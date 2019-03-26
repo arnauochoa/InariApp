@@ -7,20 +7,20 @@ import okhttp3.ResponseBody
 import java.io.*
 
 private val root: File =
-        android.os.Environment.getExternalStorageDirectory()
+    android.os.Environment.getExternalStorageDirectory()
 
 private const val APP_ROOT: String = "/Inari/Logs/"
 
 
 @SuppressLint("SetWorldReadable")
 fun saveFile(
-        url: String,
-        responseBody: ResponseBody
+    url: String,
+    responseBody: ResponseBody
 ) {
     try {
 
         val dir =
-                File(root.absolutePath + APP_ROOT)
+            File(root.absolutePath + APP_ROOT)
         dir.mkdirs()
 
         val file = File(dir, url)
@@ -54,7 +54,7 @@ fun saveFile(
     }
 }
 
-fun createDirectory (directoryName: String){
+fun createDirectory(directoryName: String) {
     val dir =
         File(root.absolutePath + APP_ROOT + directoryName)
     dir.mkdirs()
@@ -63,20 +63,36 @@ fun createDirectory (directoryName: String){
 fun getFilesList(): Array<File> {
     val path = Environment.getExternalStorageDirectory().toString() + APP_ROOT
     val directory = File(path)
-    return directory.listFiles()
+
+    return if (directory.exists()) {
+        directory.listFiles()
+    } else arrayOf()
 }
 
 
 fun retrieveFile(url: String): String {
     return try {
         val file = ResponseBody.create(
-                MediaType.parse("text/plain"),
+            MediaType.parse("text/plain"),
             getStringFromFile("${root.absolutePath}$APP_ROOT$url")
         ).string()
         file
 
     } catch (e: Exception) {
         ""
+    }
+}
+
+fun deleteFile(fileName: String): Boolean {
+    return try {
+        val dir =
+            File(root.absolutePath + APP_ROOT)
+        dir.mkdirs()
+        val file = File(dir, fileName)
+        file.delete()
+        true
+    } catch (e: Exception) {
+        false
     }
 }
 
