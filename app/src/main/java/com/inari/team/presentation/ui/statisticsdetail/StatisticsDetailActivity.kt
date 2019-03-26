@@ -127,7 +127,6 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
                     it.axisLeft.axisMinimum = 0f
                     it.axisRight.isEnabled = false
 
-
                     val lp = RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.MATCH_PARENT,
                         RelativeLayout.LayoutParams.MATCH_PARENT
