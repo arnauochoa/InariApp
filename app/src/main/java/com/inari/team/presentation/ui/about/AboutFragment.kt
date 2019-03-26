@@ -34,6 +34,7 @@ class AboutFragment : BaseFragment() {
         btSeeTutorial.setOnClickListener {
             navigator.navigateToTutorialActivtiy()
         }
+
     }
 
 

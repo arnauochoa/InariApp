@@ -6,23 +6,21 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.StrictMode
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.*
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
-import com.inari.team.core.utils.getGnssJson
-import com.inari.team.core.utils.saveFile
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
-import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,6 +40,8 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     private var startTimeString: String? = null
 
     private var isComputing = false
+    private var isEphErrorShown = false
+
 
     private var gnssData = GnssData()
     private var lastGnssStatus: GnssStatus? = null
@@ -72,6 +72,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     }
 
     fun startComputingPosition() {
+        isEphErrorShown = false
         isComputing = true
         GlobalScope.launch {
             // Delete previous measurements
@@ -117,7 +118,10 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
                     if (Date().time - lastDate.time >=
                         TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT)
                     ) {
-                        ephemeris.showError(PositionFragment.SHOW_ALERT_ERROR)
+                        if (!isEphErrorShown) {
+                            isEphErrorShown = true
+                            ephemeris.showError(PositionFragment.SHOW_ALERT_ERROR)
+                        }
                     }
                     obtainEphemerisData()
                 }
@@ -160,17 +164,17 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
     //getters
     fun saveLastLogs(fileName: String) {
-        val pvtInfoString: String = try {
-            getGnssJson(gnssData).toString(2) ?: ""
-        } catch (e: JSONException) {
-            ""
-        }
-        if (pvtInfoString.isNotBlank()) {
-            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
-            saveLogs.updateData("")
-        } else {
-            saveLogs.showError("")
-        }
+//        val pvtInfoString: String = try {
+//            getGnssJson(gnssData).toString(2) ?: ""
+//        } catch (e: JSONException) {
+//            ""
+//        }
+//        if (pvtInfoString.isNotBlank()) {
+//            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
+//            saveLogs.updateData("")
+//        } else {
+//            saveLogs.showError("")
+//        }
 
     }
 
@@ -224,7 +228,19 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     private fun computePosition(): List<ResponsePvtMode>? {
         val responses = arrayListOf<ResponsePvtMode>()
 
-        val positionJson = JSONObject(obtainPosition(getGnssJson(gnssData).toString(2)))
+//        val jsonGnssData = getGnssJson(gnssData)
+
+
+        val gnssGlobalJsonString = Gson().toJson(gnssData)
+        val gnssEphemerisJsonString = ephemerisResponseAsJson(gnssData.ephemerisResponse, lastEphemerisDate).toString(2)
+        val gnssMeasurementDataJsonString = gnssMeasurementsListAsJson(gnssData.measurements)
+
+        val stringPosition =
+            obtainPosition(gnssGlobalJsonString, gnssMeasurementDataJsonString, gnssEphemerisJsonString)
+
+        val positionJson = JSONObject(stringPosition)
+
+//        val positionJson = JSONObject(obtainPosition(getGnssJson(gnssData).toString(2)))
 
         gnssData.modes.forEachIndexed { index, it ->
             val latitude = positionJson.get("lat") as? Double
@@ -252,7 +268,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
      * C++ function used to compute the PVT. This function is defined in Project view modes at the path:
      * /app/src/main/cpp/pvtEngine-lib.cpp
      */
-    private external fun obtainPosition(gnssData: String): String
+    private external fun obtainPosition(gnssData: String, gnssMeasurements: List<String>, gnssEphemris: String): String
 
     companion object {
         const val SUPL_SERVER_HOST = "supl.google.com"

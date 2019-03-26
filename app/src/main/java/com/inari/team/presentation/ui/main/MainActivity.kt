@@ -245,6 +245,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
 
     fun navigateToLogs() {
         viewPager.currentItem = 3
+        bottomNavigation.currentItem = 3
         logsFragment.setFiles()
     }
 

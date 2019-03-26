@@ -37,10 +37,10 @@ fun getGnssJson(gnssData: GnssData): JSONObject {
     var gnssJson = JSONObject(Gson().toJson(gnssData))
     try {
 //        gnssJson.put(MEASUREMENTS_DATA_KEY, gnssMeasurementsListAsJson(gnssData.measurements))
-        gnssJson.put(
-            EPHEMERIS_DATA_KEY,
-            ephemerisResponseAsJson(gnssData.ephemerisResponse, gnssData.lastEphemerisDate)
-        )
+//        gnssJson.put(
+//            EPHEMERIS_DATA_KEY,
+//            ephemerisResponseAsJson(gnssData.ephemerisResponse, gnssData.lastEphemerisDate)
+//        )
     } catch (e: StackOverflowError) {
         gnssJson = JSONObject()
     } catch (e: JSONException) {
@@ -50,15 +50,16 @@ fun getGnssJson(gnssData: GnssData): JSONObject {
     return gnssJson
 }
 
-fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
-    val measurementsJsonArray = JSONArray()
+fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): List<String> {
+    val list = arrayListOf<String>()
+
     try {
         measurements.forEach {
             val measurementsJson = JSONObject()
             measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
             measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
             measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
-            measurementsJsonArray.put(measurementsJson)
+            list.add(measurementsJson.toString())
         }
     } catch (e: StackOverflowError) {
 
@@ -66,7 +67,7 @@ fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
 
     }
 
-    return measurementsJsonArray
+    return list
 
 }
 
@@ -172,7 +173,7 @@ fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
 }
 
 
-private fun ephemerisResponseAsJson(
+fun ephemerisResponseAsJson(
     ephemerisResponse: EphemerisResponse?,
     lastEphemerisDate: Date?
 ): JSONObject {
