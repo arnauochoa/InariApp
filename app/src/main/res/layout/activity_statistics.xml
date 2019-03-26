@@ -7,29 +7,52 @@
     android:background="@color/colorLightGrayBackground"
     tools:context=".presentation.ui.statisticsdetail.StatisticsDetailActivity">
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <RelativeLayout
+        android:id="@+id/chartLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/buttonStopSave"
         android:layout_marginStart="16dp"
         android:layout_marginTop="36dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="70dp"
         android:scaleType="fitXY"
-        app:layout_constraintBottom_toTopOf="@+id/buttonCompareSave"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/buttonClear"/>
 
     <Button
-        android:id="@+id/buttonCompareSave"
+        android:id="@+id/buttonClear"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_alignStart="@id/buttonStopSave"
+        android:layout_alignParentBottom="true"
         android:background="@color/colorAccentLight"
         android:clickable="true"
         android:focusable="true"
-        android:text="@string/compare_button"
+        android:text="@string/clear_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/buttonStopSave"/>
+
+    <Button
+        android:id="@+id/buttonStopSave"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/stopButton"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/stop_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/buttonClear"/>
+
+    <!--<Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+    </Spinner>-->
+
 </android.support.constraint.ConstraintLayout>

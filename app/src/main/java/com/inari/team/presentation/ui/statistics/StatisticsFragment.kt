@@ -54,7 +54,7 @@ class StatisticsFragment : BaseFragment(), View.OnClickListener {
                     i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.ELEVATION_CNO)
                 }
                 R.id.cardCNO -> {
-                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.CNO)
+                    i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.CNO_AGC)
                 }
                 R.id.cardMap -> {
                     i.putExtra(StatisticsDetailActivity.GRAPH_TYPE, StatisticsDetailActivity.MAP)
