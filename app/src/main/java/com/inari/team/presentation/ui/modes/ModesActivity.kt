@@ -44,7 +44,7 @@ class ModesActivity : BaseActivity() {
 
     private fun setViews() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.modes)
+        supportActionBar?.title = getString(R.string.positioning_settings)
 
         mAdapter = ModesAdapter { setSelectedModes() }
         modesRVList.layoutManager = LinearLayoutManager(this)

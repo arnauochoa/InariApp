@@ -13,14 +13,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.inari.team.R
 import com.inari.team.core.utils.deleteFile
-import com.inari.team.core.utils.toast
+import com.inari.team.core.utils.showAlert
 import kotlinx.android.synthetic.main.item_log.view.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class LogsAdapter(val context: Context) : RecyclerView.Adapter<LogsAdapter.LogsViewHolder>() {
+class LogsAdapter(val context: Context, val emptyViewAction: () -> Unit) :
+    RecyclerView.Adapter<LogsAdapter.LogsViewHolder>() {
 
     private val logs: ArrayList<File> = ArrayList()
 
@@ -61,8 +62,15 @@ class LogsAdapter(val context: Context) : RecyclerView.Adapter<LogsAdapter.LogsV
             if (deleteFile(item.name)) {
                 logs.removeAt(position)
                 notifyDataSetChanged()
+                if (logs.size == 0) {
+                    emptyViewAction.invoke()
+                }
             } else {
-                toast("Error occurred deleting file, please delete it manually")
+                showAlert(
+                    context, "Error",
+                    "Error deleting file, please delete it manually in Internal Storage", "", {},
+                    true
+                )
             }
         }
 

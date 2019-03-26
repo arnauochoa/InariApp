@@ -63,7 +63,10 @@ fun createDirectory(directoryName: String) {
 fun getFilesList(): Array<File> {
     val path = Environment.getExternalStorageDirectory().toString() + APP_ROOT
     val directory = File(path)
-    return directory.listFiles()
+
+    return if (directory.exists()) {
+        directory.listFiles()
+    } else arrayOf()
 }
 
 

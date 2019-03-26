@@ -10,6 +10,7 @@ import com.google.location.suplclient.ephemeris.GpsEphemeris
 import com.inari.team.presentation.model.GnssData
 import com.inari.team.presentation.model.MeasurementData
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,20 +34,36 @@ const val DEFAULT_FREQUENCY_HZ = 1575449984
 private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
 
 fun getGnssJson(gnssData: GnssData): JSONObject {
-    val gnssJson = JSONObject(Gson().toJson(gnssData))
-    gnssJson.put(MEASUREMENTS_DATA_KEY, gnssMeasurementsListAsJson(gnssData.measurements))
-    gnssJson.put(EPHEMERIS_DATA_KEY, ephemerisResponseAsJson(gnssData.ephemerisResponse, gnssData.lastEphemerisDate))
+    var gnssJson = JSONObject(Gson().toJson(gnssData))
+    try {
+//        gnssJson.put(MEASUREMENTS_DATA_KEY, gnssMeasurementsListAsJson(gnssData.measurements))
+        gnssJson.put(
+            EPHEMERIS_DATA_KEY,
+            ephemerisResponseAsJson(gnssData.ephemerisResponse, gnssData.lastEphemerisDate)
+        )
+    } catch (e: StackOverflowError) {
+        gnssJson = JSONObject()
+    } catch (e: JSONException) {
+
+    }
+
     return gnssJson
 }
 
 fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
     val measurementsJsonArray = JSONArray()
-    measurements.forEach {
-        val measurementsJson = JSONObject()
-        measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
-        measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
-        measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
-        measurementsJsonArray.put(measurementsJson)
+    try {
+        measurements.forEach {
+            val measurementsJson = JSONObject()
+            measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
+            measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
+            measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
+            measurementsJsonArray.put(measurementsJson)
+        }
+    } catch (e: StackOverflowError) {
+
+    } catch (e: JSONException) {
+
     }
 
     return measurementsJsonArray
@@ -148,7 +165,6 @@ fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
             "leapSecond",
             if (clock.hasLeapSecond()) clock.leapSecond else 0.0
         )
-
 
 
     }

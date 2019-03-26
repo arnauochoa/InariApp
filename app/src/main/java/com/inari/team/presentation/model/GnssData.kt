@@ -12,7 +12,7 @@ data class GnssData(
     @Transient var ephemerisResponse: EphemerisResponse? = null,
     @Transient var lastEphemerisDate: Date? = null,
     @Transient var measurements: ArrayList<MeasurementData> = arrayListOf(),
-    var avgEnabled: Boolean = false,
+    var avgEnabled: Boolean = true,
     var avg: Int = 5,
     var mask: Int = 10
 )
