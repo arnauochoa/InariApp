@@ -2,7 +2,9 @@ package com.inari.team.presentation.ui.logs
 
 
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,7 @@ import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.utils.getFilesList
 import com.inari.team.core.utils.toast
 import kotlinx.android.synthetic.main.fragment_logs.*
+
 
 class LogsFragment : BaseFragment() {
 
@@ -34,8 +37,12 @@ class LogsFragment : BaseFragment() {
             toast("There are no files yet")
         }
 
+        val layoutManager = LinearLayoutManager(view.context)
+        val dividerItemDecoration = DividerItemDecoration(rvLogs.context, RecyclerView.VERTICAL)
+
         adapter = LogsAdapter(view.context)
-        rvLogs.layoutManager = LinearLayoutManager(view.context)
+        rvLogs.layoutManager = layoutManager
+        rvLogs.addItemDecoration(dividerItemDecoration)
         rvLogs.adapter = adapter
 
         adapter?.setLogs(getFilesList())

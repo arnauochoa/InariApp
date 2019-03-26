@@ -13,7 +13,7 @@ import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import org.jetbrains.anko.toast
 
-class ModesListAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapter<ModesViewHolder>() {
+class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapter<ModesViewHolder>() {
 
     private val mPrefs = AppSharedPreferences.getInstance()
     private var modes = mPrefs.getModesList()
@@ -50,12 +50,14 @@ class ModesListAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Ad
         }
 
         holder.deleteButton.setOnClickListener {
+            holder.deleteButton.visibility = GONE
             toast("Mode '" + modes[position].name + "' deleted")
-            modes = mPrefs.deleteMode(mode)
+            mPrefs.deleteMode(mode)
             if (mode.isSelected) {
                 mPrefs.setColorToAvailableColorsList(mode.color)
             }
-            this.notifyDataSetChanged()
+            modes.removeAt(position)
+            notifyDataSetChanged()
         }
 
     }

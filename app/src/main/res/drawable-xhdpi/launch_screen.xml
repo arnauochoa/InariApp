@@ -4,6 +4,6 @@
     <item>
         <bitmap
             android:gravity="fill"
-            android:src="@drawable/earth_bg" />
+            android:src="@drawable/bg_stars" />
     </item>
 </layer-list>

@@ -28,7 +28,7 @@ class ModesActivity : BaseActivity() {
     @Inject
     lateinit var mPrefs: AppSharedPreferences
 
-    private var mAdapter: ModesListAdapter? = null
+    private var mAdapter: ModesAdapter? = null
 
     private var avg: Int = 5
     private var mask: Int = 5
@@ -46,7 +46,7 @@ class ModesActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.modes)
 
-        mAdapter = ModesListAdapter { setSelectedModes() }
+        mAdapter = ModesAdapter { setSelectedModes() }
         modesRVList.layoutManager = LinearLayoutManager(this)
         modesRVList.adapter = mAdapter
         tvModesTitle.setOnClickListener {

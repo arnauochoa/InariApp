@@ -140,7 +140,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         val position = CustomAHBottomNavigationItem(getString(R.string.position_bottom), R.drawable.ic_position)
         val status = CustomAHBottomNavigationItem(getString(R.string.gnss_state_bottom), R.drawable.ic_satellite)
         val statistics = CustomAHBottomNavigationItem(getString(R.string.statistics_bottom), R.drawable.ic_statistics)
-        val logs = CustomAHBottomNavigationItem(getString(R.string.logs_bottom), R.drawable.ic_log)
+        val logs = CustomAHBottomNavigationItem(getString(R.string.logs_bottom), R.drawable.ic_file)
         val info = CustomAHBottomNavigationItem(getString(R.string.about_bottom), R.drawable.ic_info)
 
 
