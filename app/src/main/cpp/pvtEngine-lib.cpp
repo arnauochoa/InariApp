@@ -13,9 +13,7 @@ extern "C" JNIEXPORT jstring JNICALL
 
 
 Java_com_inari_team_presentation_ui_position_PositionViewModel_obtainPosition(JNIEnv *env, jobject instance,
-                                                                              jstring jsonData,
-                                                                              jstring jsonData2,
-                                                                              jstring jsonData3) {
+                                                                              jstring jsonData) {
 
     const char *gnssData = env->GetStringUTFChars(jsonData, nullptr);
     std::string lat;
