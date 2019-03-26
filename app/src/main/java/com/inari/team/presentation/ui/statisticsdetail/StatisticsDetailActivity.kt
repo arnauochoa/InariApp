@@ -17,7 +17,7 @@ class StatisticsDetailActivity : BaseActivity() {
 
     companion object {
         const val GRAPH_TYPE: String = "graph_type"
-        const val RMS: String = "RMS"
+        const val ELEVATION_CNO: String = "Elevation_CNo"
         const val CNO: String = "CNO"
         const val MAP: String = "MAP"
         const val GRAPH4: String = "GRAPH4"
@@ -57,17 +57,26 @@ class StatisticsDetailActivity : BaseActivity() {
 
     private fun setChartData() {
         val entries = arrayListOf<Entry>()
+        val entries2 = arrayListOf<Entry>()
 
-        repeat(10) {
-            entries.add(Entry(1.0f * it, 1.0f * it))
+        repeat(20) {
+            entries.add(Entry(1.0f * (it-10), 1.0f * ((it-10)*(it-10))))
+            entries2.add(Entry(1.0f * (it-10), 1.0f * it))
         }
 
         val dataSet = LineDataSet(entries, "Label")
         dataSet.color = ContextCompat.getColor(this, R.color.colorAccentLight)
         dataSet.valueTextColor = ContextCompat.getColor(this, R.color.colorLegend1)
 
+        val dataSet2 = LineDataSet(entries2, "Label")
+        dataSet2.color = ContextCompat.getColor(this, R.color.colorAccentLight)
+        dataSet2.valueTextColor = ContextCompat.getColor(this, R.color.colorLegend1)
+
         val lineData = LineData(dataSet)
         chart.data = lineData
+        chart.invalidate()
+        val lineData2 = LineData(dataSet2)
+        chart.data = lineData2
         chart.invalidate()
     }
 
@@ -78,9 +87,9 @@ class StatisticsDetailActivity : BaseActivity() {
 
     private fun setToolbarTitle(type: String?) {
         when (type) {
-            RMS -> {
+            ELEVATION_CNO -> {
                 supportActionBar?.setTitle(getString(R.string.stats_card_1))
-                //crides al nom de la funcio de RMS
+                //crides al nom de la funcio de ELEVATION_CNO
             }
             CNO -> {
                 supportActionBar?.setTitle(getString(R.string.stats_card_2))
