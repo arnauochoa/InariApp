@@ -42,6 +42,8 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     private var startTimeString: String? = null
 
     private var isComputing = false
+    private var isEphErrorShown = false
+
 
     private var gnssData = GnssData()
     private var lastGnssStatus: GnssStatus? = null
@@ -72,6 +74,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     }
 
     fun startComputingPosition() {
+        isEphErrorShown = false
         isComputing = true
         GlobalScope.launch {
             // Delete previous measurements
@@ -117,7 +120,10 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
                     if (Date().time - lastDate.time >=
                         TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT)
                     ) {
-                        ephemeris.showError(PositionFragment.SHOW_ALERT_ERROR)
+                        if (!isEphErrorShown) {
+                            isEphErrorShown = true
+                            ephemeris.showError(PositionFragment.SHOW_ALERT_ERROR)
+                        }
                     }
                     obtainEphemerisData()
                 }
@@ -171,7 +177,6 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         } else {
             saveLogs.showError("")
         }
-
     }
 
     //compute position
@@ -224,7 +229,11 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     private fun computePosition(): List<ResponsePvtMode>? {
         val responses = arrayListOf<ResponsePvtMode>()
 
-        val positionJson = JSONObject(obtainPosition(getGnssJson(gnssData).toString(2)))
+        val jsonGnssData = getGnssJson(gnssData)
+
+        val position = obtainPosition(jsonGnssData.toString(2))
+
+        val positionJson = JSONObject(position)
 
         gnssData.modes.forEachIndexed { index, it ->
             val latitude = positionJson.get("lat") as? Double

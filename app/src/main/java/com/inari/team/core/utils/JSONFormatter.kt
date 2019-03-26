@@ -10,7 +10,6 @@ import com.google.location.suplclient.ephemeris.GpsEphemeris
 import com.inari.team.presentation.model.GnssData
 import com.inari.team.presentation.model.MeasurementData
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -18,7 +17,6 @@ import java.util.*
 
 // JSON keys
 const val STATUS_KEY = "Status"
-const val LOCATION_KEY = "Location"
 const val MEASUREMENTS_DATA_KEY = "MeasData"
 const val MEASUREMENTS_KEY = "Meas"
 const val CLOCK_KEY = "Clock"
@@ -34,78 +32,38 @@ const val DEFAULT_FREQUENCY_HZ = 1575449984
 private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
 
 fun getGnssJson(gnssData: GnssData): JSONObject {
-    var gnssJson = JSONObject(Gson().toJson(gnssData))
-    try {
-//        gnssJson.put(MEASUREMENTS_DATA_KEY, gnssMeasurementsListAsJson(gnssData.measurements))
-        gnssJson.put(
-            EPHEMERIS_DATA_KEY,
-            ephemerisResponseAsJson(gnssData.ephemerisResponse, gnssData.lastEphemerisDate)
-        )
-    } catch (e: StackOverflowError) {
-        gnssJson = JSONObject()
-    } catch (e: JSONException) {
-
-    }
-
+    val gnssJson = JSONObject(Gson().toJson(gnssData))
+    gnssJson.put(MEASUREMENTS_DATA_KEY, gnssMeasurementsListAsJson(gnssData.measurements))
+    gnssJson.put(EPHEMERIS_DATA_KEY, ephemerisResponseAsJson(gnssData.ephemerisResponse, Date()))
     return gnssJson
 }
 
 fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
     val measurementsJsonArray = JSONArray()
-    try {
-        measurements.forEach {
-            val measurementsJson = JSONObject()
-            measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
-            measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
-            measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
-            measurementsJsonArray.put(measurementsJson)
-        }
-    } catch (e: StackOverflowError) {
-
-    } catch (e: JSONException) {
-
+    measurements.forEach {
+        val measurementsJson = JSONObject()
+        measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
+        measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
+        measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
+        measurementsJsonArray.put(measurementsJson)
     }
 
     return measurementsJsonArray
 
 }
 
-fun gnssStatusAsJsonString(gnssStatus: GnssStatus?): JSONArray {
-    val statusJsonArray = JSONArray()
-    gnssStatus?.let { status ->
-        for (sat in 0 until status.satelliteCount) {
-            val childJson = JSONObject()
-            childJson.put("svid", status.getSvid(sat))
-            childJson.put("constellationType", status.getConstellationType(sat))
-            childJson.put("azimuthDegrees", status.getAzimuthDegrees(sat))
-            childJson.put("elevationDegrees", status.getElevationDegrees(sat))
-            childJson.put(
-                "carrierFrequencyHz",
-                if (status.hasCarrierFrequencyHz(sat)) status.getCarrierFrequencyHz(sat)
-                else childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
-            )
-            childJson.put("cn0DbHz", status.getCn0DbHz(sat))
-            statusJsonArray.put(childJson)
-        }
-
-    }
-    return statusJsonArray
-}
-
-
 fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSONArray {
     val measurementsJsonArray = JSONArray()
     gnssMeasurements?.let { measurements ->
         measurements.forEach { measurement ->
             val childJson = JSONObject()
-
             childJson.put("svid", measurement.svid)
             childJson.put("constellationType", measurement.constellationType)
             childJson.put("state", measurement.state)
             childJson.put("accumulatedDeltaRangeMeters", measurement.accumulatedDeltaRangeMeters)
             childJson.put("accumulatedDeltaRangeState", measurement.accumulatedDeltaRangeState)
             childJson.put("accumulatedDeltaRangeUncertaintyMeters", measurement.accumulatedDeltaRangeUncertaintyMeters)
-            childJson.put("cn0DbHz", if (measurement.hasSnrInDb()) measurement.cn0DbHz else 0.0)
+            childJson.put("cn0DbHz", measurement.cn0DbHz)
             childJson.put("multipathIndicator", measurement.multipathIndicator)
             childJson.put("pseudorangeRateMetersPerSecond", measurement.pseudorangeRateMetersPerSecond)
             childJson.put(
@@ -115,19 +73,24 @@ fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSON
             childJson.put("receivedSvTimeNanos", measurement.receivedSvTimeNanos)
             childJson.put("receivedSvTimeUncertaintyNanos", measurement.receivedSvTimeUncertaintyNanos)
             childJson.put("timeOffsetNanos", measurement.timeOffsetNanos)
-            childJson.put(
-                "automaticGainControlLevelDb",
-                if (measurement.hasAutomaticGainControlLevelDb()) measurement.automaticGainControlLevelDb else 0.0
-            )
-            childJson.put(
-                "carrierFrequencyHz",
-                if (measurement.hasCarrierFrequencyHz()) measurement.carrierFrequencyHz
-                else childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
-            )
-
+            if (measurement.hasAutomaticGainControlLevelDb()) {
+                childJson.put(
+                    "automaticGainControlLevelDb",
+                    measurement.automaticGainControlLevelDb
+                )
+            } else {
+                childJson.put(
+                    "automaticGainControlLevelDb",
+                    0.0
+                )
+            }
+            if (measurement.hasCarrierFrequencyHz()) {
+                childJson.put("carrierFrequencyHz", measurement.carrierFrequencyHz)
+            } else {
+                childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
+            }
             measurementsJsonArray.put(childJson)
         }
-//        }
     }
     return measurementsJsonArray
 }
@@ -166,13 +129,34 @@ fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
             if (clock.hasLeapSecond()) clock.leapSecond else 0.0
         )
 
-
     }
     return clockJson
 }
 
+fun gnssStatusAsJsonString(gnssStatus: GnssStatus?): JSONArray {
+    val statusJsonArray = JSONArray()
+    gnssStatus?.let { status ->
+        for (sat in 0 until status.satelliteCount) {
+            val childJson = JSONObject()
+            childJson.put("svid", status.getSvid(sat))
+            childJson.put("azimuthDegrees", status.getAzimuthDegrees(sat))
+            if (status.hasCarrierFrequencyHz(sat)) {
+                childJson.put("carrierFrequencyHz", status.getCarrierFrequencyHz(sat))
+            } else {
+                childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
+            }
+            childJson.put("cn0DbHz", status.getCn0DbHz(sat))
+            childJson.put("constellationType", status.getConstellationType(sat))
+            childJson.put("elevationDegrees", status.getElevationDegrees(sat))
+            statusJsonArray.put(childJson)
+        }
 
-private fun ephemerisResponseAsJson(
+    }
+    return statusJsonArray
+}
+
+
+fun ephemerisResponseAsJson(
     ephemerisResponse: EphemerisResponse?,
     lastEphemerisDate: Date?
 ): JSONObject {
@@ -217,4 +201,16 @@ fun isEphemerisValid(ephemeris: GpsEphemeris): Boolean {
     if (ephemeris.keplerModel == null) validity = false
     return validity
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

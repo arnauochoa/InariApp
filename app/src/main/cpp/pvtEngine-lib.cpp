@@ -67,8 +67,7 @@ Java_com_inari_team_presentation_ui_position_PositionViewModel_obtainPosition(JN
         stream << std::fixed << std::setprecision(10) << posllh[1];
         lng = stream.str();
     }
-    catch(const std::exception& e)
-    {
+    catch (const std::exception &e) {
         lat = "null";
         lng = "null";
     }
