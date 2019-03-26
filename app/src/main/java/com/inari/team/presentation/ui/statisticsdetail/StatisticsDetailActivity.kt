@@ -123,7 +123,6 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
                 scatterChart?.let {
                     it.xAxis.axisMaximum = 60f
                     it.xAxis.axisMinimum = -20f
-                    it.xAxis.labe
                     it.axisLeft.axisMaximum = 60f
                     it.axisLeft.axisMinimum = 0f
                     it.axisRight.isEnabled = false
