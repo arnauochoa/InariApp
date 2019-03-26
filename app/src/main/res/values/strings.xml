@@ -24,7 +24,7 @@
     <string name="corrections_subtitle">Corrections:</string>
     <string name="algorithm_subtitle">Algorithm:</string>
     <string name="averaging_subtitle">Averaging\n\t time:</string>
-    <string name="CN0_strip_title">Average  C/No (dB-Hz):</string>
+    <string name="CN0_strip_title">Average C/No (dB-Hz):</string>
     <string name="num_sats_title">Number of satellites:</string>
     <string name="pdop_title">PDOP:</string>
     <string name="cn0_title">C/N0:</string>

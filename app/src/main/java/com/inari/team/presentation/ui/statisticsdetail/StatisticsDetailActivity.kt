@@ -84,8 +84,6 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
 
     override fun onResume() {
         super.onResume()
-        //todo test crashes
-        MainActivity.getInstance()?.subscribeToGnssEvents(this)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -113,14 +111,10 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
 
                 // programmatically create a LineChart
                 lineChart = LineChart(context)
-                lineChart?.let {
-                    val lp = RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        RelativeLayout.LayoutParams.MATCH_PARENT
-                    )
-                    it.layoutParams = lp
-                    rl.addView(it)
-                }
+
+                rl.addView(lineChart)
+
+                setChartData()
             }
             CNO_AGC -> {
                 supportActionBar?.title = getString(com.inari.team.R.string.stats_card_2)
@@ -129,6 +123,7 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
                 scatterChart?.let {
                     it.xAxis.axisMaximum = 60f
                     it.xAxis.axisMinimum = -20f
+
                     it.axisLeft.axisMaximum = 60f
                     it.axisLeft.axisMinimum = 0f
                     it.axisRight.isEnabled = false
@@ -190,6 +185,7 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
             buttonStopSave.setBackgroundColor(ContextCompat.getColor(this, com.inari.team.R.color.colorPrimaryLight))
             buttonStopSave.text = getString(com.inari.team.R.string.save_button)
             hasStopped = false
+
         } else {
             buttonStopSave.setBackgroundColor(ContextCompat.getColor(this, com.inari.team.R.color.stopButton))
             buttonStopSave.text = getString(com.inari.team.R.string.stop_button)
@@ -266,9 +262,14 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
             carrierFrequencyHz < BAND1_UP_THRES
         ) {
             true
-        } else selectedBand == Band.L5_E5 &&
+        } else if (selectedBand == Band.L5_E5 &&
             carrierFrequencyHz > BAND5_DOWN_THRES &&
             carrierFrequencyHz < BAND5_UP_THRES
+        ) {
+            true
+        } else {
+            false
+        }
     }
 
     // Callbacks

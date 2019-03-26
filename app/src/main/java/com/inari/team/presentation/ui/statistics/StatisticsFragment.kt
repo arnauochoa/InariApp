@@ -79,6 +79,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     ?.setBackgroundResource(R.drawable.bg_corners_blue)
                 tab?.position?.let {
                     filterByFrequence(it)
+
                 }
 
 
