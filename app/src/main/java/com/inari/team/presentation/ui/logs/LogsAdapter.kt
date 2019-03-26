@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class LogsAdapter(val context: Context, val emptyViewAction: () -> Unit) :
+class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit) :
     RecyclerView.Adapter<LogsAdapter.LogsViewHolder>() {
 
     private val logs: ArrayList<File> = ArrayList()
@@ -60,6 +60,7 @@ class LogsAdapter(val context: Context, val emptyViewAction: () -> Unit) :
 
         holder.delete.setOnClickListener {
             if (deleteFile(item.name)) {
+                holder.delete.visibility = GONE
                 logs.removeAt(position)
                 notifyDataSetChanged()
                 if (logs.size == 0) {

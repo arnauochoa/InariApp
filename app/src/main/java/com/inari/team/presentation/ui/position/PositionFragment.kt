@@ -173,77 +173,75 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
     private fun showMapTypeDialog() {
 
-        context?.let {
-
-            val dialog = AlertDialog.Builder(it).create()
-            val layout = View.inflate(it, R.layout.dialog_map_terrain, null)
+        context?.let { c ->
+            val dialog = AlertDialog.Builder(c).create()
+            val layout = View.inflate(c, R.layout.dialog_map_terrain, null)
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             dialog.setView(layout)
 
-            layout?.let {
+            layout?.let { view ->
 
                 mMap?.let { gMap ->
                     when (gMap.mapType) {
                         GoogleMap.MAP_TYPE_NORMAL -> {
-                            it.ivNormalTick.visibility = VISIBLE
-                            it.ivTerrainTick.visibility = GONE
-                            it.ivHybridTick.visibility = GONE
-                            it.ivSatelliteTick.visibility = GONE
+                            view.ivNormalTick.visibility = VISIBLE
+                            view.ivTerrainTick.visibility = GONE
+                            view.ivHybridTick.visibility = GONE
+                            view.ivSatelliteTick.visibility = GONE
                         }
                         GoogleMap.MAP_TYPE_TERRAIN -> {
-                            it.ivTerrainTick.visibility = VISIBLE
-                            it.ivNormalTick.visibility = GONE
-                            it.ivHybridTick.visibility = GONE
-                            it.ivSatelliteTick.visibility = GONE
+                            view.ivTerrainTick.visibility = VISIBLE
+                            view.ivNormalTick.visibility = GONE
+                            view.ivHybridTick.visibility = GONE
+                            view.ivSatelliteTick.visibility = GONE
                         }
                         GoogleMap.MAP_TYPE_HYBRID -> {
-                            it.ivHybridTick.visibility = VISIBLE
-                            it.ivNormalTick.visibility = GONE
-                            it.ivTerrainTick.visibility = GONE
-                            it.ivSatelliteTick.visibility = GONE
+                            view.ivHybridTick.visibility = VISIBLE
+                            view.ivNormalTick.visibility = GONE
+                            view.ivTerrainTick.visibility = GONE
+                            view.ivSatelliteTick.visibility = GONE
                         }
                         GoogleMap.MAP_TYPE_SATELLITE -> {
-                            it.ivSatelliteTick.visibility = VISIBLE
-                            it.ivHybridTick.visibility = GONE
-                            it.ivNormalTick.visibility = GONE
-                            it.ivTerrainTick.visibility = GONE
+                            view.ivSatelliteTick.visibility = VISIBLE
+                            view.ivHybridTick.visibility = GONE
+                            view.ivNormalTick.visibility = GONE
+                            view.ivTerrainTick.visibility = GONE
                         }
                     }
                 }
 
-                it.clNormal.setOnClickListener { _ ->
-                    it.ivNormalTick.visibility = VISIBLE
-                    it.ivTerrainTick.visibility = GONE
-                    it.ivHybridTick.visibility = GONE
-                    it.ivSatelliteTick.visibility = GONE
+                view.clNormal.setOnClickListener {
+                    view.ivNormalTick.visibility = VISIBLE
+                    view.ivTerrainTick.visibility = GONE
+                    view.ivHybridTick.visibility = GONE
+                    view.ivSatelliteTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
                     dialog.dismiss()
                 }
-                it.clTerrain.setOnClickListener { _ ->
-                    it.ivTerrainTick.visibility = VISIBLE
-                    it.ivNormalTick.visibility = GONE
-                    it.ivHybridTick.visibility = GONE
-                    it.ivSatelliteTick.visibility = GONE
+                view.clTerrain.setOnClickListener {
+                    view.ivTerrainTick.visibility = VISIBLE
+                    view.ivNormalTick.visibility = GONE
+                    view.ivHybridTick.visibility = GONE
+                    view.ivSatelliteTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
                     dialog.dismiss()
-
                 }
-                it.clHybrid.setOnClickListener { _ ->
-                    it.ivHybridTick.visibility = VISIBLE
-                    it.ivNormalTick.visibility = GONE
-                    it.ivTerrainTick.visibility = GONE
-                    it.ivSatelliteTick.visibility = GONE
+                view.clHybrid.setOnClickListener {
+                    view.ivHybridTick.visibility = VISIBLE
+                    view.ivNormalTick.visibility = GONE
+                    view.ivTerrainTick.visibility = GONE
+                    view.ivSatelliteTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
                     dialog.dismiss()
                 }
-                it.clSatellite.setOnClickListener { _ ->
-                    it.ivSatelliteTick.visibility = VISIBLE
-                    it.ivHybridTick.visibility = GONE
-                    it.ivNormalTick.visibility = GONE
-                    it.ivTerrainTick.visibility = GONE
+                view.clSatellite.setOnClickListener {
+                    view.ivSatelliteTick.visibility = VISIBLE
+                    view.ivHybridTick.visibility = GONE
+                    view.ivNormalTick.visibility = GONE
+                    view.ivTerrainTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
                     dialog.dismiss()
@@ -273,6 +271,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     positionsList.clear()
                 } else showError("File name can not be empty")
             }
+            layout.tvDiscard.setOnClickListener {
+                dialog.dismiss()
+            }
+            dialog.setCancelable(false)
             dialog.show()
         }
     }

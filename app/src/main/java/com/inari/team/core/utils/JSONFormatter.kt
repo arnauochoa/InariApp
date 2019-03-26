@@ -74,15 +74,9 @@ fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSON
             childJson.put("receivedSvTimeUncertaintyNanos", measurement.receivedSvTimeUncertaintyNanos)
             childJson.put("timeOffsetNanos", measurement.timeOffsetNanos)
             if (measurement.hasAutomaticGainControlLevelDb()) {
-                childJson.put(
-                    "automaticGainControlLevelDb",
-                    measurement.automaticGainControlLevelDb
-                )
+                childJson.put("automaticGainControlLevelDb", measurement.automaticGainControlLevelDb)
             } else {
-                childJson.put(
-                    "automaticGainControlLevelDb",
-                    0.0
-                )
+                childJson.put("automaticGainControlLevelDb", 0.0)
             }
             if (measurement.hasCarrierFrequencyHz()) {
                 childJson.put("carrierFrequencyHz", measurement.carrierFrequencyHz)
