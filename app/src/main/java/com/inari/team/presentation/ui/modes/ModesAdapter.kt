@@ -23,7 +23,7 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModesViewHolder {
-        return ModesViewHolder(LayoutInflater.from(context).inflate(R.layout.mode_list_item, parent, false))
+        return ModesViewHolder(LayoutInflater.from(context).inflate(R.layout.item_mode_list, parent, false))
     }
 
     override fun onBindViewHolder(holder: ModesViewHolder, position: Int) {
@@ -66,12 +66,12 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
         if (selected) {
             holder.modeName.setTextColor(getColor(context, R.color.black))
             holder.cvMode.elevation = 16f
-            holder.cvMode.setCardBackgroundColor(getColor(context, R.color.colorAccentLight))
             holder.checkImage.visibility = VISIBLE
             if (modes[position].color == -1) {
                 modes[position].color = mPrefs.getColor()
             }
-
+            holder.cvMode.setCardBackgroundColor(getColor(context, modes[position].color))
+            holder.cvDot.setCardBackgroundColor(getColor(context, modes[position].color))
         } else {
             holder.modeName.setTextColor(getColor(context, R.color.gray))
             holder.cvMode.elevation = 0f
@@ -91,11 +91,12 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             if (selectedModes.size < 5) {
                 holder.modeName.setTextColor(getColor(context, R.color.black))
                 holder.cvMode.elevation = 16f
-                holder.cvMode.setCardBackgroundColor(getColor(context, R.color.colorAccentLight))
                 holder.checkImage.visibility = VISIBLE
                 if (modes[position].color == -1) {
                     modes[position].color = mPrefs.getColor()
                 }
+                holder.cvMode.setCardBackgroundColor(getColor(context, modes[position].color))
+                holder.cvDot.setCardBackgroundColor(getColor(context, modes[position].color))
                 couldSelect = true
             } else {
                 holder.checkImage.context.toast("You can not select more than five modes")

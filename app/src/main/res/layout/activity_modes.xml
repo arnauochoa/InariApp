@@ -108,9 +108,9 @@
                 android:id="@+id/clMask"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
                 android:background="@color/white"
                 android:elevation="4dp"
-                android:layout_marginTop="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/clAvgValue">
@@ -131,6 +131,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <ImageView
+                    android:id="@+id/ivMaskTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/ic_arrow_up_grey"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvMaskTitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/tvMaskTitle" />
 
             </android.support.constraint.ConstraintLayout>
 
@@ -184,9 +195,10 @@
 
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:elevation="4dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
+                android:background="@color/white"
+                android:elevation="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -196,7 +208,8 @@
                     android:id="@+id/tvModesTitle"
                     android:layout_width="0dp"
                     android:layout_height="45dp"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@color/white"
                     android:gravity="center_vertical"
                     android:paddingStart="16dp"
