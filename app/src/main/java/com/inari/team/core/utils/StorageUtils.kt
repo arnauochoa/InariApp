@@ -54,6 +54,10 @@ fun saveFile(
     }
 }
 
+fun getFile(fileName: String): File = File(root.absolutePath + APP_ROOT + fileName)
+
+
+
 fun createDirectory(directoryName: String) {
     val dir =
         File(root.absolutePath + APP_ROOT + directoryName)

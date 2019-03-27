@@ -150,6 +150,5 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             }
             fiveFirstModes
         }
-
     }
 }

@@ -97,6 +97,7 @@ struct SV{
     std::vector<SVMember> UNK;
 };
 
+
 struct Constellations{
     bool GPS = false; 
     bool GALILEO = false;
@@ -117,6 +118,21 @@ struct Flags{
 };
 
 
+struct Mode{
+    int algorithm = 0;
+
+    bool L1 = false;
+    bool L5 = false;
+
+    bool gps = false;
+    bool gal = false;
+    
+    bool iono = false;
+    bool tropo = false;
+    bool dual= false;
+};
+
+
 struct Info{
     SVList svList;
     SV sv;
@@ -128,8 +144,11 @@ struct Info{
     Flags flags;
     int svs;
     double ionoProto[8];
+    Mode mode;
 };
 
-void extract_info(json gnssInfo, Info& acqInfo);
+
+
+void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mode>& modes);
 
 #endif

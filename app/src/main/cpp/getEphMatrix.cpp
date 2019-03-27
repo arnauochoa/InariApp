@@ -1,9 +1,9 @@
 #include "getEphMatrix.h"
 
 
-void getEphMatrix(Info acqInfo, double **& eph, double *& iono, int &ephN, int &ephM){
+void getEphMatrix(Info acqInfo, Mode mode,  double **& eph, double *& iono, int &ephN, int &ephM){
 
-    if(acqInfo.flags.constellations.GPS){
+    if(mode.gps){
         std::vector<SVMember> GPS = acqInfo.sv.GPS;
         eph = new double *[22];
         for(int i = 0; i < 22; i++){
@@ -39,9 +39,8 @@ void getEphMatrix(Info acqInfo, double **& eph, double *& iono, int &ephN, int &
 
         }
     }
-
     
-    if(acqInfo.flags.constellations.GALILEO){
+    if(mode.gal){
         std::vector<SVMember> Galileo = acqInfo.sv.GALILEO;
         eph = new double *[22];
         for(int i = 0; i < 22; i++){
@@ -77,9 +76,14 @@ void getEphMatrix(Info acqInfo, double **& eph, double *& iono, int &ephN, int &
         }
     }
     
+    
+
     iono = new double [8];
     for(int i = 0; i < 8; i++){
         iono[i] = 0;
+    }
+    for(int i = 0; i < 7; i++){
+        iono[i] = acqInfo.ionoProto[i];
     }
 
 }

@@ -28,12 +28,11 @@
             android:id="@+id/fileName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
+            android:layout_marginTop="24dp"
             android:hint="@string/filename"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="@+id/title"
+            app:layout_constraintStart_toStartOf="@+id/title"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <TextView
@@ -42,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="36dp"
+            android:visibility="gone"
             android:text="@string/file_format"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -52,6 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
+            android:visibility="gone"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="@+id/fileFormatName"
             app:layout_constraintStart_toEndOf="@+id/fileFormatName"
@@ -86,6 +87,7 @@
                 android:layout_height="1dp"
                 android:background="@color/gray"
                 android:orientation="vertical"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -96,6 +98,7 @@
                 android:layout_height="0dp"
                 android:background="@color/gray"
                 android:orientation="vertical"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

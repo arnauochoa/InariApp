@@ -5,6 +5,7 @@
 std::vector<int> find_match(double **eph, int ephN, int ephM, int sv){
     int i = 0;
     std::vector<int> matches;
+
     
     for(int j = 0; j < ephM; j++){
         if(eph[i][j] == sv){
@@ -20,10 +21,11 @@ int find_eph(double **eph, int ephN, int ephM, int sv,double time){
     int icol = 0;
     
     std::vector<int> isat;
-    isat = find_match(eph,ephN,ephM,sv); // Calculate w/ a function
+    isat = find_match(eph,ephN,ephM,sv); 
     
     int n = isat.size();
 
+    
     if(n==0){
         return 0;
     }

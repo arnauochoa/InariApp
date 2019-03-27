@@ -8,7 +8,7 @@
 
 #include <vector>
 
-void PVT_recls(Info acqInfo, double **eph, int ephN, int ephM, double *iono, int Nit, double PVT0[4], bool enabCorr,
+void PVT_recls(Info acqInfo, Mode mode, double **eph, int ephN, int ephM, double *iono, int Nit, double PVT0[4], bool enabCorr,
                 double * PVT);
 
 #endif

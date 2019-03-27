@@ -8,8 +8,8 @@
     <string name="stats_card_4">Number of\nsatellites</string>
     <string name="stats_card_5">Code minus\nCarrier</string>
     <string name="stats_card_6">GDOP</string>
-    <string name="save_log">Save log</string>
-    <string name="filename">Filename</string>
+    <string name="save_log">Do you want to save the logs?</string>
+    <string name="filename">Enter file name</string>
     <string name="file_format">File format:</string>
     <string name="rinex">RINEX</string>
     <string name="nma">NMA</string>

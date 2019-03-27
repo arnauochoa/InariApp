@@ -93,11 +93,6 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
             }
         }
 
-        fabOptions.setOnClickListener {
-            navigator.navigateToModesActivity()
-        }
-
-
         tabLayout.setSelectedTabIndicatorColor(Color.TRANSPARENT)
 
         CONSTELLATION.values().forEach {

@@ -48,9 +48,6 @@
             android:name=".presentation.ui.statisticsdetail.StatisticsDetailActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".presentation.ui.logs.LogsDetailActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".presentation.ui.modes.ModesActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -61,6 +58,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar" />
 
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.inari.team.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
         <receiver
             android:name=".core.utils.connectivity.ConnectivityReceiver"

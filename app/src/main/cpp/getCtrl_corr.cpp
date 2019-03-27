@@ -1,6 +1,5 @@
 #include "getCtrl_corr.h"
 
-#include <iostream>
 
 #include "Eigen/Dense"
 
@@ -16,11 +15,9 @@ double dotProduct(double vect_A[], double vect_B[])
 void getCtrl_corr(double **eph, int ephN, int ephM, int svn,float TOW, double pr,double Y[3],double &tCorr){
     int c = 299792458;          //   Speed of light (m/s)
 
+
     double tx_RAW = TOW - pr/c;
     double X[3];
-    X[0] = Y[0];
-    X[1] = Y[1];
-    X[2] = Y[2];
 
     int col = find_eph(eph, ephN, ephM, svn, tx_RAW);
 
@@ -49,9 +46,10 @@ void getCtrl_corr(double **eph, int ephN, int ephM, int svn,float TOW, double pr
     trel = (double)-2.0 * ( dotProduct(X, vel) / (double)pow(c,2) ); // dotProduct result differs from Matlab's
 
     tCorr = tCorr + trel;
-    tx_GPS = tx_GPS - tCorr;
+    tx_GPS = tx_RAW - tCorr;
 
     double travelTime = TOW - tx_GPS;
     e_r_corr(travelTime, X, Y);
+
  
 }
