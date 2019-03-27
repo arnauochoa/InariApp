@@ -7,16 +7,11 @@
     <color name="colorAccentLight">#ffc54c</color>
     <color name="colorAccentDark">#c66500</color>
 
-    <color name="colorLegend1">#FF1F1F</color>
-    <color name="colorLegend2">#0048FF</color>
-    <color name="colorLegend3">#ff940f</color>
-    <color name="colorLegend4">#90bfff</color>
-    <color name="colorLegend5">#ffc54c</color>
-    <color name="colorLegend6">#8BC34A</color>
-    <color name="colorLegend7">#666666</color>
-    <color name="colorLegend8">#F87474</color>
-    <color name="colorLegend9">#9B307C</color>
-    <color name="colorLegend10">#D99CF3</color>
+    <color name="colorLegend1">#FF5052</color>
+    <color name="colorLegend2">#f18d00</color>
+    <color name="colorLegend3">#4A89F3</color>
+    <color name="colorLegend4">#9bbff4</color>
+    <color name="colorLegend5">#FFE047</color>
 
     <color name="colorLightGrayBackground">#DFDFDF</color>
     <color name="colorDarkGrayBackground">#777777</color>

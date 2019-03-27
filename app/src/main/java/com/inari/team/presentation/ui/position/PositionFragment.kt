@@ -131,6 +131,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
             mMap?.isMyLocationEnabled = true
         }
         mMap?.uiSettings?.isMyLocationButtonEnabled = false
+        mMap?.mapType = mSharedPreferences.getSelectedMapType()
     }
 
     private fun startComputing(it: View) {
@@ -217,6 +218,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     view.ivSatelliteTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+                    mSharedPreferences.setSelectedMapType(GoogleMap.MAP_TYPE_NORMAL)
                     dialog.dismiss()
                 }
                 view.clTerrain.setOnClickListener {
@@ -226,6 +228,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     view.ivSatelliteTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                    mSharedPreferences.setSelectedMapType(GoogleMap.MAP_TYPE_TERRAIN)
                     dialog.dismiss()
                 }
                 view.clHybrid.setOnClickListener {
@@ -235,6 +238,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     view.ivSatelliteTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
+                    mSharedPreferences.setSelectedMapType(GoogleMap.MAP_TYPE_HYBRID)
                     dialog.dismiss()
                 }
                 view.clSatellite.setOnClickListener {
@@ -244,6 +248,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                     view.ivTerrainTick.visibility = GONE
 
                     mMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                    mSharedPreferences.setSelectedMapType(GoogleMap.MAP_TYPE_SATELLITE)
                     dialog.dismiss()
                 }
 

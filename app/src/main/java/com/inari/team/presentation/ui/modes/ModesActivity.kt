@@ -49,14 +49,6 @@ class ModesActivity : BaseActivity() {
         mAdapter = ModesAdapter { setSelectedModes() }
         modesRVList.layoutManager = LinearLayoutManager(this)
         modesRVList.adapter = mAdapter
-        tvModesTitle.setOnClickListener {
-            if (modesRVList.visibility == VISIBLE) {
-                modesRVList.visibility = GONE
-            } else {
-                modesRVList.visibility = VISIBLE
-            }
-            ivModesTitle.rotation = ivModesTitle.rotation + 180f
-        }
 
         setSelectedModes()
 
@@ -93,6 +85,24 @@ class ModesActivity : BaseActivity() {
             } else {
                 clAvgValue.visibility = GONE
             }
+        }
+
+        tvModesTitle.setOnClickListener {
+            if (modesRVList.visibility == VISIBLE) {
+                modesRVList.visibility = GONE
+            } else {
+                modesRVList.visibility = VISIBLE
+            }
+            ivModesTitle.rotation = ivModesTitle.rotation + 180f
+        }
+
+        clMask.setOnClickListener {
+            if (clMaskValue.visibility == VISIBLE) {
+                clMaskValue.visibility = GONE
+            } else {
+                clMaskValue.visibility = VISIBLE
+            }
+            ivMaskTitle.rotation = ivMaskTitle.rotation + 180f
         }
 
         seekBarTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

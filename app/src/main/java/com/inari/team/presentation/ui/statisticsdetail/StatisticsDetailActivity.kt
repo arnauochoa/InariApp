@@ -84,6 +84,7 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
 
     override fun onResume() {
         super.onResume()
+        //todo test crashes
         MainActivity.getInstance()?.subscribeToGnssEvents(this)
     }
 
@@ -112,9 +113,14 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
 
                 // programmatically create a LineChart
                 lineChart = LineChart(context)
-                rl.addView(lineChart)
-
-                setChartData()
+                lineChart?.let {
+                    val lp = RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.MATCH_PARENT,
+                        RelativeLayout.LayoutParams.MATCH_PARENT
+                    )
+                    it.layoutParams = lp
+                    rl.addView(it)
+                }
             }
             CNO_AGC -> {
                 supportActionBar?.title = getString(com.inari.team.R.string.stats_card_2)
@@ -136,6 +142,7 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
                     rl.addView(it)
                 }
                 setChartData()
+
             }
             MAP -> {
                 supportActionBar?.setTitle(getString(com.inari.team.R.string.stats_card_3))
@@ -259,14 +266,9 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
             carrierFrequencyHz < BAND1_UP_THRES
         ) {
             true
-        } else if (selectedBand == Band.L5_E5 &&
+        } else selectedBand == Band.L5_E5 &&
             carrierFrequencyHz > BAND5_DOWN_THRES &&
             carrierFrequencyHz < BAND5_UP_THRES
-        ) {
-            true
-        } else {
-            false
-        }
     }
 
     // Callbacks

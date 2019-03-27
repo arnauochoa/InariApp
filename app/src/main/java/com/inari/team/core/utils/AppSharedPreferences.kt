@@ -1,6 +1,7 @@
 package com.inari.team.core.utils
 
 import android.content.SharedPreferences
+import com.google.android.gms.maps.GoogleMap
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.inari.team.R
@@ -22,6 +23,7 @@ class AppSharedPreferences {
         const val AVGTIME: String = "avgtime"
         const val MASK: String = "mask"
         const val TUTORIAL_SHOWN = "tutorial shown"
+        const val SELECTED_MAP_TYPE = "selected_map_type"
 
 
         private var INSTANCE: AppSharedPreferences? = null
@@ -36,6 +38,13 @@ class AppSharedPreferences {
     fun setTutorialShown() {
         mPrefs.edit()
             .putBoolean(TUTORIAL_SHOWN, true)
+            .apply()
+    }
+
+    fun getSelectedMapType(): Int = mPrefs.getInt(SELECTED_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL)
+    fun setSelectedMapType(type: Int) {
+        mPrefs.edit()
+            .putInt(SELECTED_MAP_TYPE, type)
             .apply()
     }
 

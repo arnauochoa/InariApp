@@ -36,27 +36,16 @@ fun convertStreamToString(`is`: InputStream): String {
     return sb.toString()
 }
 
-fun getModeColor(id: Int): Int {
-    return when (id) {
-        0 -> R.color.colorLegend1
-        1 -> R.color.colorLegend2
-        2 -> R.color.colorLegend3
-        3 -> R.color.colorLegend4
-        4 -> R.color.colorLegend5
-        else -> R.color.colorLegend1
-    }
-}
-
-fun getModeIcon(color: Int): Float{
-    return when(color){
+fun getModeIcon(color: Int): Float {
+    return when (color) {
         R.color.colorLegend1 -> {
             BitmapDescriptorFactory.HUE_RED
         }
         R.color.colorLegend2 -> {
-            BitmapDescriptorFactory.HUE_BLUE
+            BitmapDescriptorFactory.HUE_ORANGE
         }
         R.color.colorLegend3 -> {
-            BitmapDescriptorFactory.HUE_ORANGE
+            BitmapDescriptorFactory.HUE_BLUE
         }
         R.color.colorLegend4 -> {
             BitmapDescriptorFactory.HUE_CYAN
