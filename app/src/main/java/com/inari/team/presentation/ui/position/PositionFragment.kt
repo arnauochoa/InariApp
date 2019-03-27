@@ -149,19 +149,12 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
                 isCancelable = true
             )
         } else {
+            mMap?.clear()
             isStartedComputing = true
-            MainActivity.getInstance()?.subscribeToGnssEvents(this)
             btComputeAction.text = getString(R.string.stop_computing)
-            viewModel?.setSelectedModes(selectedModes)
-            startPositioning()
+            MainActivity.getInstance()?.subscribeToGnssEvents(this)
+            viewModel?.startComputingPosition(selectedModes)
         }
-    }
-
-    private fun startPositioning() {
-        mMap?.clear()
-        viewModel?.startComputingPosition()
-        viewModel?.obtainEphemerisData()
-
     }
 
     private fun stopComputing() {
@@ -172,6 +165,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         hideMapLoading()
     }
 
+    //helpers
     private fun showMapTypeDialog() {
 
         context?.let { c ->
@@ -267,11 +261,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
             layout.save.setOnClickListener {
                 val fileName = layout.fileName.text.toString()
                 if (fileName.isNotBlank()) {
-                    var format = ".rnx"
-                    if (layout.radioGroupFormat.checkedRadioButtonId != R.id.rinex) {
-                        format = ".nma"
-                    }
-                    viewModel?.saveLastLogs(fileName + format)
+                    viewModel?.saveLastLogs("$fileName.txt")
                     dialog.dismiss()
                     positionsList.clear()
                 } else showError("File name can not be empty")
@@ -300,11 +290,11 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
     }
 
-    private fun addMarker(latLng: LatLng, title: String, id: Int): Marker? {
+    private fun addMarker(latLng: LatLng, title: String, color: Int): Marker? {
         val markerOptions = MarkerOptions()
         markerOptions.position(latLng)
         markerOptions.title(title)
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(getModeIcon(id)))
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(getModeIcon(color)))
 
         return mMap?.addMarker(markerOptions)
     }
@@ -340,7 +330,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
         }
     }
 
-
+    //Callbacks
     private fun updatePosition(data: Data<List<ResponsePvtMode>>?) {
         data?.let {
             when (it.dataState) {

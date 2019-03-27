@@ -9,12 +9,13 @@ import java.util.*
 data class GnssData(
     var modes: List<Mode> = arrayListOf(),
     var location: RefLocation? = null,
-    @Transient var ephemerisResponse: EphemerisResponse? = null,
-    @Transient var lastEphemerisDate: Date? = null,
-    @Transient var measurements: ArrayList<MeasurementData> = arrayListOf(),
     var avgEnabled: Boolean = true,
-    var avg: Int = 5,
-    var mask: Int = 10
+    var avg: Int = 0,
+    var mask: Int = 15,
+    @Transient var ephemerisResponse: EphemerisResponse? = null,
+    @Transient var measurements: ArrayList<MeasurementData> = arrayListOf(),
+    @Transient var lastEphemerisDate: Date = Date(),
+    @Transient var lastGnssStatus: GnssStatus? = null
 )
 
 data class MeasurementData(

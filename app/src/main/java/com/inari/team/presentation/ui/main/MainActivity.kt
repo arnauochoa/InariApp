@@ -17,7 +17,6 @@ import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.BarAdapter
-import com.inari.team.core.utils.connectivity.ConnectivityReceiver
 import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
 import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.checkPermissionsList
@@ -36,8 +35,7 @@ import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
-    ConnectivityReceiver.ConnectivityReceiverListener {
+class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
     companion object {
         private const val MIN_TIME = 1L
@@ -90,6 +88,7 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         setContentView(R.layout.activity_main)
         activityComponent.inject(this)
 
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_logo_small)
 
@@ -108,11 +107,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
         addOrientationSensorListener()
 
         startGnss()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        ConnectivityReceiver.connectivityReceiverListener = this
     }
 
     private fun setViewPager() {
@@ -357,12 +351,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener,
     }
 
     override fun onProviderDisabled(provider: String?) {
-    }
-
-    override fun onNetworkConnectionChanged(isConnected: Boolean) {
-        if (!isConnected) {
-            toast("No network connection")
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

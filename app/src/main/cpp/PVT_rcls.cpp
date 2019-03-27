@@ -29,7 +29,7 @@ Eigen::VectorXd convert_Vector_to_Eigen(std::vector<double> v1){
     return v2;
 }
 
-void PVT_recls(Info acqInfo, double **eph, int ephN, int ephM, double *iono, int Nit, double PVT0[4], bool enabCorr,
+void PVT_recls(Info acqInfo, Mode mode, double **eph, int ephN, int ephM, double *iono, int Nit, double PVT0[4], bool enabCorr,
                 double * PVT ){
 
     std::vector<int> pr;
@@ -44,7 +44,9 @@ void PVT_recls(Info acqInfo, double **eph, int ephN, int ephM, double *iono, int
     const int c = 299792458;
     int nSat = pr.size();
     std::vector<double> tCorr(nSat);
-    std::vector<double> pCorr(nSat);
+    std::vector<double> tropoCorr(nSat);
+    std::vector<double> ionoCorr(nSat);
+    double tropoTmp, ionoTmp;
     double **X;
     X = create_matrix(X,nSat,3);
 
@@ -80,14 +82,22 @@ void PVT_recls(Info acqInfo, double **eph, int ephN, int ephM, double *iono, int
                 getCtrl_corr(eph,ephN,ephM,svn[sat],tow,pr[sat],X[sat],tCorr[sat]);
             }
 
-            // Get Propagation Corrections
-            pCorr[sat] = getProp_Corr(X[sat],PVT0,iono,tow);  // Debug
+            corr = c * tCorr[sat];
 
-            if(enabCorr){
-                corr = pCorr[sat] + c * tCorr[sat];
-            }else{
-                corr = 0;
+            // Get Propagation Corrections
+            if(mode.iono || mode.tropo){
+                getProp_Corr(X[sat],PVT0,iono,tow,tropoTmp, ionoTmp); 
+                tropoCorr[sat] = tropoTmp;
+                ionoCorr[sat] = ionoTmp;
+
+                if(mode.tropo)
+                    corr = corr - tropoCorr[sat];
+                
+                if(mode.iono)
+                    corr = corr - ionoCorr[sat];
             }
+
+            
 
             pr_c = pr[sat] + corr;
 
@@ -104,6 +114,7 @@ void PVT_recls(Info acqInfo, double **eph, int ephN, int ephM, double *iono, int
                 A(sat,2) = az;
                 A(sat,3) = 1;
             }
+
         }
 
         pEigen = convert_Vector_to_Eigen(p);
@@ -118,8 +129,5 @@ void PVT_recls(Info acqInfo, double **eph, int ephN, int ephM, double *iono, int
 
     }
 
-
-    finalTCorr = v_mean(tCorr);
-    finalPCorr = v_mean(pCorr);
  
 }

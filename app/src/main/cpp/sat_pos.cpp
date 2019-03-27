@@ -31,7 +31,6 @@ void sat_pos(double t,double *eph, int ephM, double satp[3], double satv[3]){
     double toe      =   eph[17];
 
 
-
     //Procedure for coordinate calculation
     double A = roota*roota;
     double tk;

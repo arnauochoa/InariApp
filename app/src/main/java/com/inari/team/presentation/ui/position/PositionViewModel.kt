@@ -22,9 +22,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import org.json.JSONArray
 import org.json.JSONException
-import org.json.JSONObject
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -38,23 +37,14 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     val ephemeris = MutableLiveData<Data<String>>()
     val saveLogs = MutableLiveData<Data<Any>>()
 
-    private var lastDate = Date()
-    private var startTimeString: String? = null
-
-    private var isComputing = false
-    private var isEphErrorShown = false
-
-
     private var gnssData = GnssData()
-    private var lastGnssStatus: GnssStatus? = null
 
     private var suplController: SuplController? = null
     private var refPos: LatLng? = null
-    private var lastEphemerisDate = Date()
 
-    private val formatter = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.ENGLISH)
-
-    private var obtainEphemerisIntentsPendingBeforeShowError = 2
+    private var startedComputingDate = Date()
+    private var isComputing = false
+    private var isEphErrorShown = false
 
     init {
         // Add C++ library
@@ -73,24 +63,20 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         suplController = SuplController(request)
     }
 
-    fun startComputingPosition() {
+    fun startComputingPosition(selectedModes: List<Mode>) {
         isEphErrorShown = false
         isComputing = true
-        GlobalScope.launch {
-            // Delete previous measurements
-            position.showLoading()
-            gnssData.avg = mPrefs.getAverage()
-            gnssData.mask = mPrefs.getSelectedMask()
-            gnssData.avgEnabled = mPrefs.isAverageEnabled()
-            lastDate = Date()
-            try {
-                startTimeString = formatter.format(lastDate)
-                val directoryName = "$startTimeString/"
-                //todo remove
-//                createDirectory(directoryName)
-            } catch (e: Exception) {
-            }
-        }
+        startedComputingDate = Date()
+
+        position.showLoading()
+        //init gnss
+        gnssData = GnssData()
+        gnssData.modes = selectedModes
+        gnssData.avg = mPrefs.getAverage()
+        gnssData.mask = mPrefs.getSelectedMask()
+        gnssData.avgEnabled = mPrefs.isAverageEnabled()
+
+        obtainEphemerisData()
     }
 
     fun stopComputingPosition() {
@@ -98,15 +84,13 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         ephemeris.updateData(PositionFragment.HIDE_ALERT_ERROR)
     }
 
-    fun obtainEphemerisData() {
-        obtainEphemerisIntentsPendingBeforeShowError--
+    private fun obtainEphemerisData() {
         GlobalScope.launch {
             var ephResponse: EphemerisResponse? = null
             refPos?.let {
                 val latE7 = (it.latitude * 1e7).roundToLong()
                 val lngE7 = (it.longitude * 1e7).roundToLong()
 
-                lastEphemerisDate = Date()
                 StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().permitAll().build())
                 suplController?.sendSuplRequest(latE7, lngE7)
                 ephemeris.updateData(PositionFragment.HIDE_ALERT_ERROR)
@@ -117,7 +101,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
             if (ephResponse == null) {
                 if (isComputing) {
 
-                    if (Date().time - lastDate.time >=
+                    if (Date().time - startedComputingDate.time >=
                         TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT)
                     ) {
                         if (!isEphErrorShown) {
@@ -144,7 +128,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
     }
 
     fun setGnssStatus(status: GnssStatus?) {
-        lastGnssStatus = status
+        gnssData.lastGnssStatus = status
     }
 
     fun setGnssMeasurementsEvent(gnssMeasurementsEvent: GnssMeasurementsEvent?) {
@@ -152,9 +136,9 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
         val clock = gnssMeasurementsEvent?.clock
 
         measurements?.let {
-            if (it.isNotEmpty() && clock != null && lastGnssStatus != null) {
+            if (it.isNotEmpty() && clock != null && gnssData.lastGnssStatus != null) {
                 val measurementData = MeasurementData(
-                    lastGnssStatus,
+                    gnssData.lastGnssStatus,
                     it,
                     clock
                 )
@@ -188,13 +172,13 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
             gnssData.ephemerisResponse != null
         ) {
 
-            if (Date().time - lastDate.time >=
+            if (Date().time - startedComputingDate.time >=
                 TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT)
             ) {
                 calculatePositionWithGnss()
             }
 
-            if (Date().time - lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
+            if (Date().time - gnssData.lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
                 obtainEphemerisData()
             }
         }
@@ -206,7 +190,7 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
         val coordinates = computePosition()
 
-        lastDate = Date()
+        startedComputingDate = Date()
 
         coordinates?.let {
             position.updateData(it)
@@ -217,46 +201,55 @@ class PositionViewModel @Inject constructor(private val mPrefs: AppSharedPrefere
 
     }
 
-    //Function used for testing
-    private fun saveLogsForPostProcessing() {
-        val current = Date()
-        val fileName = "$startTimeString/${formatter.format(current)}.txt"
-        val pvtInfoString = getGnssJson(gnssData).toString(2)
-        if (!pvtInfoString.isNullOrEmpty()) {
-            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
-        }
-    }
-
     private fun computePosition(): List<ResponsePvtMode>? {
         val responses = arrayListOf<ResponsePvtMode>()
 
+
         val jsonGnssData = getGnssJson(gnssData)
 
-        val position = obtainPosition(jsonGnssData.toString(2))
+        val pos = obtainPosition(jsonGnssData.toString(2))
 
-        val positionJson = JSONObject(position)
+        //todo remove when alfonso changes
+        val positionJson = JSONArray(pos.substringBeforeLast(",") + "]")
 
-        gnssData.modes.forEachIndexed { index, it ->
-            val latitude = positionJson.get("lat") as? Double
-            val longitude = positionJson.get("lng") as? Double
-            latitude?.let { lat ->
-                longitude?.let { lon ->
-                    responses.add(ResponsePvtMode(LatLng(lat, lon), it.color, it.name))
-                }
-            } ?: kotlin.run {
-                refPos?.let { latlng ->
-                    //in order to test colors
-                    val ltln = LatLng(latlng.latitude + 0.000020 * index, latlng.longitude + 0.000020 * index)
-                    responses.add(
-                        ResponsePvtMode(
-                            ltln, it.color, it.name
+        for (i in 0 until positionJson.length()) {
+            positionJson.getJSONObject(i)?.let {
+                val latitude = it.get("lat") as? Double
+                val longitude = it.get("lng") as? Double
+                latitude?.let { lat ->
+                    longitude?.let { lon ->
+                        responses.add(
+                            ResponsePvtMode(
+                                LatLng(lat, lon),
+                                gnssData.modes[i].color,
+                                gnssData.modes[i].name
+                            )
                         )
-                    )
+                    }
+                } ?: kotlin.run {
+                    refPos?.let { latlng ->
+                        //in order to test colors
+                        val ltln = LatLng(latlng.latitude + 0.000020 * i, latlng.longitude + 0.000020 * i)
+                        responses.add(
+                            ResponsePvtMode(
+                                ltln,
+                                gnssData.modes[i].color,
+                                gnssData.modes[i].name
+                            )
+                        )
+                    }
                 }
             }
         }
+
         return responses
     }
+
+
+//    fun getFineJson(): String {
+//        return retrieveFile("last_json.txt")
+//    }
+
 
     /**
      * C++ function used to compute the PVT. This function is defined in Project view modes at the path:
