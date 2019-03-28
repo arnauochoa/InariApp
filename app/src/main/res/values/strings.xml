@@ -2,7 +2,7 @@
     <string name="app_name">Inari</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="stats_card_1">Elevation vs C/No</string>
+    <string name="stats_card_1">C/No vs Elevation</string>
     <string name="stats_card_2">AGC vs C/No</string>
     <string name="stats_card_3">Map</string>
     <string name="stats_card_4">Number of\nsatellites</string>
