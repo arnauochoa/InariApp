@@ -6,7 +6,6 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.StrictMode
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.Gson
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
@@ -18,7 +17,6 @@ import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
 import com.inari.team.core.utils.getGnssJson
 import com.inari.team.core.utils.saveFile
-import com.inari.team.core.utils.savePositionFile
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -37,7 +35,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     val position = MutableLiveData<Data<List<ResponsePvtMode>>>()
     val ephemeris = MutableLiveData<Data<String>>()
-    val saveLogs = MutableLiveData<Data<Any>>()
 
     private var gnssData = GnssData()
     private var computedPositions: ArrayList<ResponsePvtMode> = arrayListOf()
@@ -155,17 +152,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     //getters
     fun getComputedPositions(): List<ResponsePvtMode> = computedPositions
 
-    fun saveLastLogs(fileName: String) {
-        val positionsJson = Gson().toJson(computedPositions)
-        if (positionsJson.isNotBlank()) {
-            savePositionFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), positionsJson))
-            saveLogs.updateData("")
-        } else {
-            saveLogs.showError("")
-        }
-    }
-
-
     //compute position
     private fun setGnssData() {
         if (gnssData.modes.isNotEmpty() &&
@@ -192,9 +178,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         coordinates?.let {
             position.updateData(it)
             computedPositions.addAll(it)
-            if (isLoggingEnabled) {
+//            if (isLoggingEnabled) {
                 saveGnssLogs()
-            }
+//            }
         } ?: kotlin.run {
             position.showError("Position could not be obtained.")
         }
@@ -232,11 +218,12 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     }
 
     private fun saveGnssLogs() {
-        val pvtInfoString: String = try {
-            getGnssJson(gnssData).toString(2) ?: ""
-        } catch (e: JSONException) {
-            ""
-        }
+//        val pvtInfoString: String = try {
+//            getGnssJson(gnssData).toString(2) ?: ""
+//        } catch (e: JSONException) {
+//            ""
+//        }
+        val pvtInfoString = "computedPosition\n\n"
         if (pvtInfoString.isNotBlank()) {
             saveFile(startedComputingDate.toString(), ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
         }
