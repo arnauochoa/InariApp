@@ -9,6 +9,8 @@ import android.os.Handler
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
+import android.view.animation.Animation
+import android.view.animation.ScaleAnimation
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
@@ -16,12 +18,10 @@ import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.*
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
+import kotlinx.android.synthetic.main.activity_splash.*
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
-import kotlinx.android.synthetic.main.activity_splash.*
 
 
 class SplashActivity : BaseActivity() {
@@ -58,7 +58,6 @@ class SplashActivity : BaseActivity() {
 
         if (mPrefs.getModesList().isEmpty()) {
             addDefaultModes()
-            mPrefs.saveColors()
             try {
                 val dir =
                     File(root.absolutePath + APP_ROOT)

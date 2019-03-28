@@ -43,15 +43,13 @@ class LogsFragment : BaseFragment() {
     private fun setViews(view: View) {
 
         adapter = LogsAdapter(view.context) {
-            layoutEmptyView.visibility = VISIBLE
-            rvLogs.visibility = GONE
+            setFiles()
         }
         rvLogs.layoutManager = LinearLayoutManager(view.context)
         rvLogs.adapter = adapter
 
         positionsAdapter = PositionLogsAdapter(view.context, {
-            layoutEmptyView.visibility = VISIBLE
-            rvPositionLogs.visibility = GONE
+            setFiles()
         }, {
             navigator.navigateToMapLogActivity(it)
         })
@@ -62,7 +60,24 @@ class LogsFragment : BaseFragment() {
             setFiles()
         }
 
-        setFiles()
+        clPositionLogsTitle.setOnClickListener {
+            if (clPositionLogs.visibility == GONE) {
+                clPositionLogs.visibility = VISIBLE
+            } else {
+                clPositionLogs.visibility = GONE
+            }
+            ivPositionLogsTitle.rotation = ivPositionLogsTitle.rotation + 180
+        }
+
+        clLogsTitle.setOnClickListener {
+            if (clLogs.visibility == GONE) {
+                clLogs.visibility = VISIBLE
+            } else {
+                clLogs.visibility = GONE
+            }
+            ivMeasurementTitle.rotation = ivMeasurementTitle.rotation + 180
+        }
+
     }
 
     fun setFiles() {
@@ -70,20 +85,29 @@ class LogsFragment : BaseFragment() {
         val positionsFileList = getPositionsFilesList()
 
         if (filesList.isEmpty() && positionsFileList.isEmpty()) {
-            clLogs.visibility = GONE
-            clPositionLogs.visibility = GONE
+            clLogsTitle.visibility = GONE
+            clPositionLogsTitle.visibility = GONE
+            tvEmptyLogs.visibility = GONE
+            tvEmptyPositionLogs.visibility = GONE
             layoutEmptyView.visibility = VISIBLE
         } else {
+
+            layoutEmptyView.visibility = GONE
+            clLogsTitle.visibility = VISIBLE
+            clPositionLogsTitle.visibility = VISIBLE
+
             if (filesList.isNotEmpty()) {
-                clLogs.visibility = VISIBLE
-                layoutEmptyView.visibility = GONE
                 adapter?.setLogs(filesList)
+            } else {
+                adapter?.clear()
+                tvEmptyLogs.visibility = VISIBLE
             }
 
             if (positionsFileList.isNotEmpty()) {
-                clPositionLogs.visibility = VISIBLE
-                layoutEmptyView.visibility = GONE
                 positionsAdapter?.setLogs(positionsFileList)
+            } else {
+                positionsAdapter?.clear()
+                tvEmptyPositionLogs.visibility = VISIBLE
             }
         }
 

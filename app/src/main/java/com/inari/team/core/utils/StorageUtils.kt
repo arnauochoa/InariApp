@@ -6,12 +6,12 @@ import okhttp3.MediaType
 import okhttp3.ResponseBody
 import java.io.*
 
-private val root: File =
+val root: File =
     android.os.Environment.getExternalStorageDirectory()
 
-private const val APP_ROOT: String = "/Inari/Logs/"
+const val APP_ROOT: String = "/Inari/Logs/"
 
-private const val POSITION_ROOT: String = "/Inari/Positions/"
+const val POSITION_ROOT: String = "/Inari/Positions/"
 
 
 @SuppressLint("SetWorldReadable")
@@ -55,6 +55,38 @@ fun saveFile(
     } catch (e: IOException) {
     }
 }
+
+//fun saveFile() {
+//    try {
+//
+//        file.setReadable(true, false)
+//
+//        var inputStream: InputStream? = null
+//        var outputStream: OutputStream? = null
+//
+//        try {
+//            val fileReader = ByteArray(4096)
+//
+//            inputStream = file.readBytes().inputStream()
+//            outputStream = FileOutputStream(file)
+//
+//            while (true) {
+//                val read = inputStream.read(fileReader)
+//                if (read == -1) {
+//                    break
+//                }
+//                outputStream.write(fileReader, 0, read)
+//            }
+//            outputStream.flush()
+//
+//        } catch (e: IOException) {
+//        } finally {
+//            inputStream?.close()
+//            outputStream?.close()
+//        }
+//    } catch (e: IOException) {
+//    }
+//}
 
 @SuppressLint("SetWorldReadable")
 fun savePositionFile(url: String, responseBody: ResponseBody) {
@@ -170,6 +202,20 @@ fun deletePositionFile(fileName: String): Boolean {
         true
     } catch (e: Exception) {
         false
+    }
+}
+
+fun createFile(fileName: String): File {
+    return File(root.absolutePath + APP_ROOT + fileName)
+}
+
+fun writeToFile(url: String, text: String) {
+    try {
+        val fw = FileWriter(File(root.absolutePath + APP_ROOT + url))
+        fw.write(text)
+        fw.close()
+    } catch (e: Exception) {
+
     }
 }
 

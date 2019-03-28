@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.location.Location
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -13,8 +12,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -28,7 +25,6 @@ import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.checkPermission
-import com.inari.team.core.utils.extensions.observe
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.showAlert
@@ -49,7 +45,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
     private var mapFragment: SupportMapFragment? = null
-    private var fusedLocationClient: FusedLocationProviderClient? = null
 
     private var viewModel: PositionViewModel? = null
 
@@ -58,7 +53,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     private var legendAdapter = LegendAdapter()
 
     private var isStartedComputing = false
-    private var refPos: Location? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,8 +68,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
 
         setViews(view)
     }
@@ -99,14 +91,19 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
             if (btComputeAction.text == getString(R.string.start_computing)) {
                 startComputing(it)
             } else {
-                stopComputing()
+                showAlert(
+                    view.context, "Stop Computing",
+                    "Are you sure that you want to stop computing position?", "YES", {
+                        stopComputing()
+                    }, true
+                )
             }
         }
 
         ivLegendArrow.setOnClickListener {
-            if (rvLegend.visibility == GONE) {
-                rvLegend.visibility = VISIBLE
-            } else rvLegend.visibility = GONE
+            if (cvLegend.visibility == GONE) {
+                cvLegend.visibility = VISIBLE
+            } else cvLegend.visibility = GONE
             ivLegendArrow.rotation = ivLegendArrow.rotation + 180
         }
 
@@ -118,7 +115,16 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        legendAdapter.setItems(mSharedPreferences.getSelectedModesList())
+        val legendItems = mSharedPreferences.getSelectedModesList()
+        if (legendItems.isNotEmpty()) {
+            legendAdapter.setItems(legendItems)
+            cvLegendArrow.visibility = VISIBLE
+            clLegend.visibility = VISIBLE
+        } else {
+            legendAdapter.clear()
+            cvLegendArrow.visibility = GONE
+            clLegend.visibility = GONE
+        }
     }
 
     private fun initMap() {
@@ -169,9 +175,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
             mMap?.clear()
             isStartedComputing = true
             btComputeAction.text = getString(R.string.stop_computing)
-//            fusedLocationClient?.lastLocation?.addOnSuccessListener {
-//                viewModel?.obtainEphemerisData(it)
-//            }
             mainListener?.startComputing(selectedModes)
         }
 
@@ -183,10 +186,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
             btComputeAction.text = getString(R.string.start_computing)
             hideMapLoading()
         }
-    }
-
-    fun setLocation(location: Location) {
-
     }
 
     //helpers
@@ -303,16 +302,18 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     fun showEphemerisAlert(show: Boolean) {
         if (show) {
-            if (ivAlert.visibility != VISIBLE) {
-                ivAlert.visibility = VISIBLE
-                ivAlert.setOnClickListener {
-                    showAlert(
-                        ivAlert.context, "Something went wrong",
-                        "Ephemeris data could not be obtained, check your connection",
-                        "Stop Computing", {
-                            stopComputing()
-                        }, true
-                    )
+            ivAlert?.let {
+                if (ivAlert.visibility != VISIBLE) {
+                    ivAlert.visibility = VISIBLE
+                    ivAlert.setOnClickListener {
+                        showAlert(
+                            ivAlert.context, "Something went wrong",
+                            "Ephemeris data could not be obtained, check your connection",
+                            "Stop Computing", {
+                                stopComputing()
+                            }, true
+                        )
+                    }
                 }
             }
         } else {
