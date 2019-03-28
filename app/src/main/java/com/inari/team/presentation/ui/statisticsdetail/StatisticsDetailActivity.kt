@@ -178,12 +178,15 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
     private fun plotElevCNoGraph(status: GnssStatus) {
         scatterChart?.let { chart ->
             if (!hasStopped) {
+                // Obtain status separately for GPS and GAL
                 val gpsGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GPS)
                 val galGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GALILEO)
 
+                // Obtain desired values of Status: svid, elevation and CNo for given frequency band
                 val gpsValues = obtainCnoElevValues(selectedBand, gpsGnssStatus)
                 val galValues = obtainCnoElevValues(selectedBand, galGnssStatus)
 
+                // Generate points
                 val gpsPoints = arrayListOf<Entry>()
                 val galPoints = arrayListOf<Entry>()
                 gpsValues.forEach {
@@ -193,28 +196,38 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
                     galPoints.add(Entry(it.elevation, it.cNo))
                 }
 
+                // Sort points by elevation
                 gpsPoints.sortBy { point -> point.x }
                 galPoints.sortBy { point -> point.x }
 
+                // Define style of sets
                 val gpsPointsSet = ScatterDataSet(gpsPoints, "GPS")
                 val galPointsSet = ScatterDataSet(galPoints, "Galileo")
 
                 gpsPointsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.gpsColor)
                 galPointsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.galColor)
 
+                // Join sets and plot them on the graph
                 val dataSets = arrayListOf<IScatterDataSet>(gpsPointsSet, galPointsSet)
                 val scatterData = ScatterData(dataSets)
+                // Do not show labels on each point
                 scatterData.setDrawValues(false)
                 chart.data = scatterData
+
+                // Update chart view
                 chart.invalidate()
-            } // If has stopped, do nothing
+
+            } // If user has stopped, do nothing
         }
     }
 
     private fun plotAgcCNoGraph(measurements: Collection<GnssMeasurement>?) {
         scatterChart?.let { chart ->
             if (!hasStopped) {
+
                 measurements?.let {
+
+                    // Obtain measurements for desired frequency band
                     it.forEach { meas ->
                         if (meas.hasAutomaticGainControlLevelDb()) {
                             if (meas.hasCarrierFrequencyHz() && isSelectedBand(selectedBand, meas.carrierFrequencyHz))
@@ -222,20 +235,26 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
                         }
                     }
 
+                    // Gnenerate points with obtained and previous measurements
                     val points = arrayListOf<Entry>()
                     agcCNoValues.forEach { point ->
                         points.add(Entry(point.first.toFloat(), point.second.toFloat())) // x: CNo, y: AGC
                     }
 
+                    // Sort points by CNo
                     points.sortBy { point -> point.x }
 
+                    // Define style of set
                     val pointsSet = ScatterDataSet(points, "")
                     pointsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.colorAccent)
 
-
+                    // Do not show labels on each point
                     val scatterData = ScatterData(pointsSet)
                     scatterData.setDrawValues(false)
+                    // Plot points on graph
                     chart.data = scatterData
+
+                    // Update chart view
                     chart.invalidate()
                 }
             } // If has stopped, do nothing
