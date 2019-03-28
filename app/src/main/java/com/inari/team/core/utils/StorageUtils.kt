@@ -11,7 +11,7 @@ private val root: File =
 
 private const val APP_ROOT: String = "/Inari/Logs/"
 
-private const val POSITION_ROOT: String = "Positions/"
+private const val POSITION_ROOT: String = "/Inari/Positions/"
 
 
 @SuppressLint("SetWorldReadable")
@@ -61,7 +61,7 @@ fun savePositionFile(url: String, responseBody: ResponseBody) {
     try {
 
         val dir =
-            File(root.absolutePath + APP_ROOT + POSITION_ROOT)
+            File(root.absolutePath + POSITION_ROOT)
         dir.mkdirs()
 
         val file = File(dir, url)
@@ -114,7 +114,7 @@ fun getFilesList(): Array<File> {
 }
 
 fun getPositionsFilesList(): Array<File> {
-    val path = Environment.getExternalStorageDirectory().toString() + APP_ROOT + POSITION_ROOT
+    val path = Environment.getExternalStorageDirectory().toString() + POSITION_ROOT
     val directory = File(path)
 
     return if (directory.exists()) {
@@ -126,7 +126,7 @@ fun retrievePositionsFile(fileName: String): String {
     return try {
         val file = ResponseBody.create(
             MediaType.parse("text/plain"),
-            getStringFromFile("${root.absolutePath}$APP_ROOT$POSITION_ROOT$fileName")
+            getStringFromFile("${root.absolutePath}$POSITION_ROOT$fileName")
         ).string()
         file
     } catch (e: Exception) {
@@ -151,6 +151,19 @@ fun deleteFile(fileName: String): Boolean {
     return try {
         val dir =
             File(root.absolutePath + APP_ROOT)
+        dir.mkdirs()
+        val file = File(dir, fileName)
+        file.delete()
+        true
+    } catch (e: Exception) {
+        false
+    }
+}
+
+fun deletePositionFile(fileName: String): Boolean {
+    return try {
+        val dir =
+            File(root.absolutePath + POSITION_ROOT)
         dir.mkdirs()
         val file = File(dir, fileName)
         file.delete()

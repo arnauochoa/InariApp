@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.inari.team.R
-import com.inari.team.core.utils.deleteFile
+import com.inari.team.core.utils.deletePositionFile
 import com.inari.team.core.utils.showAlert
 import kotlinx.android.synthetic.main.item_log.view.*
 import java.io.File
@@ -63,7 +63,7 @@ class PositionLogsAdapter(
         }
 
         holder.delete.setOnClickListener {
-            if (deleteFile(item.name)) {
+            if (deletePositionFile(item.name)) {
                 holder.delete.visibility = View.GONE
                 holder.share.visibility = View.VISIBLE
                 logs.removeAt(position)

@@ -17,5 +17,4 @@ class ModesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val deleteButton: ImageButton = view.deleteButton
     val checkImage: ImageView = view.ivChecked
     val cvMode: CardView = view.cvMode
-    val cvDot: CardView = view.cvDot
 }

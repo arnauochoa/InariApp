@@ -8,6 +8,7 @@ import android.location.GnssStatus
 import android.location.Location
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -60,6 +61,8 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
     private var viewModel: PositionViewModel? = null
 
+    private var legendAdapter = LegendAdapter()
+
     private var isStartedComputing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,11 +85,11 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.context)
 
-        setViews()
+        setViews(view)
     }
 
 
-    private fun setViews() {
+    private fun setViews(view: View) {
         fabOptions.setOnClickListener {
             navigator.navigateToModesActivity()
         }
@@ -103,7 +106,22 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
             }
         }
 
+        ivLegendArrow.setOnClickListener {
+            if (rvLegend.visibility == GONE) {
+                rvLegend.visibility = VISIBLE
+            } else rvLegend.visibility = GONE
+            ivLegendArrow.rotation = ivLegendArrow.rotation + 180
+        }
+
+        rvLegend.layoutManager = LinearLayoutManager(view.context)
+        rvLegend.adapter = legendAdapter
+
         initMap()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        legendAdapter.setItems(mSharedPreferences.getSelectedModesList())
     }
 
     private fun initMap() {
