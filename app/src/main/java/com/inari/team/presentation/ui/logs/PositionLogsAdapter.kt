@@ -11,23 +11,28 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.inari.team.R
-import com.inari.team.core.utils.*
+import com.inari.team.core.utils.deleteFile
+import com.inari.team.core.utils.showAlert
 import kotlinx.android.synthetic.main.item_log.view.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit) :
-    RecyclerView.Adapter<LogsAdapter.LogsViewHolder>() {
+
+class PositionLogsAdapter(
+    val context: Context, private val emptyViewAction: () -> Unit,
+    private val clickAction: (String) -> Unit
+) :
+    RecyclerView.Adapter<PositionLogsAdapter.PositionLogsViewHolder>() {
 
     private val logs: ArrayList<File> = ArrayList()
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int) =
-        LogsViewHolder(LayoutInflater.from(context).inflate(R.layout.item_log, p0, false))
+        PositionLogsViewHolder(LayoutInflater.from(context).inflate(R.layout.item_log, p0, false))
 
     override fun getItemCount(): Int = logs.size
 
-    override fun onBindViewHolder(holder: LogsViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PositionLogsViewHolder, position: Int) {
 
         val item = logs[position]
 
@@ -35,29 +40,32 @@ class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit)
         val simpleDate = SimpleDateFormat("dd/MM/yy hh:mm", Locale.ENGLISH).format(date)
 
         holder.name.text = item.name
-        holder.detail.text = "$simpleDate  ${item.length()}kB"
+        holder.detail.text = simpleDate
 
         holder.layout.setOnClickListener {
-            val file = getFile(item.name)
-            openFileIntent(file.absolutePath, context)
+            if (holder.delete.visibility == VISIBLE) {
+                holder.delete.visibility = GONE
+            } else {
+                clickAction.invoke(item.name)
+            }
         }
 
         holder.layout.setOnLongClickListener {
-            if (holder.share.visibility == VISIBLE) {
-                holder.share.visibility = GONE
-                holder.delete.visibility = VISIBLE
+            if (holder.share.visibility == View.VISIBLE) {
+                holder.share.visibility = View.GONE
+                holder.delete.visibility = View.VISIBLE
 
             } else {
-                holder.share.visibility = VISIBLE
-                holder.delete.visibility = GONE
+                holder.share.visibility = View.VISIBLE
+                holder.delete.visibility = View.GONE
             }
             true
         }
 
         holder.delete.setOnClickListener {
             if (deleteFile(item.name)) {
-                holder.delete.visibility = GONE
-                holder.share.visibility = VISIBLE
+                holder.delete.visibility = View.GONE
+                holder.share.visibility = View.VISIBLE
                 logs.removeAt(position)
                 notifyDataSetChanged()
                 if (logs.size == 0) {
@@ -72,10 +80,7 @@ class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit)
             }
         }
 
-        holder.share.setOnClickListener {
-            val file = getFile(item.name)
-            shareTextFile(file.absolutePath, context)
-        }
+        holder.share.visibility = View.GONE
 
     }
 
@@ -86,7 +91,7 @@ class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit)
     }
 
 
-    inner class LogsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PositionLogsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.logName
         val layout: ConstraintLayout = itemView.layout
         val share: ImageView = itemView.share

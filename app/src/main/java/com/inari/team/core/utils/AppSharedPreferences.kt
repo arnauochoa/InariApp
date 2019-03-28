@@ -17,7 +17,6 @@ class AppSharedPreferences {
 
         const val MY_PREFS: String = "MY_PREFS"
         const val MODES: String = "modes"
-        const val PVT_INFO: String = "PVT_INFO"
         const val COLORS: String = "colors"
         const val AVG_ENABLED: String = "avgenabled"
         const val AVGTIME: String = "avgtime"
@@ -121,10 +120,6 @@ class AppSharedPreferences {
             .apply()
 
         return modesList
-    }
-
-    fun getData(type: String): String? {
-        return mPrefs.getString(type, "")
     }
 
     fun isAverageEnabled(): Boolean = mPrefs.getBoolean(AVG_ENABLED, true)
