@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import com.google.android.gms.maps.GoogleMap
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.inari.team.R
 import com.inari.team.core.App
 import com.inari.team.presentation.model.Mode
 
@@ -149,64 +148,6 @@ class AppSharedPreferences {
         mPrefs.edit()
             .putInt(MASK, mask)
             .apply()
-    }
-
-    fun saveColors() {
-        val colorList = arrayListOf<Int>()
-        colorList.add(R.color.colorLegend1)
-        colorList.add(R.color.colorLegend2)
-        colorList.add(R.color.colorLegend3)
-        colorList.add(R.color.colorLegend4)
-        colorList.add(R.color.colorLegend5)
-
-        val colorListGson = Gson().toJson(colorList)
-
-        mPrefs.edit()
-            .putString(COLORS, colorListGson)
-            .apply()
-
-    }
-
-    fun getColor(): Int {
-        val colorListGson = mPrefs.getString(COLORS, "") ?: ""
-
-        val type = object : TypeToken<ArrayList<Int>>() {}.type
-
-        var color = -1
-
-        if (colorListGson.isNotBlank()) {
-            val colorList = Gson().fromJson<ArrayList<Int>>(colorListGson, type) ?: arrayListOf()
-            if (colorList.isNotEmpty()) {
-                val obtainedColor = colorList[0]
-                colorList.remove(obtainedColor)
-                val colorListGsonChanged = Gson().toJson(colorList)
-                mPrefs.edit()
-                    .putString(COLORS, colorListGsonChanged)
-                    .apply()
-
-                color = obtainedColor
-            }
-        }
-
-        return color
-
-    }
-
-    fun setColorToAvailableColorsList(color: Int) {
-        if (color != -1) {
-            val colorListGson = mPrefs.getString(COLORS, "") ?: ""
-
-            val type = object : TypeToken<ArrayList<Int>>() {}.type
-
-            if (colorListGson.isNotBlank()) {
-                val colorList = Gson().fromJson<ArrayList<Int>>(colorListGson, type) ?: arrayListOf()
-                colorList.add(color)
-                val colorListGsonChanged = Gson().toJson(colorList)
-                mPrefs.edit()
-                    .putString(COLORS, colorListGsonChanged)
-                    .apply()
-            }
-        }
     }
 
 }

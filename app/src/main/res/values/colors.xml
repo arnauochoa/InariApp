@@ -21,6 +21,7 @@
     <color name="black">#000000</color>
 
     <color name="transparentWhite">#B2FFFFFF</color>
+    <color name="legendWhite">#B7FFFFFF</color>
 
     <color name="stopButton">#ffff4444</color>
 

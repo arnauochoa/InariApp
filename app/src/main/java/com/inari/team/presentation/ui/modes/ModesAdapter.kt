@@ -54,7 +54,7 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             toast("Mode '" + modes[position].name + "' deleted")
             mPrefs.deleteMode(mode)
             if (mode.isSelected) {
-                mPrefs.setColorToAvailableColorsList(mode.color)
+                onModeSelected.invoke()
             }
             modes.removeAt(position)
             notifyDataSetChanged()
@@ -67,16 +67,12 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             holder.modeName.setTextColor(getColor(context, R.color.black))
             holder.cvMode.elevation = 16f
             holder.checkImage.visibility = VISIBLE
-            if (modes[position].color == -1) {
-                modes[position].color = mPrefs.getColor()
-            }
             holder.cvMode.setCardBackgroundColor(getColor(context, R.color.colorAccent))
         } else {
             holder.modeName.setTextColor(getColor(context, R.color.gray))
             holder.cvMode.elevation = 0f
             holder.cvMode.setCardBackgroundColor(getColor(context, R.color.white))
             holder.checkImage.visibility = GONE
-            mPrefs.setColorToAvailableColorsList(modes[position].color)
             modes[position].color = -1
         }
     }
@@ -102,8 +98,6 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             holder.cvMode.elevation = 0f
             holder.cvMode.setCardBackgroundColor(getColor(context, R.color.white))
             holder.checkImage.visibility = GONE
-            mPrefs.setColorToAvailableColorsList(modes[position].color)
-            modes[position].color = -1
             couldSelect = true
         }
 

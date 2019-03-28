@@ -156,6 +156,9 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         bottomNavigation.setOnTabSelectedListener { pos, wasSelected ->
             if (!wasSelected) {
                 viewPager.setCurrentItem(pos, false)
+                if (pos == 3) {
+                    logsFragment.setFiles()
+                }
             }
             true
         }

@@ -28,7 +28,7 @@ class PositionLogsAdapter(
     private val logs: ArrayList<File> = ArrayList()
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int) =
-        PositionLogsViewHolder(LayoutInflater.from(context).inflate(R.layout.item_log, p0, false))
+        PositionLogsViewHolder(LayoutInflater.from(context).inflate(R.layout.item_position_log, p0, false))
 
     override fun getItemCount(): Int = logs.size
 
@@ -51,12 +51,9 @@ class PositionLogsAdapter(
         }
 
         holder.layout.setOnLongClickListener {
-            if (holder.share.visibility == View.VISIBLE) {
-                holder.share.visibility = View.GONE
+            if (holder.delete.visibility == View.GONE) {
                 holder.delete.visibility = View.VISIBLE
-
             } else {
-                holder.share.visibility = View.VISIBLE
                 holder.delete.visibility = View.GONE
             }
             true
@@ -65,7 +62,6 @@ class PositionLogsAdapter(
         holder.delete.setOnClickListener {
             if (deletePositionFile(item.name)) {
                 holder.delete.visibility = View.GONE
-                holder.share.visibility = View.VISIBLE
                 logs.removeAt(position)
                 notifyDataSetChanged()
                 if (logs.size == 0) {
@@ -80,7 +76,6 @@ class PositionLogsAdapter(
             }
         }
 
-        holder.share.visibility = View.GONE
 
     }
 
@@ -90,11 +85,15 @@ class PositionLogsAdapter(
         notifyDataSetChanged()
     }
 
+    fun clear() {
+        this.logs.clear()
+        notifyDataSetChanged()
+    }
+
 
     inner class PositionLogsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.logName
         val layout: ConstraintLayout = itemView.layout
-        val share: ImageView = itemView.share
         val detail: TextView = itemView.tvDetails
         val delete: ImageView = itemView.ivDelete
     }

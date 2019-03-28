@@ -38,8 +38,12 @@ class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit)
         holder.detail.text = "$simpleDate  ${item.length()}kB"
 
         holder.layout.setOnClickListener {
-            val file = getFile(item.name)
-            openFileIntent(file.absolutePath, context)
+            if (holder.delete.visibility == VISIBLE) {
+                holder.delete.visibility = GONE
+            } else {
+                val file = getFile(item.name)
+                openFileIntent(file.absolutePath, context)
+            }
         }
 
         holder.layout.setOnLongClickListener {
@@ -82,6 +86,11 @@ class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit)
     fun setLogs(logs: Array<File>) {
         this.logs.clear()
         this.logs.addAll(logs)
+        notifyDataSetChanged()
+    }
+
+    fun clear() {
+        this.logs.clear()
         notifyDataSetChanged()
     }
 
