@@ -1,17 +1,23 @@
 package com.inari.team.presentation.ui.main
 
 import android.annotation.TargetApi
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.hardware.*
 import android.location.*
 import android.os.Build
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.view.Surface
+import android.view.View
 import android.widget.Toast
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
+import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
@@ -21,8 +27,8 @@ import com.inari.team.core.utils.extensions.*
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
-import com.inari.team.core.utils.toast
 import com.inari.team.core.utils.view.CustomAHBottomNavigationItem
+import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.about.AboutFragment
 import com.inari.team.presentation.ui.logs.LogsFragment
@@ -31,6 +37,8 @@ import com.inari.team.presentation.ui.splash.SplashActivity
 import com.inari.team.presentation.ui.statistics.StatisticsFragment
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.dialog_save_log.view.*
+import kotlinx.android.synthetic.main.fragment_position.*
 import javax.inject.Inject
 
 class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEventListener {
@@ -61,7 +69,10 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     private var gnssMeasurementsEventListener: GnssMeasurementsEvent.Callback? = null
     private var gnssNmeaMessageListener: OnNmeaMessageListener? = null
 
+    private val positionFragment = PositionFragment()
     private val logsFragment = LogsFragment()
+
+    private var positionsList = arrayListOf<ResponsePvtMode>()
 
     private var gnssListeners = arrayListOf<GnssEventsListener>()
 
@@ -81,11 +92,11 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         setContentView(R.layout.activity_main)
         activityComponent.inject(this)
 
-//        viewModel = withViewModel(viewModelFactory){
-////            observe(position, ::updatePosition)
-////            observe(ephemeris, ::updateEphemeris)
-////            observe(saveLogs, ::updateSavedLogs)
-//        }
+        viewModel = withViewModel(viewModelFactory) {
+            observe(position, ::updatePosition)
+            observe(ephemeris, ::updateEphemeris)
+            observe(saveLogs, ::updateSavedLogs)
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_logo_small)
@@ -110,7 +121,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     private fun setViewPager() {
         val pagerAdapter = BarAdapter(supportFragmentManager)
 
-        pagerAdapter.addFragments(PositionFragment(), "Position")
+        pagerAdapter.addFragments(positionFragment, "Position")
         pagerAdapter.addFragments(StatusFragment(), "GNSS state")
         pagerAdapter.addFragments(StatisticsFragment(), "Statistics")
         pagerAdapter.addFragments(logsFragment, "Logs")
@@ -151,6 +162,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             gnssStatusListener = object : GnssStatus.Callback() {
                 override fun onSatelliteStatusChanged(status: GnssStatus) {
+                    viewModel?.setGnssStatus(status)
                     gnssListeners.forEach {
                         it.onSatelliteStatusChanged(status)
                     }
@@ -173,6 +185,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 
             gnssMeasurementsEventListener = object : GnssMeasurementsEvent.Callback() {
                 override fun onGnssMeasurementsReceived(measurementsEvent: GnssMeasurementsEvent?) {
+                    viewModel?.setGnssMeasurementsEvent(measurementsEvent)
                     gnssListeners.forEach {
                         it.onGnssMeasurementsReceived(measurementsEvent)
                     }
@@ -231,89 +244,111 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         gnssListeners.add(listener)
     }
 
-    fun unSubscribeToGnssEvent(listener: GnssEventsListener) {
-        gnssListeners.remove(listener)
-    }
-
-    fun navigateToLogs() {
+    private fun navigateToLogs() {
         viewPager.currentItem = 3
         bottomNavigation.currentItem = 3
         logsFragment.setFiles()
     }
 
+    private fun showSaveDialog() {
+        val dialog = AlertDialog.Builder(this).create()
+        val layout = View.inflate(this, R.layout.dialog_save_log, null)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setView(layout)
+        layout.save.setOnClickListener {
+            val fileName = layout.fileName.text.toString()
+            if (fileName.isNotBlank()) {
+                viewModel?.saveLastLogs("$fileName.txt")
+                dialog.dismiss()
+                positionsList.clear()
+            } else showError("File name can not be empty")
+        }
+        layout.tvDiscard.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.setCancelable(false)
+        dialog.show()
 
-//    //Callbacks
-//    private fun updatePosition(data: Data<List<ResponsePvtMode>>?) {
-//        data?.let {
-//            when (it.dataState) {
-//                DataState.LOADING -> {
-//                    showMapLoading()
-//                }
-//                DataState.SUCCESS -> {
-//                    hideMapLoading()
-//                    it.data?.let { positions ->
-//                        if (positions.isNotEmpty()) {
-//                            positions.forEach { resp ->
-//                                addMarker(resp.position, "", resp.modeColor)
-//                            }
-//                            if (isStartedComputing) {
-//                                moveCameraWithZoom(positions[0].position)
-//                                isStartedComputing = false
-//                            } else {
-//                                moveCamera(positions[0].position)
-//                            }
-//                            positionsList.addAll(positions)
-//                        }
-//                    }
-//                }
-//                DataState.ERROR -> {
-//                    hideMapLoading()
-//                    it.message?.let { msg ->
-//                        showError(msg)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun updateEphemeris(data: Data<String>?) {
-//        data?.let {
-//            when (it.dataState) {
-//                DataState.LOADING -> {
-//                }
-//                DataState.SUCCESS -> {
-//                    showEphemerisAlert(false)
-//                }
-//                DataState.ERROR -> {
-//                    showEphemerisAlert(true)
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun updateSavedLogs(data: Data<Any>?) {
-//        data?.let {
-//            when (data.dataState) {
-//                DataState.LOADING -> {
-//                }
-//                DataState.SUCCESS -> {
-//                    showSavedSnackBar()
-//                }
-//                DataState.ERROR -> {
-//                    showError("An error occurred saving logs")
-//                }
-//            }
-//        }
-//    }
+    }
 
-    override fun startComputing() {
+    private fun showSavedSnackBar() {
+        val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
+        snackbar.setAction("OPEN") {
+            MainActivity.getInstance()?.navigateToLogs()
+        }
+        snackbar.show()
+    }
 
+
+    private fun showError(error: String) {
+        toast(error)
+    }
+
+    //Callbacks
+    private fun updatePosition(data: Data<List<ResponsePvtMode>>?) {
+        data?.let {
+            when (it.dataState) {
+                DataState.LOADING -> {
+                    positionFragment.showMapLoading()
+                }
+                DataState.SUCCESS -> {
+                    positionFragment.hideMapLoading()
+                    it.data?.let { positions ->
+                        positionFragment.onPositionsCalculated(positions)
+                    }
+                }
+                DataState.ERROR -> {
+                    positionFragment.hideMapLoading()
+                    it.message?.let { msg ->
+                        showError(msg)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateEphemeris(data: Data<String>?) {
+        data?.let {
+            when (it.dataState) {
+                DataState.LOADING -> {
+                }
+                DataState.SUCCESS -> {
+                    positionFragment.showEphemerisAlert(false)
+                }
+                DataState.ERROR -> {
+                    positionFragment.showEphemerisAlert(true)
+                }
+            }
+        }
+    }
+
+    private fun updateSavedLogs(data: Data<Any>?) {
+        data?.let {
+            when (data.dataState) {
+                DataState.LOADING -> {
+                }
+                DataState.SUCCESS -> {
+                    showSavedSnackBar()
+                }
+                DataState.ERROR -> {
+                    showError("An error occurred saving logs")
+                }
+            }
+        }
+    }
+
+    override fun startComputing(selectedModes: List<Mode>) {
+        viewModel?.startComputingPosition(selectedModes)
     }
 
     override fun stopComputing() {
-
+        viewModel?.stopComputingPosition()
+        showSaveDialog()
     }
 
+    override fun setEphemerisResponse(ephemerisResponse: EphemerisResponse) {
+//        viewModel?.setEphemerisResponse(ephemerisResponse)
+    }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     override fun onSensorChanged(event: SensorEvent) {
@@ -409,6 +444,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     }
 
     override fun onLocationChanged(location: Location?) {
+        viewModel?.setLocation(location)
         gnssListeners.forEach {
             it.onLocationReceived(location)
         }
@@ -458,6 +494,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 }
 
 interface MainListener {
-    fun startComputing()
+    fun startComputing(selectedModes: List<Mode>)
     fun stopComputing()
+    fun setEphemerisResponse(ephemerisResponse: EphemerisResponse)
 }

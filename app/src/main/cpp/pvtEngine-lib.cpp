@@ -19,7 +19,7 @@ double mean_vector(std::vector<double> theVector) {
 extern "C" JNIEXPORT jstring JNICALL
 
 
-Java_com_inari_team_presentation_ui_position_PositionViewModel_obtainPosition(JNIEnv *env, jobject instance,
+Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *env, jobject instance,
                                                                               jstring jsonData) {
 
     const char *gnssData = env->GetStringUTFChars(jsonData, nullptr);
