@@ -3,6 +3,7 @@ package com.inari.team.presentation.ui.statistics
 
 import android.content.Context
 import android.graphics.Color
+import android.location.GnssMeasurement
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
 import android.location.Location
@@ -15,11 +16,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
+import com.github.mikephil.charting.charts.ScatterChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.data.ScatterDataSet
 import com.inari.team.R
+import com.inari.team.R.*
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
+import com.inari.team.core.utils.L1_E1
+import com.inari.team.core.utils.createScatterChart
+import com.inari.team.core.utils.isSelectedBand
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.ui.main.MainActivity
+import com.inari.team.presentation.ui.statisticsdetail.StatisticsDetailActivity
 import kotlinx.android.synthetic.main.fragment_statistics.*
 import javax.inject.Inject
 
@@ -28,6 +38,12 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     @Inject
     lateinit var navigator: Navigator
+
+    var scatterChart: ScatterChart? = null
+
+    private var agcCNoValues = arrayListOf<Pair<Double, Double>>()
+
+    private var selectedBand = L1_E1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,19 +82,20 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(p0: TabLayout.Tab?) {
                 p0?.customView?.findViewById<ConstraintLayout>(R.id.tab)
-                    ?.setBackgroundResource(R.drawable.bg_corners_blue)
+                    ?.setBackgroundResource(drawable.bg_corners_blue)
             }
 
             override fun onTabUnselected(p0: TabLayout.Tab?) {
                 p0?.customView?.findViewById<ConstraintLayout>(R.id.tab)
-                    ?.setBackgroundResource(R.drawable.bg_corners_gray)
+                    ?.setBackgroundResource(drawable.bg_corners_gray)
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.customView?.findViewById<ConstraintLayout>(R.id.tab)
-                    ?.setBackgroundResource(R.drawable.bg_corners_blue)
+                    ?.setBackgroundResource(drawable.bg_corners_blue)
                 tab?.position?.let {
                     filterByFrequence(it)
+
                 }
 
 
@@ -110,13 +127,52 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     fun setAgcCNOGraph() {
         context?.let {
-            rlGraph.setBackgroundColor(ContextCompat.getColor(it, R.color.colorLegend1))
+            // programmatically create a ScatterChart
+            scatterChart = createScatterChart(
+                com.inari.team.core.utils.context,
+                StatisticsDetailActivity.MIN_CNO,
+                StatisticsDetailActivity.MAX_CNO,
+                StatisticsDetailActivity.MIN_AGC,
+                StatisticsDetailActivity.MAX_AGC
+            )
+            scatterChart?.let {
+
+                rlGraph.addView(scatterChart)
+            }
+            setChartData()
+
         }
+
+
+    }
+
+    private fun setChartData() {
+//        when (type) {
+//            StatisticsDetailActivity.ELEVATION_CNO -> {
+//                // todo: no data message
+//                //plotElevCNoGraph()
+//            }
+//            StatisticsDetailActivity.CNO_AGC -> {
+//                plotAgcCNoGraph(null)
+//            }
+//            StatisticsDetailActivity.MAP -> {
+//
+//            }
+//            StatisticsDetailActivity.GRAPH4 -> {
+//
+//            }
+//            StatisticsDetailActivity.GRAPH5 -> {
+//
+//            }
+//            StatisticsDetailActivity.GRAPH6 -> {
+//
+//            }
+//        }
     }
 
     fun setSecondGraph() {
         context?.let {
-            rlGraph.setBackgroundColor(ContextCompat.getColor(it, R.color.colorLegend5))
+            rlGraph.setBackgroundColor(ContextCompat.getColor(it, color.colorLegend5))
         }
     }
 
@@ -132,10 +188,55 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     }
 
     private fun createTab(title: String): TabLayout.Tab {
-        val tab = tabLayout.newTab().setCustomView(R.layout.item_filter_tab)
+        val tab = tabLayout.newTab().setCustomView(layout.item_filter_tab)
         tab.customView?.findViewById<TextView>(R.id.tvFilterTitle)?.text = title
         return tab
     }
+
+
+    private fun plotAgcCNoGraph(measurements: Collection<GnssMeasurement>?) {
+
+        context?.let { c ->
+
+            scatterChart?.let { chart ->
+
+                measurements?.let {
+
+                    // Obtain measurements for desired frequency band
+                    it.forEach { meas ->
+                        if (meas.hasAutomaticGainControlLevelDb()) {
+                            if (meas.hasCarrierFrequencyHz() && isSelectedBand(selectedBand, meas.carrierFrequencyHz))
+                                agcCNoValues.add(Pair(meas.cn0DbHz, meas.automaticGainControlLevelDb))
+                        }
+                    }
+
+                    // Gnenerate points with obtained and previous measurements
+                    val points = arrayListOf<Entry>()
+                    agcCNoValues.forEach { point ->
+                        points.add(Entry(point.first.toFloat(), point.second.toFloat())) // x: CNo, y: AGC
+                    }
+
+                    // Sort points by CNo
+                    points.sortBy { point -> point.x }
+
+                    // Define style of set
+                    val pointsSet = ScatterDataSet(points, "")
+                    pointsSet.color = ContextCompat.getColor(c, R.color.colorAccent)
+
+                    // Do not show labels on each point
+                    val scatterData = ScatterData(pointsSet)
+                    scatterData.setDrawValues(false)
+                    // Plot points on graph
+                    chart.data = scatterData
+
+                    // Update chart view
+                    chart.invalidate()
+                }
+            } // If has stopped, do nothing
+        }
+
+    }
+
 
     override fun onGnssStarted() {
     }
@@ -147,6 +248,9 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {
+        event?.let {
+            plotAgcCNoGraph(it.measurements)
+        }
     }
 
     override fun onOrientationChanged(orientation: Double, tilt: Double) {

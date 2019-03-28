@@ -7,18 +7,15 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.widget.RelativeLayout
-import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.charts.ScatterChart
-import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.data.ScatterDataSet
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
 import com.inari.team.core.base.BaseActivity
-import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.context
-import com.inari.team.core.utils.filterGnssStatus
+import com.inari.team.core.utils.*
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.model.Mode
-import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_statistics.*
 import javax.inject.Inject
@@ -35,16 +32,12 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
         const val GRAPH5: String = "GRAPH5"
         const val GRAPH6: String = "GRAPH6"
 
-        const val BAND1_DOWN_THRES = 1575000000
-        const val BAND1_UP_THRES = 1576000000
-        const val BAND5_DOWN_THRES = 1176000000
-        const val BAND5_UP_THRES = 1177000000
-
-        class SatElevCNo(var elevation: Float, var cNo: Float)
-    }
-
-    private enum class Band {
-        L1_E1, L5_E5
+        const val MIN_ELEV = 0f
+        const val MAX_ELEV = 90f
+        const val MAX_CNO = 60f
+        const val MIN_CNO = -40f
+        const val MAX_AGC = 60f
+        const val MIN_AGC = 10f
     }
 
     @Inject
@@ -62,10 +55,9 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
 
     var type: String? = null
 
-    var lineChart: LineChart? = null
     var scatterChart: ScatterChart? = null
 
-    private var selectedBand = Band.L1_E1
+    private var selectedBand = L1_E1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,8 +76,6 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
 
     override fun onResume() {
         super.onResume()
-        //todo test crashes
-        MainActivity.getInstance()?.subscribeToGnssEvents(this)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -103,7 +93,6 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
         buttonClear.setOnClickListener {
             satElevCNoList = arrayListOf()
             agcCNoValues = arrayListOf()
-            lineChart?.invalidate()
             scatterChart?.invalidate()
         }
 
@@ -111,35 +100,22 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
             ELEVATION_CNO -> {
                 supportActionBar?.title = getString(com.inari.team.R.string.stats_card_1)
 
-                // programmatically create a LineChart
-                lineChart = LineChart(context)
-                lineChart?.let {
-                    val lp = RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        RelativeLayout.LayoutParams.MATCH_PARENT
-                    )
-                    it.layoutParams = lp
-                    rl.addView(it)
+
+                // programmatically create a ScatterChart
+                scatterChart = createScatterChart(context, MIN_ELEV, MAX_ELEV, MIN_CNO, MAX_CNO)
+                scatterChart?.let {
+                    rl.addView(scatterChart)
                 }
+                setChartData()
             }
             CNO_AGC -> {
                 supportActionBar?.title = getString(com.inari.team.R.string.stats_card_2)
 
-                scatterChart = ScatterChart(context)
+                // programmatically create a ScatterChart
+                scatterChart = createScatterChart(context, MIN_CNO, MAX_CNO, MIN_AGC, MAX_AGC)
                 scatterChart?.let {
-                    it.xAxis.axisMaximum = 60f
-                    it.xAxis.axisMinimum = -20f
-                    it.axisLeft.axisMaximum = 60f
-                    it.axisLeft.axisMinimum = 0f
-                    it.axisRight.isEnabled = false
 
-
-                    val lp = RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        RelativeLayout.LayoutParams.MATCH_PARENT
-                    )
-                    it.layoutParams = lp
-                    rl.addView(it)
+                    rl.addView(scatterChart)
                 }
                 setChartData()
 
@@ -165,7 +141,8 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
     private fun setChartData() {
         when (type) {
             ELEVATION_CNO -> {
-                plotElevCNoGraph()
+                // todo: no data message
+                //plotElevCNoGraph()
             }
             CNO_AGC -> {
                 plotAgcCNoGraph(null)
@@ -190,6 +167,7 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
             buttonStopSave.setBackgroundColor(ContextCompat.getColor(this, com.inari.team.R.color.colorPrimaryLight))
             buttonStopSave.text = getString(com.inari.team.R.string.save_button)
             hasStopped = false
+
         } else {
             buttonStopSave.setBackgroundColor(ContextCompat.getColor(this, com.inari.team.R.color.stopButton))
             buttonStopSave.text = getString(com.inari.team.R.string.stop_button)
@@ -197,79 +175,92 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
         }
     }
 
-    private fun plotElevCNoGraph() {
-        val cnos = arrayListOf<Entry>()
-        val elevations = arrayListOf<Entry>()
-        var x = 1
-
-        // Set chart points
-        satElevCNoList.forEach {
-            cnos.add(Entry(1.0f * x, it.cNo))
-            elevations.add(Entry(1.0f * x, it.elevation))
-            x++
-        }
-
-        // CNo line
-        val cNosSet = LineDataSet(cnos, "CNo evolution (dB-Hz)")
-        cNosSet.axisDependency = YAxis.AxisDependency.LEFT
-        cNosSet.color = ContextCompat.getColor(this, com.inari.team.R.color.colorAccentLight)
-        cNosSet.valueTextColor = ContextCompat.getColor(this, com.inari.team.R.color.colorLegend1)
-
-        // Elevation line
-        val elevationsSet = LineDataSet(elevations, "Elevation evolution (º)")
-        elevationsSet.axisDependency = YAxis.AxisDependency.RIGHT
-        elevationsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.colorPrimaryLight)
-        elevationsSet.valueTextColor = ContextCompat.getColor(this, com.inari.team.R.color.colorLegend1)
-
-        // Join lines
-        val dataSets = arrayListOf<ILineDataSet>(cNosSet, elevationsSet)
-
-        // Refresh chart
-        lineChart?.let {
+    private fun plotElevCNoGraph(status: GnssStatus) {
+        scatterChart?.let { chart ->
             if (!hasStopped) {
-                it.data = LineData(dataSets)
-                it.invalidate()
-            }
-        }
+                // Obtain status separately for GPS and GAL
+                val gpsGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GPS)
+                val galGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GALILEO)
 
+                // Obtain desired values of Status: svid, elevation and CNo for given frequency band
+                val gpsValues = obtainCnoElevValues(selectedBand, gpsGnssStatus)
+                val galValues = obtainCnoElevValues(selectedBand, galGnssStatus)
+
+                // Generate points
+                val gpsPoints = arrayListOf<Entry>()
+                val galPoints = arrayListOf<Entry>()
+                gpsValues.forEach {
+                    gpsPoints.add(Entry(it.elevation, it.cNo))
+                }
+                galValues.forEach {
+                    galPoints.add(Entry(it.elevation, it.cNo))
+                }
+
+                // Sort points by elevation
+                gpsPoints.sortBy { point -> point.x }
+                galPoints.sortBy { point -> point.x }
+
+                // Define style of sets
+                val gpsPointsSet = ScatterDataSet(gpsPoints, "GPS")
+                val galPointsSet = ScatterDataSet(galPoints, "Galileo")
+
+                gpsPointsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.gpsColor)
+                galPointsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.galColor)
+
+                // Join sets and plot them on the graph
+                val dataSets = arrayListOf<IScatterDataSet>(gpsPointsSet, galPointsSet)
+                val scatterData = ScatterData(dataSets)
+                // Do not show labels on each point
+                scatterData.setDrawValues(false)
+                chart.data = scatterData
+
+                // Update chart view
+                chart.invalidate()
+
+            } // If user has stopped, do nothing
+        }
     }
 
     private fun plotAgcCNoGraph(measurements: Collection<GnssMeasurement>?) {
-        measurements?.let {
-            it.forEach { meas ->
-                if (meas.hasAutomaticGainControlLevelDb()) {
-                    if (meas.hasCarrierFrequencyHz() && isSelectedBand(meas.carrierFrequencyHz))
-                        agcCNoValues.add(Pair(meas.cn0DbHz, meas.automaticGainControlLevelDb))
-                }
-            }
-        }
-
-        val points = arrayListOf<Entry>()
-        agcCNoValues.forEach { point ->
-            points.add(Entry(point.first.toFloat(), point.second.toFloat())) // x: CNo, y: AGC
-        }
-
-        val pointsSet = ScatterDataSet(points, "")
-        pointsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.colorAccent)
-
-        scatterChart?.let {
+        scatterChart?.let { chart ->
             if (!hasStopped) {
-                it.data = ScatterData(pointsSet)
-                it.invalidate()
-            }
+
+                measurements?.let {
+
+                    // Obtain measurements for desired frequency band
+                    it.forEach { meas ->
+                        if (meas.hasAutomaticGainControlLevelDb()) {
+                            if (meas.hasCarrierFrequencyHz() && isSelectedBand(selectedBand, meas.carrierFrequencyHz))
+                                agcCNoValues.add(Pair(meas.cn0DbHz, meas.automaticGainControlLevelDb))
+                        }
+                    }
+
+                    // Gnenerate points with obtained and previous measurements
+                    val points = arrayListOf<Entry>()
+                    agcCNoValues.forEach { point ->
+                        points.add(Entry(point.first.toFloat(), point.second.toFloat())) // x: CNo, y: AGC
+                    }
+
+                    // Sort points by CNo
+                    points.sortBy { point -> point.x }
+
+                    // Define style of set
+                    val pointsSet = ScatterDataSet(points, "")
+                    pointsSet.color = ContextCompat.getColor(this, com.inari.team.R.color.colorAccent)
+
+                    // Do not show labels on each point
+                    val scatterData = ScatterData(pointsSet)
+                    scatterData.setDrawValues(false)
+                    // Plot points on graph
+                    chart.data = scatterData
+
+                    // Update chart view
+                    chart.invalidate()
+                }
+            } // If has stopped, do nothing
         }
     }
 
-    private fun isSelectedBand(carrierFrequencyHz: Float): Boolean {
-        return if (selectedBand == Band.L1_E1 &&
-            carrierFrequencyHz > BAND1_DOWN_THRES &&
-            carrierFrequencyHz < BAND1_UP_THRES
-        ) {
-            true
-        } else selectedBand == Band.L5_E5 &&
-            carrierFrequencyHz > BAND5_DOWN_THRES &&
-            carrierFrequencyHz < BAND5_UP_THRES
-    }
 
     // Callbacks
     override fun onGnssStarted() {
@@ -278,22 +269,12 @@ class StatisticsDetailActivity : BaseActivity(), GnssEventsListener {
     override fun onGnssStopped() {
     }
 
-    override fun onSatelliteStatusChanged(status: GnssStatus) {
-        val filteredGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GPS)
-        val selectedSat = 1
-        with(filteredGnssStatus) {
-            val satElevCNo =
-                StatisticsDetailActivity.Companion.SatElevCNo(getElevationDegrees(selectedSat), getCn0DbHz(selectedSat))
-            if (satElevCNoList.size == 100) {
-                satElevCNoList.removeAt(0)
+    override fun onSatelliteStatusChanged(status: GnssStatus?) {
+        status?.let {
+            if (type.equals(ELEVATION_CNO)) {
+                plotElevCNoGraph(status)
             }
-            satElevCNoList.add(satElevCNo)
         }
-
-        if (type.equals(ELEVATION_CNO)) {
-            plotElevCNoGraph()
-        }
-
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {

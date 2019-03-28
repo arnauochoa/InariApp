@@ -2,7 +2,7 @@
     <string name="app_name">Inari</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="stats_card_1">Elevation vs C/No</string>
+    <string name="stats_card_1">C/No vs Elevation</string>
     <string name="stats_card_2">AGC vs C/No</string>
     <string name="stats_card_3">Map</string>
     <string name="stats_card_4">Number of\nsatellites</string>
@@ -24,7 +24,7 @@
     <string name="corrections_subtitle">Corrections:</string>
     <string name="algorithm_subtitle">Algorithm:</string>
     <string name="averaging_subtitle">Averaging\n\t time:</string>
-    <string name="CN0_strip_title">Average  C/No (dB-Hz):</string>
+    <string name="CN0_strip_title">Average C/No (dB-Hz):</string>
     <string name="num_sats_title">Number of satellites:</string>
     <string name="pdop_title">PDOP:</string>
     <string name="cn0_title">C/N0:</string>
