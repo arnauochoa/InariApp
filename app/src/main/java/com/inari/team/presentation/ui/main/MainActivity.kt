@@ -341,8 +341,10 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     override fun stopComputing() {
         viewModel?.stopComputingPosition()
         isComputing = false
-
-        showSaveDialog()
+        val computedPositions = viewModel?.getComputedPositions() ?: arrayListOf()
+        if (computedPositions.isNotEmpty()) {
+            showSaveDialog()
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -439,7 +441,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     }
 
     override fun onLocationChanged(location: Location?) {
-        if (isComputing)  viewModel?.setLocation(location)
+        if (isComputing) viewModel?.setLocation(location)
         gnssListeners.forEach {
             it.onLocationReceived(location)
         }
