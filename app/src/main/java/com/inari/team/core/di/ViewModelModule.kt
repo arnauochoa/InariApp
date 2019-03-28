@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.inari.team.core.utils.extensions.ViewModelFactory
 import com.inari.team.core.utils.extensions.ViewModelKey
+import com.inari.team.presentation.ui.main.MainViewModel
 import com.inari.team.presentation.ui.position.PositionViewModel
 import com.inari.team.presentation.ui.status.StatusViewModel
 import dagger.Binds
@@ -26,5 +27,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(PositionViewModel::class)
     internal abstract fun positionViewModel(viewModel: PositionViewModel): ViewModel
+
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainViewModel::class)
+    internal abstract fun mainViewModel(viewModel: MainViewModel): ViewModel
 
 }
