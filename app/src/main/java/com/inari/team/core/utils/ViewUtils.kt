@@ -36,6 +36,17 @@ fun convertStreamToString(`is`: InputStream): String {
     return sb.toString()
 }
 
+fun getLegendColor(position: Int): Int{
+    return when(position){
+        0 -> R.color.colorLegend1
+        1 -> R.color.colorLegend2
+        2 -> R.color.colorLegend3
+        3 -> R.color.colorLegend4
+        4 -> R.color.colorLegend5
+        else -> R.color.colorLegend1
+    }
+}
+
 fun getModeIcon(color: Int): Float {
     return when (color) {
         R.color.colorLegend1 -> {
