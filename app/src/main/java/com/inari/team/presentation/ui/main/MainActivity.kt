@@ -81,11 +81,11 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         setContentView(R.layout.activity_main)
         activityComponent.inject(this)
 
-        viewModel = withViewModel(viewModelFactory){
-//            observe(position, ::updatePosition)
-//            observe(ephemeris, ::updateEphemeris)
-//            observe(saveLogs, ::updateSavedLogs)
-        }
+//        viewModel = withViewModel(viewModelFactory){
+////            observe(position, ::updatePosition)
+////            observe(ephemeris, ::updateEphemeris)
+////            observe(saveLogs, ::updateSavedLogs)
+//        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_logo_small)
