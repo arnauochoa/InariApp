@@ -23,6 +23,7 @@ class AppSharedPreferences {
         const val MASK: String = "mask"
         const val TUTORIAL_SHOWN = "tutorial shown"
         const val SELECTED_MAP_TYPE = "selected_map_type"
+        const val GNSS_LOGGING_ENABLED = "gnss_logging_enabled"
 
 
         private var INSTANCE: AppSharedPreferences? = null
@@ -44,6 +45,13 @@ class AppSharedPreferences {
     fun setSelectedMapType(type: Int) {
         mPrefs.edit()
             .putInt(SELECTED_MAP_TYPE, type)
+            .apply()
+    }
+
+    fun isGnssLoggingEnabled() = mPrefs.getBoolean(GNSS_LOGGING_ENABLED, false)
+    fun setGnssLoggingEnabled(enabled: Boolean) {
+        mPrefs.edit()
+            .putBoolean(GNSS_LOGGING_ENABLED, enabled)
             .apply()
     }
 

@@ -49,6 +49,8 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var isComputing = false
     private var isEphErrorShown = false
 
+    private var isLoggingEnabled = false
+
     init {
         // Add C++ library
         System.loadLibrary("pvtEngine-lib")
@@ -71,6 +73,8 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isComputing = true
         startedComputingDate = Date()
         computedPositions = arrayListOf()
+
+        isLoggingEnabled = mPrefs.isGnssLoggingEnabled()
 
         position.showLoading()
         //init gnss
@@ -149,15 +153,11 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     }
 
     //getters
+    fun getComputedPositions(): List<ResponsePvtMode> = computedPositions
+
     fun saveLastLogs(fileName: String) {
-        val pvtInfoString: String = try {
-            getGnssJson(gnssData).toString(2) ?: ""
-        } catch (e: JSONException) {
-            ""
-        }
         val positionsJson = Gson().toJson(computedPositions)
-        if (pvtInfoString.isNotBlank()) {
-            saveFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
+        if (positionsJson.isNotBlank()) {
             savePositionFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), positionsJson))
             saveLogs.updateData("")
         } else {
@@ -165,9 +165,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         }
     }
 
+
     //compute position
     private fun setGnssData() {
-
         if (gnssData.modes.isNotEmpty() &&
             gnssData.location != null &&
             gnssData.measurements.isNotEmpty() &&
@@ -192,6 +192,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         coordinates?.let {
             position.updateData(it)
             computedPositions.addAll(it)
+            if (isLoggingEnabled) {
+                saveGnssLogs()
+            }
         } ?: kotlin.run {
             position.showError("Position could not be obtained.")
         }
@@ -226,6 +229,17 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         }
 
         return responses
+    }
+
+    private fun saveGnssLogs() {
+        val pvtInfoString: String = try {
+            getGnssJson(gnssData).toString(2) ?: ""
+        } catch (e: JSONException) {
+            ""
+        }
+        if (pvtInfoString.isNotBlank()) {
+            saveFile(startedComputingDate.toString(), ResponseBody.create(MediaType.parse("text/plain"), pvtInfoString))
+        }
     }
 
 

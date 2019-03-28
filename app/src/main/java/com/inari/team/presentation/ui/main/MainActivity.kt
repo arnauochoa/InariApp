@@ -17,13 +17,14 @@ import android.view.Surface
 import android.view.View
 import android.widget.Toast
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
-import com.google.location.suplclient.ephemeris.EphemerisResponse
+import com.google.gson.Gson
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.BarAdapter
 import com.inari.team.core.utils.extensions.*
+import com.inari.team.core.utils.savePositionFile
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
@@ -39,6 +40,8 @@ import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_save_log.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
+import okhttp3.MediaType
+import okhttp3.ResponseBody
 import javax.inject.Inject
 
 class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEventListener {
@@ -76,6 +79,8 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 
     private var gnssListeners = arrayListOf<GnssEventsListener>()
 
+    private var isComputing = false
+
     // Holds sensor data
     private val mRotationMatrix = FloatArray(16)
     private val mRemappedMatrix = FloatArray(16)
@@ -95,7 +100,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         viewModel = withViewModel(viewModelFactory) {
             observe(position, ::updatePosition)
             observe(ephemeris, ::updateEphemeris)
-            observe(saveLogs, ::updateSavedLogs)
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -162,7 +166,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
             gnssStatusListener = object : GnssStatus.Callback() {
                 override fun onSatelliteStatusChanged(status: GnssStatus) {
-                    viewModel?.setGnssStatus(status)
+                    if (isComputing) viewModel?.setGnssStatus(status)
                     gnssListeners.forEach {
                         it.onSatelliteStatusChanged(status)
                     }
@@ -185,7 +189,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 
             gnssMeasurementsEventListener = object : GnssMeasurementsEvent.Callback() {
                 override fun onGnssMeasurementsReceived(measurementsEvent: GnssMeasurementsEvent?) {
-                    viewModel?.setGnssMeasurementsEvent(measurementsEvent)
+                    if (isComputing) viewModel?.setGnssMeasurementsEvent(measurementsEvent)
                     gnssListeners.forEach {
                         it.onGnssMeasurementsReceived(measurementsEvent)
                     }
@@ -244,12 +248,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         gnssListeners.add(listener)
     }
 
-    private fun navigateToLogs() {
-        viewPager.currentItem = 3
-        bottomNavigation.currentItem = 3
-        logsFragment.setFiles()
-    }
-
     private fun showSaveDialog() {
         val dialog = AlertDialog.Builder(this).create()
         val layout = View.inflate(this, R.layout.dialog_save_log, null)
@@ -258,7 +256,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         layout.save.setOnClickListener {
             val fileName = layout.fileName.text.toString()
             if (fileName.isNotBlank()) {
-                viewModel?.saveLastLogs("$fileName.txt")
+                saveLastLogs(fileName)
                 dialog.dismiss()
                 positionsList.clear()
             } else showError("File name can not be empty")
@@ -271,10 +269,23 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 
     }
 
+    private fun saveLastLogs(fileName: String) {
+        val computedPositions = viewModel?.getComputedPositions() ?: arrayListOf()
+        val positionsJson = Gson().toJson(computedPositions)
+        if (positionsJson.isNotBlank()) {
+            savePositionFile(fileName, ResponseBody.create(MediaType.parse("text/plain"), positionsJson))
+            showSavedSnackBar()
+        } else {
+            showError("An error occurred saving logs")
+        }
+    }
+
     private fun showSavedSnackBar() {
         val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
         snackbar.setAction("OPEN") {
-            MainActivity.getInstance()?.navigateToLogs()
+            viewPager.currentItem = 3
+            bottomNavigation.currentItem = 3
+            logsFragment.setFiles()
         }
         snackbar.show()
     }
@@ -322,32 +333,16 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         }
     }
 
-    private fun updateSavedLogs(data: Data<Any>?) {
-        data?.let {
-            when (data.dataState) {
-                DataState.LOADING -> {
-                }
-                DataState.SUCCESS -> {
-                    showSavedSnackBar()
-                }
-                DataState.ERROR -> {
-                    showError("An error occurred saving logs")
-                }
-            }
-        }
-    }
-
     override fun startComputing(selectedModes: List<Mode>) {
         viewModel?.startComputingPosition(selectedModes)
+        isComputing = true
     }
 
     override fun stopComputing() {
         viewModel?.stopComputingPosition()
-        showSaveDialog()
-    }
+        isComputing = false
 
-    override fun setEphemerisResponse(ephemerisResponse: EphemerisResponse) {
-//        viewModel?.setEphemerisResponse(ephemerisResponse)
+        showSaveDialog()
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -444,7 +439,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     }
 
     override fun onLocationChanged(location: Location?) {
-        viewModel?.setLocation(location)
+        if (isComputing)  viewModel?.setLocation(location)
         gnssListeners.forEach {
             it.onLocationReceived(location)
         }
@@ -496,5 +491,4 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 interface MainListener {
     fun startComputing(selectedModes: List<Mode>)
     fun stopComputing()
-    fun setEphemerisResponse(ephemerisResponse: EphemerisResponse)
 }
