@@ -70,13 +70,11 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             if (modes[position].color == -1) {
                 modes[position].color = mPrefs.getColor()
             }
-            holder.cvMode.setCardBackgroundColor(getColor(context, modes[position].color))
-            holder.cvDot.setCardBackgroundColor(getColor(context, modes[position].color))
+            holder.cvMode.setCardBackgroundColor(getColor(context, R.color.colorAccent))
         } else {
             holder.modeName.setTextColor(getColor(context, R.color.gray))
             holder.cvMode.elevation = 0f
             holder.cvMode.setCardBackgroundColor(getColor(context, R.color.white))
-            holder.cvDot.visibility = GONE
             holder.checkImage.visibility = GONE
             mPrefs.setColorToAvailableColorsList(modes[position].color)
             modes[position].color = -1
@@ -93,14 +91,7 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
                 holder.modeName.setTextColor(getColor(context, R.color.black))
                 holder.cvMode.elevation = 16f
                 holder.checkImage.visibility = VISIBLE
-                if (modes[position].color == -1) {
-                    val color = mPrefs.getColor()
-                    if (color != -1) {
-                        modes[position].color = color
-                        holder.cvMode.setCardBackgroundColor(getColor(context, modes[position].color))
-                        holder.cvDot.setCardBackgroundColor(getColor(context, modes[position].color))
-                    }
-                }
+                holder.cvMode.setCardBackgroundColor(getColor(context, R.color.colorAccent))
                 couldSelect = true
             } else {
                 holder.checkImage.context.toast("You can not select more than five modes")
@@ -110,7 +101,6 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             holder.modeName.setTextColor(getColor(context, R.color.gray))
             holder.cvMode.elevation = 0f
             holder.cvMode.setCardBackgroundColor(getColor(context, R.color.white))
-            holder.cvDot.visibility = GONE
             holder.checkImage.visibility = GONE
             mPrefs.setColorToAvailableColorsList(modes[position].color)
             modes[position].color = -1

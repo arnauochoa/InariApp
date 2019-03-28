@@ -58,7 +58,21 @@ class ModesActivity : BaseActivity() {
 
         apply_gnss_modes.setOnClickListener {
             mAdapter?.let {
-                mPrefs.saveModes(it.getItems())
+                val modes = it.getItems()
+
+                val colorList = arrayListOf<Int>()
+                colorList.add(R.color.colorLegend1)
+                colorList.add(R.color.colorLegend2)
+                colorList.add(R.color.colorLegend3)
+                colorList.add(R.color.colorLegend4)
+                colorList.add(R.color.colorLegend5)
+
+                modes.forEachIndexed { index, mode ->
+                    if (mode.isSelected && index < 5) {
+                        mode.color = colorList[index]
+                    }
+                }
+                mPrefs.saveModes(modes)
             }
             mPrefs.setAverageEnabled(switchAvg.isChecked)
             mPrefs.setAverage(avg)
