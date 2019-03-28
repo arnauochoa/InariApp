@@ -17,15 +17,13 @@ import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.BarAdapter
-import com.inari.team.core.utils.extensions.PERMISSION_ACCESS_FINE_LOCATION
-import com.inari.team.core.utils.extensions.checkPermission
-import com.inari.team.core.utils.extensions.checkPermissionsList
-import com.inari.team.core.utils.extensions.requestPermissionss
+import com.inari.team.core.utils.extensions.*
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
 import com.inari.team.core.utils.toast
 import com.inari.team.core.utils.view.CustomAHBottomNavigationItem
+import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.about.AboutFragment
 import com.inari.team.presentation.ui.logs.LogsFragment
 import com.inari.team.presentation.ui.position.PositionFragment
@@ -35,7 +33,7 @@ import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
+class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEventListener {
 
     companion object {
         private const val MIN_TIME = 1L
@@ -55,6 +53,8 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     @Inject
     lateinit var navigator: Navigator
 
+    private var viewModel: MainViewModel? = null
+
     private var locationManager: LocationManager? = null
 
     private var gnssStatusListener: GnssStatus.Callback? = null
@@ -67,19 +67,12 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
 
     // Holds sensor data
     private val mRotationMatrix = FloatArray(16)
-
     private val mRemappedMatrix = FloatArray(16)
-
     private val mValues = FloatArray(3)
-
     private val mTruncatedRotationVector = FloatArray(4)
-
     private var mTruncateVector = false
-
     private var mFaceTrueNorth: Boolean = true
-
     private var mGeomagneticField: GeomagneticField? = null
-
     private var mSensorManager: SensorManager? = null
 
 
@@ -88,6 +81,11 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
         setContentView(R.layout.activity_main)
         activityComponent.inject(this)
 
+        viewModel = withViewModel(viewModelFactory){
+//            observe(position, ::updatePosition)
+//            observe(ephemeris, ::updateEphemeris)
+//            observe(saveLogs, ::updateSavedLogs)
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_logo_small)
@@ -243,7 +241,80 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
         logsFragment.setFiles()
     }
 
-    //callbacks
+
+//    //Callbacks
+//    private fun updatePosition(data: Data<List<ResponsePvtMode>>?) {
+//        data?.let {
+//            when (it.dataState) {
+//                DataState.LOADING -> {
+//                    showMapLoading()
+//                }
+//                DataState.SUCCESS -> {
+//                    hideMapLoading()
+//                    it.data?.let { positions ->
+//                        if (positions.isNotEmpty()) {
+//                            positions.forEach { resp ->
+//                                addMarker(resp.position, "", resp.modeColor)
+//                            }
+//                            if (isStartedComputing) {
+//                                moveCameraWithZoom(positions[0].position)
+//                                isStartedComputing = false
+//                            } else {
+//                                moveCamera(positions[0].position)
+//                            }
+//                            positionsList.addAll(positions)
+//                        }
+//                    }
+//                }
+//                DataState.ERROR -> {
+//                    hideMapLoading()
+//                    it.message?.let { msg ->
+//                        showError(msg)
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun updateEphemeris(data: Data<String>?) {
+//        data?.let {
+//            when (it.dataState) {
+//                DataState.LOADING -> {
+//                }
+//                DataState.SUCCESS -> {
+//                    showEphemerisAlert(false)
+//                }
+//                DataState.ERROR -> {
+//                    showEphemerisAlert(true)
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun updateSavedLogs(data: Data<Any>?) {
+//        data?.let {
+//            when (data.dataState) {
+//                DataState.LOADING -> {
+//                }
+//                DataState.SUCCESS -> {
+//                    showSavedSnackBar()
+//                }
+//                DataState.ERROR -> {
+//                    showError("An error occurred saving logs")
+//                }
+//            }
+//        }
+//    }
+
+    override fun startComputing() {
+
+    }
+
+    override fun stopComputing() {
+
+    }
+
+
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     override fun onSensorChanged(event: SensorEvent) {
 
@@ -337,7 +408,6 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     }
 
-
     override fun onLocationChanged(location: Location?) {
         gnssListeners.forEach {
             it.onLocationReceived(location)
@@ -385,4 +455,9 @@ class MainActivity : BaseActivity(), LocationListener, SensorEventListener {
         locationManager?.removeUpdates(this)
         gnssListeners.clear()
     }
+}
+
+interface MainListener {
+    fun startComputing()
+    fun stopComputing()
 }
