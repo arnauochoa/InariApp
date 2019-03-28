@@ -420,8 +420,5 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback, GnssEventsListener 
 
     companion object {
         const val FRAG_TAG = "position_fragment"
-
-        const val SHOW_ALERT_ERROR = "show alert error"
-        const val HIDE_ALERT_ERROR = "hide alert error"
     }
 }

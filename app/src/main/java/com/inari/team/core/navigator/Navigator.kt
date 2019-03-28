@@ -13,4 +13,6 @@ interface Navigator {
 
     fun navigateToModesActivity()
 
+    fun navigateToMapLogActivity(positions: String)
+
 }

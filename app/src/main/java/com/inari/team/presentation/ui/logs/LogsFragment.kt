@@ -2,9 +2,7 @@ package com.inari.team.presentation.ui.logs
 
 
 import android.os.Bundle
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -12,13 +10,20 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
+import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.getFilesList
+import com.inari.team.core.utils.getPositionsFilesList
 import kotlinx.android.synthetic.main.fragment_logs.*
+import javax.inject.Inject
 
 
 class LogsFragment : BaseFragment() {
 
+    @Inject
+    lateinit var navigator: Navigator
+
     private var adapter: LogsAdapter? = null
+    private var positionsAdapter: PositionLogsAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,16 +37,26 @@ class LogsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val layoutManager = LinearLayoutManager(view.context)
-        val dividerItemDecoration = DividerItemDecoration(rvLogs.context, RecyclerView.VERTICAL)
+        setViews(view)
+    }
+
+    private fun setViews(view: View) {
 
         adapter = LogsAdapter(view.context) {
             layoutEmptyView.visibility = VISIBLE
             rvLogs.visibility = GONE
         }
-        rvLogs.layoutManager = layoutManager
-        rvLogs.addItemDecoration(dividerItemDecoration)
+        rvLogs.layoutManager = LinearLayoutManager(view.context)
         rvLogs.adapter = adapter
+
+        positionsAdapter = PositionLogsAdapter(view.context, {
+            layoutEmptyView.visibility = VISIBLE
+            rvPositionLogs.visibility = GONE
+        }, {
+            navigator.navigateToMapLogActivity(it)
+        })
+        rvPositionLogs.layoutManager = LinearLayoutManager(view.context)
+        rvPositionLogs.adapter = positionsAdapter
 
         swipeRefresh.setOnRefreshListener {
             setFiles()
@@ -52,14 +67,24 @@ class LogsFragment : BaseFragment() {
 
     fun setFiles() {
         val filesList = getFilesList()
+        val positionsFileList = getPositionsFilesList()
 
-        if (filesList.isEmpty()) {
-            rvLogs.visibility = GONE
+        if (filesList.isEmpty() && positionsFileList.isEmpty()) {
+            clLogs.visibility = GONE
+            clPositionLogs.visibility = GONE
             layoutEmptyView.visibility = VISIBLE
         } else {
-            rvLogs.visibility = VISIBLE
-            layoutEmptyView.visibility = GONE
-            adapter?.setLogs(filesList)
+            if (filesList.isNotEmpty()) {
+                clLogs.visibility = VISIBLE
+                layoutEmptyView.visibility = GONE
+                adapter?.setLogs(filesList)
+            }
+
+            if (positionsFileList.isNotEmpty()) {
+                clPositionLogs.visibility = VISIBLE
+                layoutEmptyView.visibility = GONE
+                positionsAdapter?.setLogs(positionsFileList)
+            }
         }
 
         swipeRefresh.isRefreshing = false

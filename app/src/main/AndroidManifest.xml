@@ -17,10 +17,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:largeHeap="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".presentation.ui.maplog.MapLogActivity"></activity>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
@@ -38,12 +39,8 @@
         </activity>
         <activity
             android:name=".presentation.ui.main.MainActivity"
-            android:screenOrientation="portrait" />
-
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".presentation.ui.statisticsdetail.StatisticsDetailActivity"
             android:screenOrientation="portrait" />
@@ -54,10 +51,14 @@
             android:name=".presentation.ui.settings.GnssSettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar" />
-        <activity android:name=".presentation.ui.tutorial.TutorialActivity"
+        <activity
+            android:name=".presentation.ui.tutorial.TutorialActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeNoActionBar" />
 
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -66,7 +67,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
         <receiver
