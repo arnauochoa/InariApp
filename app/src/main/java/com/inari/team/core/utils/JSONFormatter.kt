@@ -40,12 +40,15 @@ fun getGnssJson(gnssData: GnssData): JSONObject {
 
 fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
     val measurementsJsonArray = JSONArray()
-    measurements.forEach {
-        val measurementsJson = JSONObject()
-        measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
-        measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
-        measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
-        measurementsJsonArray.put(measurementsJson)
+    try {
+        measurements.forEach {
+            val measurementsJson = JSONObject()
+            measurementsJson.put(MEASUREMENTS_KEY, gnssMeasurementsAsJson(it.gnssMeasurements))
+            measurementsJson.put(CLOCK_KEY, gnssClockAsJson(it.gnssClock))
+            measurementsJson.put(STATUS_KEY, gnssStatusAsJsonString(it.gnssStatus))
+            measurementsJsonArray.put(measurementsJson)
+        }
+    } catch (e: Exception) {
     }
 
     return measurementsJsonArray
@@ -54,74 +57,88 @@ fun gnssMeasurementsListAsJson(measurements: List<MeasurementData>): JSONArray {
 
 fun gnssMeasurementsAsJson(gnssMeasurements: Collection<GnssMeasurement>?): JSONArray {
     val measurementsJsonArray = JSONArray()
-    gnssMeasurements?.let { measurements ->
-        measurements.forEach { measurement ->
-            val childJson = JSONObject()
-            childJson.put("svid", measurement.svid)
-            childJson.put("constellationType", measurement.constellationType)
-            childJson.put("state", measurement.state)
-            childJson.put("accumulatedDeltaRangeMeters", measurement.accumulatedDeltaRangeMeters)
-            childJson.put("accumulatedDeltaRangeState", measurement.accumulatedDeltaRangeState)
-            childJson.put("accumulatedDeltaRangeUncertaintyMeters", measurement.accumulatedDeltaRangeUncertaintyMeters)
-            childJson.put("cn0DbHz", measurement.cn0DbHz)
-            childJson.put("multipathIndicator", measurement.multipathIndicator)
-            childJson.put("pseudorangeRateMetersPerSecond", measurement.pseudorangeRateMetersPerSecond)
-            childJson.put(
-                "pseudorangeRateUncertaintyMetersPerSecond",
-                measurement.pseudorangeRateUncertaintyMetersPerSecond
-            )
-            childJson.put("receivedSvTimeNanos", measurement.receivedSvTimeNanos)
-            childJson.put("receivedSvTimeUncertaintyNanos", measurement.receivedSvTimeUncertaintyNanos)
-            childJson.put("timeOffsetNanos", measurement.timeOffsetNanos)
-            if (measurement.hasAutomaticGainControlLevelDb()) {
-                childJson.put("automaticGainControlLevelDb", measurement.automaticGainControlLevelDb)
-            } else {
-                childJson.put("automaticGainControlLevelDb", 0.0)
+    try {
+
+        gnssMeasurements?.let { measurements ->
+            measurements.forEach { measurement ->
+                val childJson = JSONObject()
+                childJson.put("svid", measurement.svid)
+                childJson.put("constellationType", measurement.constellationType)
+                childJson.put("state", measurement.state)
+                childJson.put("accumulatedDeltaRangeMeters", measurement.accumulatedDeltaRangeMeters)
+                childJson.put("accumulatedDeltaRangeState", measurement.accumulatedDeltaRangeState)
+                childJson.put(
+                    "accumulatedDeltaRangeUncertaintyMeters",
+                    measurement.accumulatedDeltaRangeUncertaintyMeters
+                )
+                childJson.put("cn0DbHz", measurement.cn0DbHz)
+                childJson.put("multipathIndicator", measurement.multipathIndicator)
+                childJson.put("pseudorangeRateMetersPerSecond", measurement.pseudorangeRateMetersPerSecond)
+                childJson.put(
+                    "pseudorangeRateUncertaintyMetersPerSecond",
+                    measurement.pseudorangeRateUncertaintyMetersPerSecond
+                )
+                childJson.put("receivedSvTimeNanos", measurement.receivedSvTimeNanos)
+                childJson.put("receivedSvTimeUncertaintyNanos", measurement.receivedSvTimeUncertaintyNanos)
+                childJson.put("timeOffsetNanos", measurement.timeOffsetNanos)
+                if (measurement.hasAutomaticGainControlLevelDb()) {
+                    childJson.put("automaticGainControlLevelDb", measurement.automaticGainControlLevelDb)
+                } else {
+                    childJson.put("automaticGainControlLevelDb", 0.0)
+                }
+                if (measurement.hasCarrierFrequencyHz()) {
+                    childJson.put("carrierFrequencyHz", measurement.carrierFrequencyHz)
+                } else {
+                    childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
+                }
+                measurementsJsonArray.put(childJson)
             }
-            if (measurement.hasCarrierFrequencyHz()) {
-                childJson.put("carrierFrequencyHz", measurement.carrierFrequencyHz)
-            } else {
-                childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
-            }
-            measurementsJsonArray.put(childJson)
         }
+    } catch (e: Exception) {
     }
     return measurementsJsonArray
 }
 
 fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
     val clockJson = JSONObject()
-    gnssClock?.let { clock ->
-        clockJson.put("timeNanos", clock.timeNanos)         // Time nanos
-        clockJson.put("hasBiasNanos", clock.hasBiasNanos()) // Boolean flags
-        clockJson.put("hasFullBiasNanos", clock.hasFullBiasNanos())
-        clockJson.put("hasBiasUncertaintyNanos", clock.hasBiasUncertaintyNanos())
-        clockJson.put("hasTimeUncertaintyNanos", clock.hasTimeUncertaintyNanos())
-        clockJson.put("hasDriftNanosPerSecond", clock.hasDriftNanosPerSecond())
-        clockJson.put("hasDriftUncertaintyNanosPerSecond", clock.hasDriftUncertaintyNanosPerSecond())
-        clockJson.put("hasLeapSecond", clock.hasLeapSecond())
-        clockJson.put("biasNanos", if (clock.hasBiasNanos()) clock.biasNanos else 0.0) // Possibly empty params
-        clockJson.put("fullBiasNanos", if (clock.hasFullBiasNanos()) clock.fullBiasNanos else 0.0)
-        clockJson.put(
-            "biasUncertaintyNanos",
-            if (clock.hasBiasUncertaintyNanos()) clock.biasUncertaintyNanos else 0.0
-        )
-        clockJson.put(
-            "timeUncertaintyNanos",
-            if (clock.hasTimeUncertaintyNanos()) clock.timeUncertaintyNanos else 0.0
-        )
-        clockJson.put(
-            "driftNanosPerSecond",
-            if (clock.hasDriftNanosPerSecond()) clock.driftNanosPerSecond else 0.0
-        )
-        clockJson.put(
-            "driftUncertaintyNanosPerSecond",
-            if (clock.hasDriftUncertaintyNanosPerSecond()) clock.driftUncertaintyNanosPerSecond else 0.0
-        )
-        clockJson.put(
-            "leapSecond",
-            if (clock.hasLeapSecond()) clock.leapSecond else 0.0
-        )
+
+    try {
+
+
+        gnssClock?.let { clock ->
+            clockJson.put("timeNanos", clock.timeNanos)         // Time nanos
+            clockJson.put("hasBiasNanos", clock.hasBiasNanos()) // Boolean flags
+            clockJson.put("hasFullBiasNanos", clock.hasFullBiasNanos())
+            clockJson.put("hasBiasUncertaintyNanos", clock.hasBiasUncertaintyNanos())
+            clockJson.put("hasTimeUncertaintyNanos", clock.hasTimeUncertaintyNanos())
+            clockJson.put("hasDriftNanosPerSecond", clock.hasDriftNanosPerSecond())
+            clockJson.put("hasDriftUncertaintyNanosPerSecond", clock.hasDriftUncertaintyNanosPerSecond())
+            clockJson.put("hasLeapSecond", clock.hasLeapSecond())
+            clockJson.put("biasNanos", if (clock.hasBiasNanos()) clock.biasNanos else 0.0) // Possibly empty params
+            clockJson.put("fullBiasNanos", if (clock.hasFullBiasNanos()) clock.fullBiasNanos else 0.0)
+            clockJson.put(
+                "biasUncertaintyNanos",
+                if (clock.hasBiasUncertaintyNanos()) clock.biasUncertaintyNanos else 0.0
+            )
+            clockJson.put(
+                "timeUncertaintyNanos",
+                if (clock.hasTimeUncertaintyNanos()) clock.timeUncertaintyNanos else 0.0
+            )
+            clockJson.put(
+                "driftNanosPerSecond",
+                if (clock.hasDriftNanosPerSecond()) clock.driftNanosPerSecond else 0.0
+            )
+            clockJson.put(
+                "driftUncertaintyNanosPerSecond",
+                if (clock.hasDriftUncertaintyNanosPerSecond()) clock.driftUncertaintyNanosPerSecond else 0.0
+            )
+            clockJson.put(
+                "leapSecond",
+                if (clock.hasLeapSecond()) clock.leapSecond else 0.0
+            )
+
+        }
+    } catch (e: Exception) {
 
     }
     return clockJson
@@ -129,21 +146,27 @@ fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
 
 fun gnssStatusAsJsonString(gnssStatus: GnssStatus?): JSONArray {
     val statusJsonArray = JSONArray()
-    gnssStatus?.let { status ->
-        for (sat in 0 until status.satelliteCount) {
-            val childJson = JSONObject()
-            childJson.put("svid", status.getSvid(sat))
-            childJson.put("azimuthDegrees", status.getAzimuthDegrees(sat))
-            if (status.hasCarrierFrequencyHz(sat)) {
-                childJson.put("carrierFrequencyHz", status.getCarrierFrequencyHz(sat))
-            } else {
-                childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
+    try {
+
+
+        gnssStatus?.let { status ->
+            for (sat in 0 until status.satelliteCount) {
+                val childJson = JSONObject()
+                childJson.put("svid", status.getSvid(sat))
+                childJson.put("azimuthDegrees", status.getAzimuthDegrees(sat))
+                if (status.hasCarrierFrequencyHz(sat)) {
+                    childJson.put("carrierFrequencyHz", status.getCarrierFrequencyHz(sat))
+                } else {
+                    childJson.put("carrierFrequencyHz", DEFAULT_FREQUENCY_HZ)
+                }
+                childJson.put("cn0DbHz", status.getCn0DbHz(sat))
+                childJson.put("constellationType", status.getConstellationType(sat))
+                childJson.put("elevationDegrees", status.getElevationDegrees(sat))
+                statusJsonArray.put(childJson)
             }
-            childJson.put("cn0DbHz", status.getCn0DbHz(sat))
-            childJson.put("constellationType", status.getConstellationType(sat))
-            childJson.put("elevationDegrees", status.getElevationDegrees(sat))
-            statusJsonArray.put(childJson)
         }
+    } catch (e: Exception) {
+
     }
     return statusJsonArray
 }
@@ -155,24 +178,28 @@ fun ephemerisResponseAsJson(
 ): JSONObject {
     val gson = Gson()
     val ephemerisJson = JSONObject()
-    ephemerisJson.put(EPHEMERIS_TIME_KEY, formatter.format(lastEphemerisDate))
-    ephemerisResponse?.let {
-        val galileoEphemerisJsonArray = JSONArray()
-        val gpsEphemerisJsonArray = JSONArray()
-        it.ephList.forEach { ephemeris ->
-            val ephJson = JSONObject(gson.toJson(ephemeris)) // Creates JSONObject of GnssEphemeris object
-            when (ephemeris) {
-                is GalEphemeris -> if (isEphemerisValid(ephemeris)) galileoEphemerisJsonArray.put(ephJson)
-                is GpsEphemeris -> if (isEphemerisValid(ephemeris)) gpsEphemerisJsonArray.put(ephJson)
-            }
-        }
-        ephemerisJson.put(GALILEO_KEY, galileoEphemerisJsonArray)
-        ephemerisJson.put(GPS_KEY, gpsEphemerisJsonArray)
+    try {
 
-        val klobucharJson = JSONObject(gson.toJson(it.ionoProto))
-        val neQuickJson = JSONObject(gson.toJson(it.ionoProto2))
-        ephemerisJson.put(KLOBUCHAR_KEY, klobucharJson)
-        ephemerisJson.put(NEQUICK_KEY, neQuickJson)
+        ephemerisJson.put(EPHEMERIS_TIME_KEY, formatter.format(lastEphemerisDate))
+        ephemerisResponse?.let {
+            val galileoEphemerisJsonArray = JSONArray()
+            val gpsEphemerisJsonArray = JSONArray()
+            it.ephList.forEach { ephemeris ->
+                val ephJson = JSONObject(gson.toJson(ephemeris)) // Creates JSONObject of GnssEphemeris object
+                when (ephemeris) {
+                    is GalEphemeris -> if (isEphemerisValid(ephemeris)) galileoEphemerisJsonArray.put(ephJson)
+                    is GpsEphemeris -> if (isEphemerisValid(ephemeris)) gpsEphemerisJsonArray.put(ephJson)
+                }
+            }
+            ephemerisJson.put(GALILEO_KEY, galileoEphemerisJsonArray)
+            ephemerisJson.put(GPS_KEY, gpsEphemerisJsonArray)
+
+            val klobucharJson = JSONObject(gson.toJson(it.ionoProto))
+            val neQuickJson = JSONObject(gson.toJson(it.ionoProto2))
+            ephemerisJson.put(KLOBUCHAR_KEY, klobucharJson)
+            ephemerisJson.put(NEQUICK_KEY, neQuickJson)
+        }
+    } catch (e: Exception) {
     }
     return ephemerisJson
 }

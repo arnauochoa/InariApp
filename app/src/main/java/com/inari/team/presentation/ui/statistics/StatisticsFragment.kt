@@ -323,17 +323,17 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
                 // Generate points by mode
                 val dataSets = arrayListOf<IScatterDataSet>()
-                positionsByMode.keys.forEach{
+                positionsByMode.keys.forEach {
                     val modePositions = arrayListOf<Entry>()
                     val color = positionsByMode[it]?.get(0)?.modeColor ?: 0
                     // For every position, get point as error between computed and reference position
                     positionsByMode[it]?.forEach { pos ->
                         val error = computeErrorNE(pos.refPosition, pos.refAltitude, pos.compPosition)
-                        modePositions.add(Entry(error[1], error[0])) //x: East, y: North
+                        modePositions.add(Entry(error[1].toFloat(), error[0].toFloat())) //x: East, y: North
                     }
                     modePositions.sortBy { point -> point.x }
                     val pointsSet = ScatterDataSet(modePositions, it)
-                    pointsSet.color = ContextCompat.getColor(c, getLegendColor(color))
+                    pointsSet.color = ContextCompat.getColor(c, color)
                     dataSets.add(pointsSet)
                 }
 
@@ -351,9 +351,9 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     // Callbacks
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
-        if (graph == GRAPH_ERROR){
+        if (graph == GRAPH_ERROR) {
             positions.forEach { pos ->
-                if (computedPositions.size == MAX_POS_POINTS){
+                if (computedPositions.size == MAX_POS_POINTS) {
                     computedPositions.removeAt(0)
                 }
                 computedPositions.add(pos)
@@ -362,7 +362,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         }
     }
 
-    fun onStopComputing(){
+    fun onStopComputing() {
         computedPositions.clear()
     }
 
