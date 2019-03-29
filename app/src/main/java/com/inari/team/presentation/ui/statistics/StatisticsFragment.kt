@@ -1,7 +1,6 @@
 package com.inari.team.presentation.ui.statistics
 
 
-import android.content.Context
 import android.graphics.Color
 import android.location.GnssMeasurement
 import android.location.GnssMeasurementsEvent
@@ -32,7 +31,6 @@ import com.inari.team.core.utils.filterGnssStatus
 import com.inari.team.core.utils.isSelectedBand
 import com.inari.team.core.utils.obtainCnoElevValues
 import com.inari.team.core.utils.skyplot.GnssEventsListener
-import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.fragment_statistics.*
 import javax.inject.Inject
@@ -60,11 +58,6 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_statistics, container, false)
-    }
-
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        MainActivity.getInstance()?.subscribeToGnssEvents(this)
     }
 
     override fun onResume() {
@@ -151,7 +144,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                 chart.description.isEnabled = false
                 chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
                 rlGraph.addView(chart)
-                plotAgcCNoGraph(null)
+//                plotAgcCNoGraph(null)
             }
         }
     }
@@ -299,7 +292,6 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             }
         }
     }
-
 
     override fun onGnssStarted() {
     }

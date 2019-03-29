@@ -22,7 +22,6 @@ import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONException
-import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
 import java.util.*
@@ -74,12 +73,12 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isComputing = true
         startedComputingDate = Date()
         computedPositions = arrayListOf()
-        fileName = Date().toString()
 
-        fileWriter = FileWriter(File(root.absolutePath + APP_ROOT + fileName))
-//        isLoggingEnabled = mPrefs.isGnssLoggingEnabled()
+        isLoggingEnabled = mPrefs.isGnssLoggingEnabled()
         if (isLoggingEnabled) {
+            fileName = Date().toString()
             saveFile(startedComputingDate.toString(), ResponseBody.create(MediaType.parse("text/plain"), ""))
+            fileWriter = FileWriter(File(root.absolutePath + APP_ROOT + fileName))
         }
 
         position.showLoading()
@@ -87,8 +86,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         gnssData = GnssData()
         gnssData.modes = selectedModes
         gnssData.avg = mPrefs.getAverage()
-        gnssData.mask = mPrefs.getSelectedMask()
+        gnssData.elevationMask = mPrefs.getSelectedMask()
         gnssData.avgEnabled = mPrefs.isAverageEnabled()
+        gnssData.cnoMask = mPrefs.getSelectedCnoMask()
 
         obtainEphemerisData()
     }
@@ -187,10 +187,14 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             val coordinates = computePosition()
 
             coordinates?.let {
-                position.updateData(it)
-                computedPositions.addAll(it)
-                if (isLoggingEnabled) {
-                    saveGnssLogs(it)
+                if (it.isNotEmpty()) {
+                    position.updateData(it)
+                    computedPositions.addAll(it)
+                    if (isLoggingEnabled) {
+                        saveGnssLogs(it)
+                    }
+                } else {
+                    position.showError("Position could not be obtained.")
                 }
             } ?: kotlin.run {
                 position.showError("Position could not be obtained.")
@@ -232,14 +236,14 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private fun saveGnssLogs(positions: List<ResponsePvtMode>) {
         val pvtInfoString: String = try {
             val json = getGnssJson(gnssData)
-            val obtainedPositions = JSONArray()
-            positions.forEach {
-                val obtainedPosition = JSONObject()
-                obtainedPosition.put("lat", it.position.latitude)
-                obtainedPosition.put("lon", it.position.longitude)
-                obtainedPositions.put(obtainedPosition)
-            }
-            json.put("Obtained_Positions", obtainedPositions)
+//            val obtainedPositions = JSONArray()
+//            positions.forEach {
+//                val obtainedPosition = JSONObject()
+//                obtainedPosition.put("lat", it.position.latitude)
+//                obtainedPosition.put("lon", it.position.longitude)
+//                obtainedPositions.put(obtainedPosition)
+//            }
+//            json.put("Obtained_Positions", obtainedPositions)
             json.toString(2)
         } catch (e: JSONException) {
             ""

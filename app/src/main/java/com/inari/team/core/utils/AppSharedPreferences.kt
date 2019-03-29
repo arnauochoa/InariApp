@@ -20,6 +20,7 @@ class AppSharedPreferences {
         const val AVG_ENABLED: String = "avgenabled"
         const val AVGTIME: String = "avgtime"
         const val MASK: String = "mask"
+        const val CN0_MASK: String = "cno_mask"
         const val TUTORIAL_SHOWN = "tutorial shown"
         const val SELECTED_MAP_TYPE = "selected_map_type"
         const val GNSS_LOGGING_ENABLED = "gnss_logging_enabled"
@@ -147,6 +148,13 @@ class AppSharedPreferences {
     fun setSelectedMask(mask: Int) {
         mPrefs.edit()
             .putInt(MASK, mask)
+            .apply()
+    }
+
+    fun getSelectedCnoMask(): Int = mPrefs.getInt(CN0_MASK, 0)
+    fun setSelectedCnoMask(mask: Int) {
+        mPrefs.edit()
+            .putInt(CN0_MASK, mask)
             .apply()
     }
 

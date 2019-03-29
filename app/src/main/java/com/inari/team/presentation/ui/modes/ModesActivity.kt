@@ -33,6 +33,7 @@ class ModesActivity : BaseActivity() {
 
     private var avg: Int = 5
     private var mask: Int = 5
+    private var cnoMask: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +68,11 @@ class ModesActivity : BaseActivity() {
                 }
                 mPrefs.saveModes(modes)
             }
+            mPrefs.setGnssLoggingEnabled(switchGnssLogs.isChecked)
             mPrefs.setAverageEnabled(switchAvg.isChecked)
             mPrefs.setAverage(avg)
             mPrefs.setSelectedMask(mask)
+            mPrefs.setSelectedCnoMask(cnoMask)
             finish()
         }
 
@@ -83,7 +86,13 @@ class ModesActivity : BaseActivity() {
         val maskText = "${mask}º"
         tvMaskValue.text = maskText
 
+        cnoMask = mPrefs.getSelectedCnoMask()
+        seekBarCno.progress = cnoMask
+        val cnoMaskText = "$cnoMask dB-Hz"
+        tvCnoValue.text = cnoMaskText
+
         switchAvg.isChecked = mPrefs.isAverageEnabled()
+        switchGnssLogs.isChecked = mPrefs.isGnssLoggingEnabled()
         clAvgValue.visibility = if (mPrefs.isAverageEnabled()) VISIBLE else GONE
 
         switchAvg.setOnCheckedChangeListener { _, isChecked ->
@@ -112,6 +121,15 @@ class ModesActivity : BaseActivity() {
             ivMaskTitle.rotation = ivMaskTitle.rotation + 180f
         }
 
+        clCno.setOnClickListener {
+            if (clCnoValue.visibility == VISIBLE) {
+                clCnoValue.visibility = GONE
+            } else {
+                clCnoValue.visibility = VISIBLE
+            }
+            ivCnoTitle.rotation = ivCnoTitle.rotation + 180f
+        }
+
         seekBarTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 avg = progress
@@ -133,6 +151,21 @@ class ModesActivity : BaseActivity() {
                 mask = progress
                 val maskProgressText = "${mask}º"
                 tvMaskValue.text = maskProgressText
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
+
+        seekBarCno.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                cnoMask = progress
+                val cnoMaskProgressText = "$cnoMask dB-Hz"
+                tvCnoValue.text = cnoMaskProgressText
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
