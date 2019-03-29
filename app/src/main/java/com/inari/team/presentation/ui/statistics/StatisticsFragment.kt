@@ -7,7 +7,6 @@ import android.location.GnssMeasurement
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
 import android.location.Location
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
@@ -18,7 +17,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
 import com.github.mikephil.charting.charts.ScatterChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.ScatterData
 import com.github.mikephil.charting.data.ScatterDataSet
@@ -33,7 +31,6 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.main.MainListener
 import com.inari.team.presentation.ui.status.StatusFragment
-import kotlinx.android.synthetic.main.dialog_new_mode.*
 import kotlinx.android.synthetic.main.fragment_statistics.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -161,7 +158,6 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             yAxisTitle.text = getString(R.string.agcAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
-//                plotAgcCNoGraph(null)
             }
         }
     }
@@ -209,7 +205,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     it.forEach { meas ->
                         if (meas.hasAutomaticGainControlLevelDb()) {
                             if (meas.hasCarrierFrequencyHz() && isSelectedBand(selectedBand, meas.carrierFrequencyHz)) {
-                                if (agcCNoValues.size == MAX_AGC_CNO_LENGTH) {
+                                if (agcCNoValues.size == MAX_AGC_CNO_POINTS) {
                                     agcCNoValues.removeAt(0)
                                 }
                                 agcCNoValues.add(Pair(meas.cn0DbHz, meas.automaticGainControlLevelDb))
@@ -333,7 +329,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     // For every position, get point as error between computed and reference position
                     positionsByMode[it]?.forEach { pos ->
                         val error = computeErrorNE(pos.refPosition, pos.refAltitude, pos.compPosition)
-                        modePositions.add(Entry(error[0], error[1]))
+                        modePositions.add(Entry(error[1], error[0])) //x: East, y: North
                     }
                     modePositions.sortBy { point -> point.x }
                     val pointsSet = ScatterDataSet(modePositions, it)
@@ -357,13 +353,17 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
         if (graph == GRAPH_ERROR){
             positions.forEach { pos ->
-                if (computedPositions.size == MAX_POS_LENGTH){
+                if (computedPositions.size == MAX_POS_POINTS){
                     computedPositions.removeAt(0)
                 }
                 computedPositions.add(pos)
             }
             plotErrorGraph()
         }
+    }
+
+    fun onStopComputing(){
+        computedPositions.clear()
     }
 
     override fun onGnssStarted() {
@@ -410,8 +410,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val GRAPH_CNO_ELEV = "CNo/Elevation"
         const val GRAPH_ERROR = "Error plot"
 
-        const val MAX_AGC_CNO_LENGTH = 100
-        const val MAX_POS_LENGTH = 100
+        const val MAX_AGC_CNO_POINTS = 100
+        const val MAX_POS_POINTS = 500
 
         const val MIN_ELEV = 0f // º
         const val MAX_ELEV = 90f // º
@@ -421,8 +421,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MIN_AGC_L1 = 10f // dB-Hz
         const val MAX_AGC_L5 = 30f // dB-Hz
         const val MIN_AGC_L5 = -10f // dB-Hz
-        const val NORTH_LIM = 200f // m
-        const val EAST_LIM = 200f // m
+        const val NORTH_LIM = 600f // m
+        const val EAST_LIM = 600f // m
 
         const val THRES_AGC_L1 = 45f
         const val THRES_CN0_L1 = 5f

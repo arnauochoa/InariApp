@@ -336,7 +336,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 DataState.SUCCESS -> {
                     positionFragment.hideMapLoading()
                     it.data?.let { positions ->
-                        // todo control which fragment is open
                         positionFragment.onPositionsCalculated(positions)
                         statisticsFragment.onPositionsCalculated(positions)
                     }
@@ -378,6 +377,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         if (computedPositions.isNotEmpty()) {
             showSaveDialog()
         }
+        statisticsFragment.onStopComputing()
     }
 
     override fun getComputedPositions(): List<ResponsePvtMode>? {
