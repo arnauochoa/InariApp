@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
 import com.github.mikephil.charting.charts.ScatterChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.ScatterData
 import com.github.mikephil.charting.data.ScatterDataSet
@@ -170,6 +171,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
             }
+            scatterChart?.xAxis?.labelCount = 10
         }
     }
 
@@ -416,7 +418,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MIN_ELEV = 0f // º
         const val MAX_ELEV = 90f // º
         const val MAX_CNO = 50f // dB
-        const val MIN_CNO = -20f // dB
+        const val MIN_CNO = -10f // dB
         const val MAX_AGC_L1 = 60f // dB-Hz
         const val MIN_AGC_L1 = 10f // dB-Hz
         const val MAX_AGC_L5 = 30f // dB-Hz

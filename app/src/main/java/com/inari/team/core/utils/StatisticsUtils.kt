@@ -41,6 +41,7 @@ fun createScatterChart(
         chart.layoutParams = chartLP
         chart.description.isEnabled = false
         chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        chart.setDrawBorders(true)
     }
 
     return scatterChart
