@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
 import com.github.mikephil.charting.charts.ScatterChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.ScatterData
 import com.github.mikephil.charting.data.ScatterDataSet
@@ -151,25 +152,27 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         context?.let { c ->
             // programmatically create a ScatterChart
             when (selectedBand) {
-                L1_E1 -> scatterChart = createScatterChart(c, MIN_CNO, MAX_CNO, MIN_AGC_L1, MAX_AGC_L1)
-                L5_E5 -> scatterChart = createScatterChart(c, MIN_CNO, MAX_CNO, MIN_AGC_L5, MAX_AGC_L5)
+                L1_E1 -> scatterChart = createScatterChart(c, MIN_CNO_L1, MAX_CNO_L1, MIN_AGC_L1, MAX_AGC_L1)
+                L5_E5 -> scatterChart = createScatterChart(c, MIN_CNO_L5, MAX_CNO_L5, MIN_AGC_L5, MAX_AGC_L5)
             }
             xAxisTitle.text = getString(R.string.cnoAxisTitle)
             yAxisTitle.text = getString(R.string.agcAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
             }
+            scatterChart?.axisLeft?.labelCount = 6
         }
     }
 
     private fun setCNoElevGraph() {
         context?.let { c ->
-            scatterChart = createScatterChart(c, MIN_ELEV, MAX_ELEV, MIN_CNO, MAX_CNO)
+            scatterChart = createScatterChart(c, MIN_ELEV, MAX_ELEV, MIN_CNO_L1, MAX_CNO_L1)
             xAxisTitle.text = getString(R.string.elevAxisTitle)
             yAxisTitle.text = getString(R.string.cnoAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
             }
+            scatterChart?.xAxis?.labelCount = 10
         }
     }
 
@@ -182,6 +185,14 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
             }
+            val limitLine = LimitLine(0.0f, "")
+            limitLine.lineColor = ContextCompat.getColor(c, R.color.black)
+            limitLine.lineWidth = 1f
+            scatterChart?.xAxis?.addLimitLine(limitLine)
+            scatterChart?.axisLeft?.addLimitLine(limitLine)
+            scatterChart?.setDrawBorders(false)
+            scatterChart?.xAxis?.setDrawAxisLine(false)
+            scatterChart?.axisLeft?.setDrawAxisLine(false)
             plotErrorGraph()
         }
     }
@@ -219,44 +230,37 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                         points.add(Entry(point.first.toFloat(), point.second.toFloat())) // x: CNo, y: AGC
                     }
 
-                    // Separate on good and bad points for plotting on different colors
-                    var goodAgcCNoPoints = arrayListOf<Entry>()
-                    var badAgcCNoPoints = arrayListOf<Entry>()
-
+                    // Obtain threshold and points divided by threshold
+                    var agcCNoThreshold = AgcCNoThreshold()
                     when (selectedBand) {
                         L1_E1 -> {
-                            goodAgcCNoPoints =
-                                points.filter { point -> point.x > THRES_CN0_L1 && point.y > THRES_AGC_L1 } as ArrayList<Entry>
-                            badAgcCNoPoints =
-                                points.filter { point -> point.x < THRES_CN0_L1 || point.y < THRES_AGC_L1 } as ArrayList<Entry>
+                            agcCNoThreshold = setAgcCNoThreshold(AGC_CNO_M, AGC_CNO_N_L1, points)
                         }
                         L5_E5 -> {
-                            goodAgcCNoPoints =
-                                points.filter { point -> point.x > THRES_CN0_L5 && point.y > THRES_AGC_L5 } as ArrayList<Entry>
-                            badAgcCNoPoints =
-                                points.filter { point -> point.x < THRES_CN0_L5 || point.y < THRES_AGC_L5 } as ArrayList<Entry>
+                            agcCNoThreshold = setAgcCNoThreshold(AGC_CNO_M, AGC_CNO_N_L5, points)
                         }
                     }
 
-                    // Sort points by CNo
-                    goodAgcCNoPoints.sortBy { point -> point.x }
-                    badAgcCNoPoints.sortBy { point -> point.x }
-
                     // Define style of set
-                    val goodPointsSet = ScatterDataSet(goodAgcCNoPoints, "Nominal conditions")
-                    goodPointsSet.color = ContextCompat.getColor(c, R.color.agcCnoGood)
-                    val badPointsSet = ScatterDataSet(badAgcCNoPoints, "Possible jamming")
-                    badPointsSet.color = ContextCompat.getColor(c, R.color.agcCnoBad)
-
+                    val thresholdSet = ScatterDataSet(agcCNoThreshold.threshold, "RFI threshold")
+                    thresholdSet.color = ContextCompat.getColor(c, R.color.agcCnoThreshold)
+                    thresholdSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                    thresholdSet.scatterShapeSize = 5.0f
+                    val nominalPointsSet = ScatterDataSet(agcCNoThreshold.nominalPoints, "Nominal conditions")
+                    nominalPointsSet.color = ContextCompat.getColor(c, R.color.agcCnoNominal)
+                    nominalPointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                    val interfPointsSet = ScatterDataSet(agcCNoThreshold.interferencePoints, "Possible interference")
+                    interfPointsSet.color = ContextCompat.getColor(c, R.color.agcCnoInterf)
+                    interfPointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
 
                     // Join sets and plot them on the graph
-                    val dataSets = arrayListOf<IScatterDataSet>(goodPointsSet, badPointsSet)
+                    val dataSets = arrayListOf<IScatterDataSet>(thresholdSet, nominalPointsSet, interfPointsSet)
                     val scatterData = ScatterData(dataSets)
                     // Do not show labels on each point
                     scatterData.setDrawValues(false)
+                    scatterData.isHighlightEnabled = false
                     // Plot points on graph
                     chart.data = scatterData
-
                     // Update chart view
                     chart.invalidate()
                 }
@@ -287,7 +291,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                         galPoints.add(Entry(it.elevation, it.cNo))
                     }
 
-                    // Sort points by elevation
+                    // Sort points by elevation to plot them
                     gpsPoints.sortBy { point -> point.x }
                     galPoints.sortBy { point -> point.x }
 
@@ -295,18 +299,19 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     val gpsPointsSet = ScatterDataSet(gpsPoints, "GPS")
                     val galPointsSet = ScatterDataSet(galPoints, "Galileo")
 
-
                     gpsPointsSet.color = ContextCompat.getColor(c, com.inari.team.R.color.gpsColor)
+                    gpsPointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                     galPointsSet.color = ContextCompat.getColor(c, com.inari.team.R.color.galColor)
+                    galPointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
 
                     // Join sets and plot them on the graph
                     val dataSets = arrayListOf<IScatterDataSet>(gpsPointsSet, galPointsSet)
                     val scatterData = ScatterData(dataSets)
                     // Do not show labels on each point
                     scatterData.setDrawValues(false)
+                    scatterData.isHighlightEnabled = false
                     // Plot points on graph
                     chart.data = scatterData
-
                     // Update chart view
                     chart.invalidate()
 
@@ -331,15 +336,17 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                         val error = computeErrorNE(pos.refPosition, pos.refAltitude, pos.compPosition)
                         modePositions.add(Entry(error[1].toFloat(), error[0].toFloat())) //x: East, y: North
                     }
+
                     modePositions.sortBy { point -> point.x }
                     val pointsSet = ScatterDataSet(modePositions, it)
                     pointsSet.color = ContextCompat.getColor(c, color)
+                    pointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                     dataSets.add(pointsSet)
                 }
-
                 val scatterData = ScatterData(dataSets)
                 // Do not show labels on each point
                 scatterData.setDrawValues(false)
+                scatterData.isHighlightEnabled = false
                 // Plot points on graph
                 chart.data = scatterData
 
@@ -406,27 +413,32 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val L1_E1 = 0
         const val L5_E5 = 1
 
+        //Graph names
         const val GRAPH_AGC_CNO = "AGC/CNo"
         const val GRAPH_CNO_ELEV = "CNo/Elevation"
         const val GRAPH_ERROR = "Error plot"
 
-        const val MAX_AGC_CNO_POINTS = 100
+        // Maximum number of points
+        const val MAX_AGC_CNO_POINTS = 200
         const val MAX_POS_POINTS = 500
 
+        // Limit values for graphs
         const val MIN_ELEV = 0f // º
         const val MAX_ELEV = 90f // º
-        const val MAX_CNO = 50f // dB
-        const val MIN_CNO = -20f // dB
-        const val MAX_AGC_L1 = 60f // dB-Hz
-        const val MIN_AGC_L1 = 10f // dB-Hz
-        const val MAX_AGC_L5 = 30f // dB-Hz
-        const val MIN_AGC_L5 = -10f // dB-Hz
-        const val NORTH_LIM = 600f // m
-        const val EAST_LIM = 600f // m
+        const val MAX_CNO_L1 = 45f // dB
+        const val MIN_CNO_L1 = 0f // dB
+        const val MAX_CNO_L5 = 30f // dB
+        const val MIN_CNO_L5 = -5f // dB
+        const val MAX_AGC_L1 = 45f // dB-Hz
+        const val MIN_AGC_L1 = 30f // dB-Hz
+        const val MAX_AGC_L5 = 15f // dB-Hz
+        const val MIN_AGC_L5 = -5f // dB-Hz
+        const val NORTH_LIM = 200f // m
+        const val EAST_LIM = 200f // m
 
-        const val THRES_AGC_L1 = 45f
-        const val THRES_CN0_L1 = 5f
-        const val THRES_AGC_L5 = 5f
-        const val THRES_CN0_L5 = 0f
+        // AGC-CNO threshold values: y=mx+n
+        const val AGC_CNO_M = -0.1f
+        const val AGC_CNO_N_L1 = 45f
+        const val AGC_CNO_N_L5 = 9f
     }
 }
