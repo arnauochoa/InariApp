@@ -70,5 +70,8 @@
     <string name="logs_bottom">logs</string>
     <string name="positioning_settings">Positioning Settings</string>
     <string name="clear_button">Clear</string>
+    <string name="CNoAxisTitle">CNo [dB-Hz]</string>
+    <string name="AGCAxisTitle">AGC [dB]</string>
+    <string name="ElevAxisTitle">Elevation [dB]</string>
 
 </resources>
