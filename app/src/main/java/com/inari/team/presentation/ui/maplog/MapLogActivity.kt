@@ -67,10 +67,10 @@ class MapLogActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(p0: GoogleMap?) {
         mMap = p0
         positions.forEach {
-            mMap?.addMarker(MarkerOptions().position(it.position))
+            mMap?.addMarker(MarkerOptions().position(it.compPosition))
         }
         if (positions.isNotEmpty()) {
-            moveCameraWithZoom(positions[0].position)
+            moveCameraWithZoom(positions[0].compPosition)
         }
 
     }

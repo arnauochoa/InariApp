@@ -3,7 +3,9 @@ package com.inari.team.presentation.model
 import com.google.android.gms.maps.model.LatLng
 
 data class ResponsePvtMode(
-    val position: LatLng,
+    val refPosition: LatLng,
+    val refAltitude: Float,
+    val compPosition: LatLng,
     val modeColor: Int,
     val modeName: String
 )

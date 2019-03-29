@@ -353,13 +353,13 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
         if (positions.isNotEmpty()) {
             positions.forEach { resp ->
-                addMarker(resp.position, "", resp.modeColor)
+                addMarker(resp.compPosition, "", resp.modeColor)
             }
             if (isStartedComputing) {
-                moveCameraWithZoom(positions[0].position)
+                moveCameraWithZoom(positions[0].compPosition)
                 isStartedComputing = false
             } else {
-                moveCamera(positions[0].position)
+                moveCamera(positions[0].compPosition)
             }
         }
     }

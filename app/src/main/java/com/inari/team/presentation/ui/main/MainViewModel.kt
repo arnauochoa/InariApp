@@ -216,19 +216,32 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         //todo remove when alfonso changes
         val positionJson = JSONArray(obtainedPosition.substringBeforeLast(",") + "]")
 
-        for (i in 0 until positionJson.length()) {
-            positionJson.getJSONObject(i)?.let {
-                val latitude = it.get("lat") as? Double
-                val longitude = it.get("lng") as? Double
-                latitude?.let { lat ->
-                    longitude?.let { lon ->
-                        responses.add(
-                            ResponsePvtMode(LatLng(lat, lon), gnssData.modes[i].color, gnssData.modes[i].name)
-                        )
+        //todo remove this when ref position obtained
+        // >>>>>
+        val alt = 100f
+        refPos?.let { pos ->
+        // <<<<<<
+            for (i in 0 until positionJson.length()) {
+                positionJson.getJSONObject(i)?.let {
+                    val latitude = it.get("lat") as? Double
+                    val longitude = it.get("lng") as? Double
+                    latitude?.let { lat ->
+                        longitude?.let { lon ->
+                            // todo add ref position
+                            responses.add(
+                                ResponsePvtMode(
+                                    pos,
+                                    alt,
+                                    LatLng(lat, lon),
+                                    gnssData.modes[i].color,
+                                    gnssData.modes[i].name
+                                )
+                            )
+                        }
                     }
                 }
             }
-        }
+        } // <<<<
 
         return responses
     }
