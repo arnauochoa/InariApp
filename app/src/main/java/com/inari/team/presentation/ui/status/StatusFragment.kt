@@ -9,7 +9,8 @@ import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
@@ -27,9 +28,9 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.takeTwoDecimalsToDouble
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.model.StatusData
-import com.inari.team.presentation.ui.main.MainActivity
 import kotlinx.android.synthetic.main.fragment_status.*
 import kotlinx.android.synthetic.main.view_cno_indicator.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class StatusFragment : BaseFragment(), GnssEventsListener {
@@ -71,15 +72,14 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
 
     override fun onResume() {
         super.onResume()
-        MainActivity.getInstance()?.subscribeToGnssEvents(this)
         tabLayout?.getTabAt(0)?.select()
         skyplot.setHorizonSelected(mPrefs.getSelectedMask().toFloat())
     }
 
     private fun setViews() {
 
-        tvLegend.setOnClickListener {
-            clLegend.visibility = if (clLegend.visibility == VISIBLE) {
+        tvLegend?.setOnClickListener {
+            clLegend?.visibility = if (clLegend.visibility == VISIBLE) {
                 GONE
             } else {
                 VISIBLE
@@ -112,7 +112,6 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
                     }
                 }
 
-                legend_cv.visibility = if (selectedConstellation == Companion.CONSTELLATION.ALL) VISIBLE else GONE
             }
         })
 
@@ -130,15 +129,14 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
         val cno = takeTwoDecimalsToDouble(getCNo(status, selectedConstellation))
 
         if (cno in 10.00..45.00) {
-            seekBar.setProgress(cno.toInt(), true)
-            clIndicator.visibility = VISIBLE
+            seekBar?.setProgress(cno.toInt(), true)
         } else {
-            clIndicator.visibility = INVISIBLE
+            seekBar?.setProgress(11, true)
         }
 
-        seekBar.isEnabled = false
+        seekBar?.isEnabled = false
 
-        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        seekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, p: Int, fromUser: Boolean) {
                 seekBar?.let {
                     tvCnoAvg?.text = "$cno"
@@ -165,8 +163,8 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
                 }
                 SUCCESS -> {
                     it.data?.let { statusData ->
-                        cn0Content.text = statusData.CN0
-                        numSatsContent.text = statusData.satellitesCount
+                        cn0Content?.text = statusData.CN0
+                        numSatsContent?.text = statusData.satellitesCount
                     }
                 }
                 ERROR -> {
@@ -176,23 +174,24 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
     }
 
     override fun onSatelliteStatusChanged(status: android.location.GnssStatus) {
+        Timber.d("onGnssCallback - Status - STATUS")
         val filteredGnssStatus = filterGnssStatus(status, selectedConstellation)
 
         viewModel?.obtainStatusParameters(filteredGnssStatus, selectedConstellation)
-        skyplot.setGnssStatus(filteredGnssStatus)
+        skyplot?.setGnssStatus(filteredGnssStatus)
         setCNo(status = filteredGnssStatus)
     }
 
     override fun onOrientationChanged(orientation: Double, tilt: Double) {
-        skyplot.onOrientationChanged(orientation, tilt)
+        skyplot?.onOrientationChanged(orientation, tilt)
     }
 
     override fun onGnssStopped() {
-        skyplot.setStopped()
+        skyplot?.setStopped()
     }
 
     override fun onGnssStarted() {
-        skyplot.setStarted()
+        skyplot?.setStarted()
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {

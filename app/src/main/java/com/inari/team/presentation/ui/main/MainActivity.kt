@@ -73,6 +73,8 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     private var gnssNmeaMessageListener: OnNmeaMessageListener? = null
 
     private val positionFragment = PositionFragment()
+    private val statusFragment = StatusFragment()
+    private val statisticsFragment = StatisticsFragment()
     private val logsFragment = LogsFragment()
 
     private var positionsList = arrayListOf<ResponsePvtMode>()
@@ -126,8 +128,8 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         val pagerAdapter = BarAdapter(supportFragmentManager)
 
         pagerAdapter.addFragments(positionFragment, "Position")
-        pagerAdapter.addFragments(StatusFragment(), "GNSS state")
-        pagerAdapter.addFragments(StatisticsFragment(), "Statistics")
+        pagerAdapter.addFragments(statusFragment, "GNSS state")
+        pagerAdapter.addFragments(statisticsFragment, "Statistics")
         pagerAdapter.addFragments(logsFragment, "Logs")
         pagerAdapter.addFragments(AboutFragment(), "About")
 
@@ -155,14 +157,42 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 
         bottomNavigation.setOnTabSelectedListener { pos, wasSelected ->
             if (!wasSelected) {
-                viewPager.setCurrentItem(pos, false)
-                if (pos == 3) {
-                    logsFragment.setFiles()
-                }
+                switchFragment(pos)
             }
             true
         }
 
+    }
+
+    private fun switchFragment(pos: Int) {
+        when (pos) {
+            0 -> {
+                viewPager.setCurrentItem(pos, false)
+                unSubscribeToGnssEvents(statisticsFragment)
+                unSubscribeToGnssEvents(statusFragment)
+            }
+            1 -> {
+                viewPager.setCurrentItem(pos, false)
+                subscribeToGnssEvents(statusFragment)
+                unSubscribeToGnssEvents(statisticsFragment)
+            }
+            2 -> {
+                viewPager.setCurrentItem(pos, false)
+                subscribeToGnssEvents(statisticsFragment)
+                unSubscribeToGnssEvents(statusFragment)
+            }
+            3 -> {
+                viewPager.setCurrentItem(pos, false)
+                logsFragment.setFiles()
+                unSubscribeToGnssEvents(statisticsFragment)
+                unSubscribeToGnssEvents(statusFragment)
+            }
+            4 -> {
+                viewPager.setCurrentItem(pos, false)
+                unSubscribeToGnssEvents(statisticsFragment)
+                unSubscribeToGnssEvents(statusFragment)
+            }
+        }
     }
 
     private fun startGnss() {
@@ -248,7 +278,11 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     }
 
     fun subscribeToGnssEvents(listener: GnssEventsListener) {
-        gnssListeners.add(listener)
+        if (!gnssListeners.contains(listener)) gnssListeners.add(listener)
+    }
+
+    fun unSubscribeToGnssEvents(listener: GnssEventsListener) {
+        if (gnssListeners.contains(listener)) gnssListeners.remove(listener)
     }
 
     private fun showSaveDialog() {
@@ -286,9 +320,8 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     private fun showSavedSnackBar() {
         val snackbar = Snackbar.make(snackbarCl, "File saved", Snackbar.LENGTH_LONG)
         snackbar.setAction("OPEN") {
-            viewPager.currentItem = 3
+            switchFragment(3)
             bottomNavigation.currentItem = 3
-            logsFragment.setFiles()
         }
         snackbar.show()
     }
