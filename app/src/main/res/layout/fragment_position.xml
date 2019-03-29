@@ -86,7 +86,7 @@
         android:layout_marginBottom="8dp"
         android:drawableStart="@drawable/ic_google_arrow"
         android:text="RECENTRE"
-        android:visibility="visible"
+        android:visibility="gone"
         android:drawablePadding="4dp"
         android:paddingEnd="16dp"
         android:paddingStart="16dp"
