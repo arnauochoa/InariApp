@@ -30,6 +30,9 @@
     <color name="agcCnoGood">#4CAF50</color>
     <color name="agcCnoBad">#FF2626</color>
 
+    <color name="linkColor">#1282FF</color>
+
+
 
     <!-- GPSTest Theme -->
     <!--<color name="colorPrimary">#3F51B5</color>-->

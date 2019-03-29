@@ -73,5 +73,18 @@
     <string name="CNoAxisTitle">CNo [dB-Hz]</string>
     <string name="AGCAxisTitle">AGC [dB]</string>
     <string name="ElevAxisTitle">Elevation [dB]</string>
+    <string name="app_version_title">App version:</string>
+    <string name="app_version_number">1.0.0</string>
+    <string name="contact_title">Contact:</string>
+    <string name="contact_email">inariteam@gmail.com</string>
+    <string name="developed_by_title">Developed by:</string>
+    <string name="inari_team">inari team</string>
+    <string name="composed_by_title">Composed by:</string>
+    <string name="team_composers">Albert Becerra \nAlejandro Pérez \nAlfonso Amayuelas \nArnau Ochoa \nJuan Bernabeu</string>
+    <string name="advisored_by_title">Advisored by:</string>
+    <string name="advisors">Daniel Egea</string>
+    <string name="see_tutorial_text">See tutorial</string>
+    <string name="developed_in_uab_title">Developed in \nUniversitat Autònoma \nde Barcelona</string>
+    <string name="supported_by_the_neuropean_space_agency">Supported by the \nEuropean Space Agency</string>
 
 </resources>
