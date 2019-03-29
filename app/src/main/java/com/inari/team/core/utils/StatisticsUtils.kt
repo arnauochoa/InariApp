@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.RelativeLayout
 import com.github.mikephil.charting.charts.ScatterChart
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
 import com.google.android.gms.maps.model.LatLng
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.ui.statistics.StatisticsFragment.Companion.L1_E1
@@ -16,6 +17,11 @@ const val BAND5_DOWN_THRES = 1176000000
 const val BAND5_UP_THRES = 1177000000
 
 class SatElevCNo(var svid: Int, var elevation: Float, var cNo: Float)
+class AgcCNoThreshold(
+    var threshold: ArrayList<Entry> = arrayListOf(),
+    var nominalPoints: ArrayList<Entry> = arrayListOf(),
+    var interferencePoints: ArrayList<Entry> = arrayListOf()
+)
 
 fun createScatterChart(
     context: Context?,
@@ -41,6 +47,8 @@ fun createScatterChart(
         chart.layoutParams = chartLP
         chart.description.isEnabled = false
         chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        chart.xAxis.granularity = 0.1f
+        chart.axisLeft.granularity = 0.1f
         chart.setDrawBorders(true)
     }
 
@@ -64,6 +72,29 @@ fun obtainCnoElevValues(selectedBand: Int, status: GnssStatus): ArrayList<SatEle
         } // End for
     }
     return satElevCNoList
+}
+
+fun setAgcCNoThreshold(
+    m: Float,
+    n: Float,
+    points: ArrayList<Entry>
+): AgcCNoThreshold {
+    val agcCNoThreshold = AgcCNoThreshold()
+    // Build points of threshold equation (y=mx+n)
+    repeat(1000){x ->
+        agcCNoThreshold.threshold.add(Entry(1.0f * (x-100), m * (x-100) + n ))
+    }
+
+    // Take nominal points as points above the threshold
+    agcCNoThreshold.nominalPoints = points.filter { p -> p.y >= m * p.x + n } as? ArrayList<Entry> ?: arrayListOf()
+    // Take interference points as points under the threshold
+    agcCNoThreshold.interferencePoints = points.filter { p -> p.y < m * p.x + n } as? ArrayList<Entry> ?: arrayListOf()
+
+    // Sort points over X to plot them
+    agcCNoThreshold.nominalPoints.sortBy { p -> p.x }
+    agcCNoThreshold.interferencePoints.sortBy { p -> p.x }
+
+    return agcCNoThreshold
 }
 
 fun isSelectedBand(selectedBand: Int, carrierFrequencyHz: Float): Boolean {
@@ -119,3 +150,4 @@ fun computeErrorNE(refPos: LatLng, refAlt: Float, compPos: LatLng): DoubleArray 
 
     return doubleArrayOf(deltaN, deltaE)
 }
+

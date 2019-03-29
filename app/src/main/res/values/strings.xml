@@ -72,7 +72,7 @@
     <string name="clear_button">Clear</string>
     <string name="cnoAxisTitle">CNo [dB-Hz]</string>
     <string name="agcAxisTitle">AGC [dB]</string>
-    <string name="elevAxisTitle">Elevation [dB]</string>
+    <string name="elevAxisTitle">Elevation [º]</string>
     <string name="app_version_title">App version:</string>
     <string name="app_version_number">1.0.0</string>
     <string name="contact_title">Contact:</string>
