@@ -11,4 +11,6 @@
     <dimen name="sky_legend_cno_medium_line">7dp</dimen>
     <dimen name="sky_legend_shape_size">14sp</dimen>
     <dimen name="sky_legend_shape_small_line">5dp</dimen>
+    <dimen name="margin_between_lines_about">20dp</dimen>
+    <dimen name="size_logos_about">60dp</dimen>
 </resources>
