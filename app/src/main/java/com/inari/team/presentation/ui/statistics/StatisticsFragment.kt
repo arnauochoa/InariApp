@@ -1,11 +1,13 @@
 package com.inari.team.presentation.ui.statistics
 
 
+import android.content.Context
 import android.graphics.Color
 import android.location.GnssMeasurement
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
 import android.location.Location
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.design.widget.TabLayout
@@ -26,12 +28,12 @@ import com.inari.team.R.drawable
 import com.inari.team.R.layout
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
-import com.inari.team.core.utils.createScatterChart
-import com.inari.team.core.utils.filterGnssStatus
-import com.inari.team.core.utils.isSelectedBand
-import com.inari.team.core.utils.obtainCnoElevValues
+import com.inari.team.core.utils.*
 import com.inari.team.core.utils.skyplot.GnssEventsListener
+import com.inari.team.presentation.model.ResponsePvtMode
+import com.inari.team.presentation.ui.main.MainListener
 import com.inari.team.presentation.ui.status.StatusFragment
+import kotlinx.android.synthetic.main.dialog_new_mode.*
 import kotlinx.android.synthetic.main.fragment_statistics.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -42,9 +44,13 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     @Inject
     lateinit var navigator: Navigator
 
+    private var mainListener: MainListener? = null
+
     private var scatterChart: ScatterChart? = null
 
     private var agcCNoValues = arrayListOf<Pair<Double, Double>>()
+
+    private var computedPositions = arrayListOf<ResponsePvtMode>()
 
     private var selectedBand = L1_E1
 
@@ -59,6 +65,11 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_statistics, container, false)
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        mainListener = context as? MainListener
     }
 
     override fun onResume() {
@@ -122,46 +133,60 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         agcCNoValues = arrayListOf()
         when (graph) {
             GRAPH_AGC_CNO -> {
+                tabLayout.visibility = View.VISIBLE
                 setAgcCNoGraph()
             }
             GRAPH_CNO_ELEV -> {
+                tabLayout.visibility = View.VISIBLE
                 setCNoElevGraph()
             }
+            GRAPH_ERROR -> {
+                tabLayout.visibility = View.GONE
+                setErrorGraph()
+            }
         }
+
+        scatterChart?.let { chart -> rlGraph.addView(chart) }
     }
 
     // Different graphs builders
     private fun setAgcCNoGraph() {
-        context?.let {
+        context?.let { c ->
             // programmatically create a ScatterChart
             when (selectedBand) {
-                L1_E1 -> scatterChart = createScatterChart(context, MIN_CNO, MAX_CNO, MIN_AGC_L1, MAX_AGC_L1)
-                L5_E5 -> scatterChart = createScatterChart(context, MIN_CNO, MAX_CNO, MIN_AGC_L5, MAX_AGC_L5)
+                L1_E1 -> scatterChart = createScatterChart(c, MIN_CNO, MAX_CNO, MIN_AGC_L1, MAX_AGC_L1)
+                L5_E5 -> scatterChart = createScatterChart(c, MIN_CNO, MAX_CNO, MIN_AGC_L5, MAX_AGC_L5)
             }
-            xAxisTitle.text = getString(R.string.CNoAxisTitle)
-            yAxisTitle.text = getString(R.string.AGCAxisTitle)
+            xAxisTitle.text = getString(R.string.cnoAxisTitle)
+            yAxisTitle.text = getString(R.string.agcAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
-                chart.description.isEnabled = false
-                chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-                rlGraph.addView(chart)
 //                plotAgcCNoGraph(null)
             }
         }
     }
 
     private fun setCNoElevGraph() {
-        context?.let {
-            scatterChart = createScatterChart(context, MIN_ELEV, MAX_ELEV, MIN_CNO, MAX_CNO)
-            xAxisTitle.text = getString(R.string.ElevAxisTitle)
-            yAxisTitle.text = getString(R.string.CNoAxisTitle)
+        context?.let { c ->
+            scatterChart = createScatterChart(c, MIN_ELEV, MAX_ELEV, MIN_CNO, MAX_CNO)
+            xAxisTitle.text = getString(R.string.elevAxisTitle)
+            yAxisTitle.text = getString(R.string.cnoAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
-                chart.description.isEnabled = false
-                chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-                rlGraph.removeAllViews()
-                rlGraph.addView(chart)
             }
+        }
+    }
+
+    private fun setErrorGraph() {
+        context?.let { c ->
+            computedPositions = mainListener?.getComputedPositions() as ArrayList<ResponsePvtMode>
+            scatterChart = createScatterChart(c, -EAST_LIM, EAST_LIM, -NORTH_LIM, NORTH_LIM)
+            xAxisTitle.text = getString(R.string.eastAxisTitle)
+            yAxisTitle.text = getString(R.string.northAxisTitle)
+            scatterChart?.let { chart ->
+                chart.legend.isEnabled = true
+            }
+            plotErrorGraph()
         }
     }
 
@@ -294,6 +319,51 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         }
     }
 
+    private fun plotErrorGraph() {
+        context?.let { c ->
+            scatterChart?.let { chart ->
+                // Separate by modes
+                val positionsByMode = computedPositions.groupBy { pos -> pos.modeName }
+
+                // Generate points by mode
+                val dataSets = arrayListOf<IScatterDataSet>()
+                positionsByMode.keys.forEach{
+                    val modePositions = arrayListOf<Entry>()
+                    val color = positionsByMode[it]?.get(0)?.modeColor ?: 0
+                    // For every position, get point as error between computed and reference position
+                    positionsByMode[it]?.forEach { pos ->
+                        val error = computeErrorNE(pos.refPosition, pos.refAltitude, pos.compPosition)
+                        modePositions.add(Entry(error[0], error[1]))
+                    }
+                    modePositions.sortBy { point -> point.x }
+                    val pointsSet = ScatterDataSet(modePositions, it)
+                    pointsSet.color = ContextCompat.getColor(c, getLegendColor(color))
+                    dataSets.add(pointsSet)
+                }
+
+                val scatterData = ScatterData(dataSets)
+                // Do not show labels on each point
+                scatterData.setDrawValues(false)
+                // Plot points on graph
+                chart.data = scatterData
+
+                chart.invalidate()
+
+            }
+        }
+    }
+
+    // Callbacks
+    fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
+        positions.forEach { pos ->
+            if (computedPositions.size == MAX_POS_LENGTH){
+                computedPositions.removeAt(0)
+            }
+            computedPositions.add(pos)
+        }
+        plotErrorGraph()
+    }
+
     override fun onGnssStarted() {
     }
 
@@ -339,15 +409,18 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val GRAPH_ERROR = "Error plot"
 
         const val MAX_AGC_CNO_LENGTH = 100
+        const val MAX_POS_LENGTH = 100
 
-        const val MIN_ELEV = 0f
-        const val MAX_ELEV = 90f
-        const val MAX_CNO = 50f
-        const val MIN_CNO = -20f
-        const val MAX_AGC_L1 = 60f
-        const val MIN_AGC_L1 = 10f
-        const val MAX_AGC_L5 = 30f
-        const val MIN_AGC_L5 = -10f
+        const val MIN_ELEV = 0f // º
+        const val MAX_ELEV = 90f // º
+        const val MAX_CNO = 50f // dB
+        const val MIN_CNO = -20f // dB
+        const val MAX_AGC_L1 = 60f // dB-Hz
+        const val MIN_AGC_L1 = 10f // dB-Hz
+        const val MAX_AGC_L5 = 30f // dB-Hz
+        const val MIN_AGC_L5 = -10f // dB-Hz
+        const val NORTH_LIM = 200f // m
+        const val EAST_LIM = 200f // m
 
         const val THRES_AGC_L1 = 45f
         const val THRES_CN0_L1 = 5f

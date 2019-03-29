@@ -70,9 +70,9 @@
     <string name="logs_bottom">Logs</string>
     <string name="positioning_settings">Positioning Settings</string>
     <string name="clear_button">Clear</string>
-    <string name="CNoAxisTitle">CNo [dB-Hz]</string>
-    <string name="AGCAxisTitle">AGC [dB]</string>
-    <string name="ElevAxisTitle">Elevation [dB]</string>
+    <string name="cnoAxisTitle">CNo [dB-Hz]</string>
+    <string name="agcAxisTitle">AGC [dB]</string>
+    <string name="elevAxisTitle">Elevation [dB]</string>
     <string name="app_version_title">App version:</string>
     <string name="app_version_number">1.0.0</string>
     <string name="contact_title">Contact:</string>
@@ -86,5 +86,7 @@
     <string name="see_tutorial_text">See tutorial</string>
     <string name="developed_in_uab_title">Developed in \nUniversitat Autònoma \nde Barcelona</string>
     <string name="supported_by_the_neuropean_space_agency">Supported by the \nEuropean Space Agency</string>
+    <string name="eastAxisTitle">East [m]</string>
+    <string name="northAxisTitle">North [m]</string>
 
 </resources>

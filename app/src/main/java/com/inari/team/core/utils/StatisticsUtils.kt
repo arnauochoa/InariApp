@@ -3,6 +3,8 @@ package com.inari.team.core.utils
 import android.content.Context
 import android.widget.RelativeLayout
 import com.github.mikephil.charting.charts.ScatterChart
+import com.github.mikephil.charting.components.XAxis
+import com.google.android.gms.maps.model.LatLng
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.ui.statistics.StatisticsFragment.Companion.L1_E1
 import com.inari.team.presentation.ui.statistics.StatisticsFragment.Companion.L5_E5
@@ -24,19 +26,21 @@ fun createScatterChart(
 ): ScatterChart? {
     val scatterChart = ScatterChart(context)
 
-    scatterChart.let {
-        it.xAxis.axisMinimum = xMin
-        it.xAxis.axisMaximum = xMax
-        it.axisLeft.axisMinimum = yMin
-        it.axisLeft.axisMaximum = yMax
-        it.axisRight.isEnabled = false
+    scatterChart.let { chart ->
+        chart.xAxis.axisMinimum = xMin
+        chart.xAxis.axisMaximum = xMax
+        chart.axisLeft.axisMinimum = yMin
+        chart.axisLeft.axisMaximum = yMax
+        chart.axisRight.isEnabled = false
 
 
         val chartLP = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.MATCH_PARENT
         )
-        it.layoutParams = chartLP
+        chart.layoutParams = chartLP
+        chart.description.isEnabled = false
+        chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
     }
 
     return scatterChart
@@ -81,4 +85,33 @@ fun isSelectedBand(selectedBand: Int, carrierFrequencyHz: Float): Boolean {
         }
     }
     return isSelected
+}
+
+
+fun computeErrorNE(refPos: LatLng, refAlt: Float, compPos: LatLng): FloatArray {
+
+    val deltaLat = (compPos.latitude - refPos.latitude) * Math.PI / 180.0
+    val deltaLng = (compPos.longitude - refPos.longitude) * Math.PI / 180.0
+
+    // Declare the required WGS-84 ellipsoid parameters
+    val a = 6378137.0     // Semi-major axis
+    val b = 6356752.31425 // Semi-minor axis
+
+    // Compute the second eccentricity
+    val e2 = (Math.pow(a, 2.0) - Math.pow(b, 2.0)) / Math.pow(a, 2.0)
+
+    // Compute additional parameter required in the processing
+    val W = Math.sqrt(1.0 - e2 * Math.pow(Math.sin(refPos.latitude), 2.0))
+
+    // Compute the meridian radius of curvature at the given latitude
+    val M = a * (1.0 - e2) / Math.pow(W, 3.0)
+
+    // Compute the the prime vertical radius of curvature at the given latitude
+    val N = a / W
+
+    // Compute the differences on North and East
+    val deltaN = (deltaLat * (M + refAlt)).toFloat()
+    val deltaE = (deltaLng * (N + refAlt) * Math.cos(refPos.latitude)).toFloat()
+
+    return floatArrayOf(deltaN, deltaE)
 }

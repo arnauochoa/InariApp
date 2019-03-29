@@ -336,7 +336,9 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 DataState.SUCCESS -> {
                     positionFragment.hideMapLoading()
                     it.data?.let { positions ->
+                        // todo control which fragment is open
                         positionFragment.onPositionsCalculated(positions)
+                        statisticsFragment.onPositionsCalculated(positions)
                     }
                 }
                 DataState.ERROR -> {
@@ -376,6 +378,10 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         if (computedPositions.isNotEmpty()) {
             showSaveDialog()
         }
+    }
+
+    override fun getComputedPositions(): List<ResponsePvtMode>? {
+        return viewModel?.getComputedPositions()
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -524,4 +530,5 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 interface MainListener {
     fun startComputing(selectedModes: List<Mode>)
     fun stopComputing()
+    fun getComputedPositions(): List<ResponsePvtMode>?
 }
