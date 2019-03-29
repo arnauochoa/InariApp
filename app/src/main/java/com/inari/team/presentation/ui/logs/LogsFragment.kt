@@ -2,28 +2,16 @@ package com.inari.team.presentation.ui.logs
 
 
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
-import com.inari.team.core.navigator.Navigator
-import com.inari.team.core.utils.getFilesList
-import com.inari.team.core.utils.getPositionsFilesList
+import com.inari.team.core.utils.BarAdapter
 import kotlinx.android.synthetic.main.fragment_logs.*
-import javax.inject.Inject
 
 
 class LogsFragment : BaseFragment() {
-
-    @Inject
-    lateinit var navigator: Navigator
-
-    private var adapter: LogsAdapter? = null
-    private var positionsAdapter: PositionLogsAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,82 +25,20 @@ class LogsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setViews(view)
+        setViews()
     }
 
-    private fun setViews(view: View) {
+    private fun setViews() {
+        val adapter = BarAdapter(childFragmentManager)
 
-        adapter = LogsAdapter(view.context) {
-            setFiles()
-        }
-        rvLogs.layoutManager = LinearLayoutManager(view.context)
-        rvLogs.adapter = adapter
+        adapter.addFragments(PositionLogsFragment(), "Position Logs")
+        adapter.addFragments(MeasurementsLogsFragment(), "Measurements Logs")
 
-        positionsAdapter = PositionLogsAdapter(view.context, {
-            setFiles()
-        }, {
-            navigator.navigateToMapLogActivity(it)
-        })
-        rvPositionLogs.layoutManager = LinearLayoutManager(view.context)
-        rvPositionLogs.adapter = positionsAdapter
-
-        swipeRefresh.setOnRefreshListener {
-            setFiles()
-        }
-
-        clPositionLogsTitle.setOnClickListener {
-            if (clPositionLogs.visibility == GONE) {
-                clPositionLogs.visibility = VISIBLE
-            } else {
-                clPositionLogs.visibility = GONE
-            }
-            ivPositionLogsTitle.rotation = ivPositionLogsTitle.rotation + 180
-        }
-
-        clLogsTitle.setOnClickListener {
-            if (clLogs.visibility == GONE) {
-                clLogs.visibility = VISIBLE
-            } else {
-                clLogs.visibility = GONE
-            }
-            ivMeasurementTitle.rotation = ivMeasurementTitle.rotation + 180
-        }
+        viewPager.adapter = adapter
+        tabLayout.addTab(tabLayout.newTab().setText("Position Logs"))
+        tabLayout.addTab(tabLayout.newTab().setText("Measurement Logs"))
+        tabLayout.setupWithViewPager(viewPager)
 
     }
-
-    fun setFiles() {
-        val filesList = getFilesList()
-        val positionsFileList = getPositionsFilesList()
-
-        if (filesList.isEmpty() && positionsFileList.isEmpty()) {
-            clLogsTitle.visibility = GONE
-            clPositionLogsTitle.visibility = GONE
-            tvEmptyLogs.visibility = GONE
-            tvEmptyPositionLogs.visibility = GONE
-            layoutEmptyView.visibility = VISIBLE
-        } else {
-
-            layoutEmptyView.visibility = GONE
-            clLogsTitle.visibility = VISIBLE
-            clPositionLogsTitle.visibility = VISIBLE
-
-            if (filesList.isNotEmpty()) {
-                adapter?.setLogs(filesList)
-            } else {
-                adapter?.clear()
-                tvEmptyLogs.visibility = VISIBLE
-            }
-
-            if (positionsFileList.isNotEmpty()) {
-                positionsAdapter?.setLogs(positionsFileList)
-            } else {
-                positionsAdapter?.clear()
-                tvEmptyPositionLogs.visibility = VISIBLE
-            }
-        }
-
-        swipeRefresh.isRefreshing = false
-    }
-
 
 }

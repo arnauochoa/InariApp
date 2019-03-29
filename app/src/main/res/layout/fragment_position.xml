@@ -78,6 +78,23 @@
         app:layout_constraintBottom_toTopOf="@+id/clLegend"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/btRecenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="8dp"
+        android:drawableStart="@drawable/ic_google_arrow"
+        android:text="RECENTRE"
+        android:visibility="gone"
+        android:drawablePadding="4dp"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:background="@drawable/bg_recenter"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toTopOf="@+id/clLegend"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <android.support.v7.widget.CardView
         android:id="@+id/cvLegendArrow"
         android:layout_width="wrap_content"
