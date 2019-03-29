@@ -6,7 +6,6 @@ import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.modes.ModesActivity
 import com.inari.team.presentation.ui.settings.GnssSettingsActivity
 import com.inari.team.presentation.ui.splash.SplashActivity
-import com.inari.team.presentation.ui.statisticsdetail.StatisticsDetailActivity
 import dagger.Subcomponent
 
 @PerActivity
@@ -21,5 +20,4 @@ interface ActivityComponent {
 
     fun inject(modesActivity: ModesActivity)
 
-    fun inject(statisticsDetailActivity: StatisticsDetailActivity)
 }

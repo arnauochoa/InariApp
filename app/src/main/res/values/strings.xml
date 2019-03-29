@@ -67,7 +67,7 @@
     <string name="band_l1">L1/E1</string>
     <string name="band_l5">L5/E5a</string>
     <string name="about_bottom">About</string>
-    <string name="logs_bottom">logs</string>
+    <string name="logs_bottom">Logs</string>
     <string name="positioning_settings">Positioning Settings</string>
     <string name="clear_button">Clear</string>
     <string name="CNoAxisTitle">CNo [dB-Hz]</string>

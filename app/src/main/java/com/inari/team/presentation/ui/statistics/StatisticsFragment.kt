@@ -13,13 +13,10 @@ import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
 import com.github.mikephil.charting.charts.ScatterChart
-import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.ScatterData
@@ -30,12 +27,14 @@ import com.inari.team.R.drawable
 import com.inari.team.R.layout
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
-import com.inari.team.core.utils.*
+import com.inari.team.core.utils.createScatterChart
+import com.inari.team.core.utils.filterGnssStatus
+import com.inari.team.core.utils.isSelectedBand
+import com.inari.team.core.utils.obtainCnoElevValues
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.fragment_statistics.*
-import kotlinx.android.synthetic.main.fragment_statistics.view.*
 import javax.inject.Inject
 
 
