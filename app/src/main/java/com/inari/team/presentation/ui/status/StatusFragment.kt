@@ -30,6 +30,7 @@ import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.model.StatusData
 import kotlinx.android.synthetic.main.fragment_status.*
 import kotlinx.android.synthetic.main.view_cno_indicator.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class StatusFragment : BaseFragment(), GnssEventsListener {
@@ -173,6 +174,7 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
     }
 
     override fun onSatelliteStatusChanged(status: android.location.GnssStatus) {
+        Timber.d("onGnssCallback - Status - STATUS")
         val filteredGnssStatus = filterGnssStatus(status, selectedConstellation)
 
         viewModel?.obtainStatusParameters(filteredGnssStatus, selectedConstellation)

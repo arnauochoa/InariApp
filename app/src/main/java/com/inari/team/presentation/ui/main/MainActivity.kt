@@ -168,6 +168,8 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         when (pos) {
             0 -> {
                 viewPager.setCurrentItem(pos, false)
+                unSubscribeToGnssEvents(statisticsFragment)
+                unSubscribeToGnssEvents(statusFragment)
             }
             1 -> {
                 viewPager.setCurrentItem(pos, false)
@@ -182,9 +184,13 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
             3 -> {
                 viewPager.setCurrentItem(pos, false)
                 logsFragment.setFiles()
+                unSubscribeToGnssEvents(statisticsFragment)
+                unSubscribeToGnssEvents(statusFragment)
             }
             4 -> {
                 viewPager.setCurrentItem(pos, false)
+                unSubscribeToGnssEvents(statisticsFragment)
+                unSubscribeToGnssEvents(statusFragment)
             }
         }
     }

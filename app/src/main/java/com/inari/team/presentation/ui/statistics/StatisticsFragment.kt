@@ -33,6 +33,7 @@ import com.inari.team.core.utils.obtainCnoElevValues
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.fragment_statistics.*
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -300,6 +301,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     }
 
     override fun onSatelliteStatusChanged(status: GnssStatus?) {
+        Timber.d("onGnssCallback - Status - STATISTICS")
         status?.let {
             if (graph == GRAPH_CNO_ELEV) {
                 plotElevCNoGraph(status)
@@ -308,6 +310,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     }
 
     override fun onGnssMeasurementsReceived(event: GnssMeasurementsEvent?) {
+        Timber.d("onGnssCallback - Measurement - STATISTICS")
         event?.let {
             if (graph == GRAPH_AGC_CNO) {
                 plotAgcCNoGraph(it.measurements)
