@@ -162,10 +162,11 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                     isMyLocationEnabled = true
                 }
                 uiSettings?.isMyLocationButtonEnabled = false
+                uiSettings?.isMapToolbarEnabled = false
                 mapType = mSharedPreferences.getSelectedMapType()
 
-                setOnCameraMoveStartedListener {
-                    when (it) {
+                setOnCameraMoveStartedListener { reason ->
+                    when (reason) {
                         REASON_GESTURE -> {
                             if (btComputeAction.text == getString(R.string.stop_computing)) {
                                 isCameraIntercepted = true
@@ -345,7 +346,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                 }
             }
         } else {
-            ivAlert.visibility = GONE
+            ivAlert?.visibility = GONE
         }
     }
 

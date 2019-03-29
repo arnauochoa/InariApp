@@ -91,7 +91,7 @@ fun isSelectedBand(selectedBand: Int, carrierFrequencyHz: Float): Boolean {
  * Function used to compute the error between two points in Latitude, Longitude
  * as the distance in meters on East and North axis.
  */
-fun computeErrorNE(refPos: LatLng, refAlt: Float, compPos: LatLng): FloatArray {
+fun computeErrorNE(refPos: LatLng, refAlt: Float, compPos: LatLng): DoubleArray {
 
     val deltaLat = (compPos.latitude - refPos.latitude) * Math.PI / 180.0
     val deltaLng = (compPos.longitude - refPos.longitude) * Math.PI / 180.0
@@ -113,8 +113,8 @@ fun computeErrorNE(refPos: LatLng, refAlt: Float, compPos: LatLng): FloatArray {
     val N = a / W
 
     // Compute the differences on North and East
-    val deltaN = (deltaLat * (M + refAlt)).toFloat()
-    val deltaE = (deltaLng * (N + refAlt) * Math.cos(refPos.latitude)).toFloat()
+    val deltaN = (deltaLat * (M + refAlt))
+    val deltaE = -(deltaLng * (N + refAlt) * Math.cos(refPos.latitude))
 
-    return floatArrayOf(deltaN, deltaE)
+    return doubleArrayOf(deltaN, deltaE)
 }
