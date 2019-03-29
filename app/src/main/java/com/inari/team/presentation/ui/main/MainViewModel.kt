@@ -176,7 +176,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                 calculatePositionWithGnss()
             }
 
-            if (Date().time - gnssData.lastEphemerisDate.time >= TimeUnit.HOURS.toMillis(EPHEMERIS_UPDATE_TIME_HOURS)) {
+            if (Date().time - gnssData.lastEphemerisDate.time >= TimeUnit.MINUTES.toMillis(EPHEMERIS_UPDATE_TIME_MINUTES)) {
                 obtainEphemerisData()
             }
         }
@@ -263,7 +263,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         const val SUPL_SSL_ENABLED = true
         const val SUPL_MESSAGE_LOGGING_ENABLED = true
         const val SUPL_LOGGING_ENABLED = true
-        const val EPHEMERIS_UPDATE_TIME_HOURS = 1L //h
+        const val EPHEMERIS_UPDATE_TIME_MINUTES = 5L //min
         const val AVG_RATING_DEFAULT = 1L //s
     }
 

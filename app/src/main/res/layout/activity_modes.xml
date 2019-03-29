@@ -204,7 +204,7 @@
                 app:layout_constraintTop_toBottomOf="@id/clAvgValue">
 
                 <TextView
-                    android:id="@+id/tvMaskTitle"
+                    android:id="@+id/tvCnoTitle"
                     android:layout_width="0dp"
                     android:layout_height="45dp"
                     android:layout_marginTop="8dp"
@@ -220,16 +220,16 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/ivMaskTitle"
+                    android:id="@+id/ivCnoTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
                     android:src="@drawable/ic_arrow_up_grey"
-                    app:layout_constraintBottom_toBottomOf="@+id/tvMaskTitle"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvCnoTitle"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/tvMaskTitle" />
+                    app:layout_constraintTop_toTopOf="@+id/tvCnoTitle" />
 
             </android.support.constraint.ConstraintLayout>
 
