@@ -1,21 +1,17 @@
 package com.inari.team.core.utils
 
 import android.content.Context
-import android.view.View
 import android.widget.RelativeLayout
-import android.widget.TextView
 import com.github.mikephil.charting.charts.ScatterChart
 import com.inari.team.data.GnssStatus
-import com.inari.team.presentation.ui.statisticsdetail.StatisticsDetailActivity
+import com.inari.team.presentation.ui.statistics.StatisticsFragment.Companion.L1_E1
+import com.inari.team.presentation.ui.statistics.StatisticsFragment.Companion.L5_E5
 
 
 const val BAND1_DOWN_THRES = 1575000000
 const val BAND1_UP_THRES = 1576000000
 const val BAND5_DOWN_THRES = 1176000000
 const val BAND5_UP_THRES = 1177000000
-
-const val L1_E1 = 1
-const val L5_E5 = 2
 
 class SatElevCNo(var svid: Int, var elevation: Float, var cNo: Float)
 
@@ -28,7 +24,7 @@ fun createScatterChart(
 ): ScatterChart? {
     val scatterChart = ScatterChart(context)
 
-    scatterChart?.let {
+    scatterChart.let {
         it.xAxis.axisMinimum = xMin
         it.xAxis.axisMaximum = xMax
         it.axisLeft.axisMinimum = yMin
@@ -69,15 +65,17 @@ fun isSelectedBand(selectedBand: Int, carrierFrequencyHz: Float): Boolean {
     var isSelected = false
     when (selectedBand) {
         L1_E1 -> {
-            if (carrierFrequencyHz > BAND1_DOWN_THRES &&  // If carrierFrequencyHz inside L1_E1 band
-                carrierFrequencyHz < BAND1_UP_THRES
+            if ((carrierFrequencyHz > BAND1_DOWN_THRES &&  // If carrierFrequencyHz inside L1_E1 band
+                        carrierFrequencyHz < BAND1_UP_THRES) ||
+                (carrierFrequencyHz == 0.0f)
             ) {
                 isSelected = true
             }
         }
-        L5_E5 ->{
+        L5_E5 -> {
             if (carrierFrequencyHz > BAND5_DOWN_THRES &&   // If carrierFrequencyHz inside L5_E5 band
-                carrierFrequencyHz < BAND5_UP_THRES){
+                carrierFrequencyHz < BAND5_UP_THRES
+            ) {
                 isSelected = true
             }
         }
