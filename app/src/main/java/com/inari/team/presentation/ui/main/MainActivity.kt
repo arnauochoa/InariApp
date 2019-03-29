@@ -52,10 +52,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         const val TUTORIAL_CODE = 88
 
         private var mActivity: MainActivity? = null
-
-        fun getInstance(): MainActivity? {
-            return mActivity
-        }
     }
 
     @Inject
@@ -183,7 +179,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
             }
             3 -> {
                 viewPager.setCurrentItem(pos, false)
-                logsFragment.setFiles()
                 unSubscribeToGnssEvents(statisticsFragment)
                 unSubscribeToGnssEvents(statusFragment)
             }
@@ -277,11 +272,11 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         }
     }
 
-    fun subscribeToGnssEvents(listener: GnssEventsListener) {
+    private fun subscribeToGnssEvents(listener: GnssEventsListener) {
         if (!gnssListeners.contains(listener)) gnssListeners.add(listener)
     }
 
-    fun unSubscribeToGnssEvents(listener: GnssEventsListener) {
+    private fun unSubscribeToGnssEvents(listener: GnssEventsListener) {
         if (gnssListeners.contains(listener)) gnssListeners.remove(listener)
     }
 

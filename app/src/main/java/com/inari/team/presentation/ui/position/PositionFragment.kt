@@ -14,6 +14,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -53,6 +54,8 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     private var legendAdapter = LegendAdapter()
 
     private var isStartedComputing = false
+
+    private var isCameraIntercepted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,6 +101,11 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                     }, true
                 )
             }
+        }
+
+        btRecenter.setOnClickListener {
+            isCameraIntercepted = false
+            btRecenter.visibility = GONE
         }
 
         ivLegendArrow.setOnClickListener {
@@ -148,11 +156,27 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap?) {
         mMap = map
 
-        if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-            mMap?.isMyLocationEnabled = true
+        mMap?.let {
+            with(it) {
+                if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    isMyLocationEnabled = true
+                }
+                uiSettings?.isMyLocationButtonEnabled = false
+                mapType = mSharedPreferences.getSelectedMapType()
+
+                setOnCameraMoveStartedListener {
+                    when (it) {
+                        REASON_GESTURE -> {
+                            if (btComputeAction.text == getString(R.string.stop_computing)) {
+                                isCameraIntercepted = true
+                                btRecenter.visibility = VISIBLE
+                            }
+                        }
+                    }
+                }
+            }
         }
-        mMap?.uiSettings?.isMyLocationButtonEnabled = false
-        mMap?.mapType = mSharedPreferences.getSelectedMapType()
+
     }
 
 
@@ -276,11 +300,15 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun moveCamera(latLng: LatLng) {
-        mMap?.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+        if (!isCameraIntercepted) {
+            mMap?.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+        }
     }
 
     private fun moveCameraWithZoom(latLng: LatLng) {
-        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
+        if (!isCameraIntercepted) {
+            mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
+        }
     }
 
     private fun addMarker(latLng: LatLng, title: String, color: Int): Marker? {
