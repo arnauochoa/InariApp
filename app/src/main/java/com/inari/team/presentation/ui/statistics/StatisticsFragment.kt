@@ -355,13 +355,15 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     // Callbacks
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
-        positions.forEach { pos ->
-            if (computedPositions.size == MAX_POS_LENGTH){
-                computedPositions.removeAt(0)
+        if (graph == GRAPH_ERROR){
+            positions.forEach { pos ->
+                if (computedPositions.size == MAX_POS_LENGTH){
+                    computedPositions.removeAt(0)
+                }
+                computedPositions.add(pos)
             }
-            computedPositions.add(pos)
+            plotErrorGraph()
         }
-        plotErrorGraph()
     }
 
     override fun onGnssStarted() {
