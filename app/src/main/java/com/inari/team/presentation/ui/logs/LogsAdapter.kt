@@ -34,8 +34,8 @@ class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit)
         val date = Date(item.lastModified())
         val simpleDate = SimpleDateFormat("dd/MM/yy hh:mm", Locale.ENGLISH).format(date)
 
-        holder.name.text = item.name
-        holder.detail.text = "$simpleDate  ${item.length()}kB"
+        holder.name.text = simpleDate
+        holder.detail.text = "${item.length()}kB"
 
         holder.layout.setOnClickListener {
             if (holder.delete.visibility == VISIBLE) {

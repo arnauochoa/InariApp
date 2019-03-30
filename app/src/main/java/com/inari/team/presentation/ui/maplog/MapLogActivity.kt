@@ -20,7 +20,6 @@ import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.retrievePositionsFile
 import com.inari.team.presentation.model.ResponsePvtMode
-import com.inari.team.presentation.ui.position.LegendAdapter
 import com.inari.team.presentation.ui.position.PositionFragment
 import kotlinx.android.synthetic.main.activity_map_log.*
 import kotlinx.android.synthetic.main.dialog_map_terrain.view.*
@@ -28,7 +27,7 @@ import kotlinx.android.synthetic.main.dialog_map_terrain.view.*
 
 class MapLogActivity : BaseActivity(), OnMapReadyCallback {
 
-    private var legendAdapter = LegendAdapter()
+    private var legendAdapter = MapLogLegendAdapter()
 
     private var mapFragment: SupportMapFragment? = null
 
@@ -107,21 +106,17 @@ class MapLogActivity : BaseActivity(), OnMapReadyCallback {
         val width: Int = resources.displayMetrics.widthPixels
         val padding: Int = (width * mZoom).toInt() // offset from edges of the map 10% of screen
 
-//        val legendItems = arrayListOf<Mode>()
+        val legendItems = hashMapOf<Int, String>()
         positions.forEach {
             addMarker(it.compPosition, it.modeName, it.modeColor)
             builder.include(it.compPosition)
+            if (!legendItems.keys.contains(it.modeColor)) {
+                legendItems[it.modeColor] = it.modeName
+            }
+
         }
 
-//        if (legendItems.isNotEmpty()) {
-//            legendAdapter.setItems(legendItems)
-//            cvLegendArrow.visibility = VISIBLE
-//            clLegend.visibility = VISIBLE
-//        } else {
-//            legendAdapter.clear()
-//            cvLegendArrow.visibility = GONE
-//            clLegend.visibility = GONE
-//        }
+        addLegendItems(legendItems)
 
         if (positions.isNotEmpty()) {
             val bounds = builder.build()
@@ -133,6 +128,23 @@ class MapLogActivity : BaseActivity(), OnMapReadyCallback {
             }
         }
 
+    }
+
+    private fun addLegendItems(legendItems: HashMap<Int, String>) {
+        val mapLogLegendItems = arrayListOf<MapLogLegendAdapter.MapLogLegendItem>()
+        legendItems.forEach { color, name ->
+            mapLogLegendItems.add(MapLogLegendAdapter.MapLogLegendItem(color, name))
+        }
+
+        if (mapLogLegendItems.isNotEmpty()) {
+            legendAdapter.setItems(mapLogLegendItems)
+            cvLegendArrow.visibility = VISIBLE
+            clLegend.visibility = VISIBLE
+        } else {
+            legendAdapter.clear()
+            cvLegendArrow.visibility = GONE
+            clLegend.visibility = GONE
+        }
     }
 
     private fun addMarker(latLng: LatLng, title: String, color: Int): Marker? {

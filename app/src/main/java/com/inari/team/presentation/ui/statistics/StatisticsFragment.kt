@@ -1,8 +1,10 @@
 package com.inari.team.presentation.ui.statistics
 
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.location.GnssMeasurement
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
@@ -13,8 +15,9 @@ import android.support.design.widget.TabLayout
 import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.TextView
 import com.github.mikephil.charting.charts.ScatterChart
 import com.github.mikephil.charting.components.LimitLine
@@ -32,6 +35,7 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.main.MainListener
 import com.inari.team.presentation.ui.status.StatusFragment
+import kotlinx.android.synthetic.main.dialog_change_graph.view.*
 import kotlinx.android.synthetic.main.fragment_statistics.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,6 +45,9 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     @Inject
     lateinit var navigator: Navigator
+
+    @Inject
+    lateinit var mPrefs: AppSharedPreferences
 
     private var mainListener: MainListener? = null
 
@@ -78,10 +85,10 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setViews(view)
+        setViews()
     }
 
-    private fun setViews(view: View) {
+    private fun setViews() {
 
         //init default graph
         setAgcCNoGraph()
@@ -111,19 +118,19 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             }
         })
 
-
-        val graphs = arrayListOf(GRAPH_AGC_CNO, GRAPH_CNO_ELEV, GRAPH_ERROR)
-        spGraphType.adapter = GraphSpinnerAdapter(view.context, graphs)
-        spGraphType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                graph = graphs[position]
-
-                setGraph()
-            }
+        fabChangeGraph.setOnClickListener {
+            showGraphTypeDialog()
         }
+
+        ivGraphInformation.setOnClickListener {
+            if (tvInformationDetail.visibility == VISIBLE) {
+                tvInformationDetail.visibility = GONE
+            } else {
+                tvInformationDetail.visibility = VISIBLE
+            }
+            ivGraphInformation.rotation = ivGraphInformation.rotation + 180
+        }
+
     }
 
     fun setGraph() {
@@ -359,6 +366,77 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             }
         }
     }
+
+    private fun showGraphTypeDialog() {
+
+        context?.let { c ->
+            val dialog = AlertDialog.Builder(c).create()
+            val layout = View.inflate(c, R.layout.dialog_change_graph, null)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog.setView(layout)
+
+            layout?.let { view ->
+
+                val graphType = mPrefs.getSelectedGraphType()
+                when (graphType) {
+                    GRAPH_AGC_CNO -> {
+                        view.ivNormalTick.visibility = View.VISIBLE
+                        view.ivTerrainTick.visibility = View.GONE
+                        view.ivHybridTick.visibility = View.GONE
+                    }
+                    GRAPH_CNO_ELEV -> {
+                        view.ivTerrainTick.visibility = View.VISIBLE
+                        view.ivNormalTick.visibility = View.GONE
+                        view.ivHybridTick.visibility = View.GONE
+                    }
+                    GRAPH_ERROR -> {
+                        view.ivHybridTick.visibility = View.VISIBLE
+                        view.ivNormalTick.visibility = View.GONE
+                        view.ivTerrainTick.visibility = View.GONE
+                    }
+                }
+
+                view.clAgc.setOnClickListener {
+                    view.ivNormalTick.visibility = View.VISIBLE
+                    view.ivTerrainTick.visibility = View.GONE
+                    view.ivHybridTick.visibility = View.GONE
+
+                    graph = GRAPH_AGC_CNO
+                    mPrefs.setSelectedGraphType(GRAPH_AGC_CNO)
+                    setGraph()
+
+                    dialog.dismiss()
+                }
+                view.clElev.setOnClickListener {
+                    view.ivTerrainTick.visibility = View.VISIBLE
+                    view.ivNormalTick.visibility = View.GONE
+                    view.ivHybridTick.visibility = View.GONE
+
+                    graph = GRAPH_CNO_ELEV
+                    mPrefs.setSelectedGraphType(GRAPH_CNO_ELEV)
+                    setGraph()
+
+                    dialog.dismiss()
+                }
+                view.clError.setOnClickListener {
+                    view.ivHybridTick.visibility = View.VISIBLE
+                    view.ivNormalTick.visibility = View.GONE
+                    view.ivTerrainTick.visibility = View.GONE
+
+                    graph = GRAPH_ERROR
+                    mPrefs.setSelectedGraphType(GRAPH_ERROR)
+                    setGraph()
+
+                    dialog.dismiss()
+                }
+
+
+            }
+            dialog.show()
+        }
+
+    }
+
 
     // Callbacks
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {

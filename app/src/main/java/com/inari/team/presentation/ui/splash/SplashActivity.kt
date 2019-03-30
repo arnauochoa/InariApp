@@ -15,9 +15,8 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.addDefaultModes
 import com.inari.team.core.utils.extensions.*
-import com.inari.team.presentation.model.Mode
-import com.inari.team.presentation.model.PositionParameters
 import kotlinx.android.synthetic.main.activity_splash.*
 import java.io.File
 import java.io.IOException
@@ -56,7 +55,7 @@ class SplashActivity : BaseActivity() {
         clLogo.startAnimation(fadeIn)
 
         if (mPrefs.getModesList().isEmpty()) {
-            addDefaultModes()
+            mPrefs.saveModes(addDefaultModes())
             try {
                 val dir =
                     File(root.absolutePath + APP_ROOT)
@@ -113,41 +112,6 @@ class SplashActivity : BaseActivity() {
             }, TIME_OUT)
 
         }
-    }
-
-    private fun addDefaultModes() {
-
-        val mode = Mode(
-            0,
-            "GPS LS",
-            arrayListOf(PositionParameters.CONST_GPS),
-            arrayListOf(PositionParameters.BAND_L1),
-            arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
-            PositionParameters.ALG_LS,
-            isSelected = false
-        )
-        val mode2 = Mode(
-            1,
-            "Galileo WLS",
-            arrayListOf(PositionParameters.CONST_GAL),
-            arrayListOf(PositionParameters.BAND_L1),
-            arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
-            PositionParameters.ALG_WLS,
-            isSelected = false
-        )
-        val mode3 = Mode(
-            2,
-            "Multiconst Iono-Free",
-            arrayListOf(PositionParameters.CONST_GPS, PositionParameters.CONST_GAL),
-            arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_L5),
-            arrayListOf(PositionParameters.CORR_TROPOSPHERE, PositionParameters.CORR_IONOFREE),
-            PositionParameters.ALG_WLS,
-            isSelected = false
-        )
-
-        val list = arrayListOf(mode, mode2, mode3)
-
-        mPrefs.saveModes(list)
     }
 
     private fun goToMainActivity() {
