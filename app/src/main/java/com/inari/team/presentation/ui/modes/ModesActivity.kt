@@ -5,6 +5,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -13,7 +15,7 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.getLegendColor
+import com.inari.team.core.utils.addDefaultModes
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
@@ -44,6 +46,27 @@ class ModesActivity : BaseActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_modes, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.let {
+            when (it.itemId) {
+                R.id.reset -> {
+                    mPrefs.saveModes(addDefaultModes())
+                    tvSelectedModesTitle.text = ""
+                    mAdapter?.update()
+                }
+                else -> {
+                }
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun setViews() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.positioning_settings)
@@ -61,9 +84,11 @@ class ModesActivity : BaseActivity() {
         apply_gnss_modes.setOnClickListener {
             mAdapter?.let {
                 val modes = it.getItems()
+                var selectedModes = 0
                 modes.forEachIndexed { index, mode ->
-                    if (mode.isSelected && index < 5) {
-                        mode.color = getLegendColor(index)
+                    if (mode.isSelected && selectedModes < 5) {
+                        selectedModes++
+                        mode.color = index
                     }
                 }
                 mPrefs.saveModes(modes)

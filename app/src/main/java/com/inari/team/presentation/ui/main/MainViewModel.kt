@@ -191,7 +191,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                     position.updateData(it)
                     computedPositions.addAll(it)
                     if (isLoggingEnabled) {
-                        saveGnssLogs(it)
+                        saveGnssLogs()
                     }
                 } else {
                     position.showError("Position could not be obtained.")
@@ -246,17 +246,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         return responses
     }
 
-    private fun saveGnssLogs(positions: List<ResponsePvtMode>) {
+    private fun saveGnssLogs() {
         val pvtInfoString: String = try {
             val json = getGnssJson(gnssData)
-//            val obtainedPositions = JSONArray()
-//            positions.forEach {
-//                val obtainedPosition = JSONObject()
-//                obtainedPosition.put("lat", it.position.latitude)
-//                obtainedPosition.put("lon", it.position.longitude)
-//                obtainedPositions.put(obtainedPosition)
-//            }
-//            json.put("Obtained_Positions", obtainedPositions)
             json.toString(2)
         } catch (e: JSONException) {
             ""

@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.inari.team.core.App
 import com.inari.team.presentation.model.Mode
+import com.inari.team.presentation.ui.statistics.StatisticsFragment
 
 
 class AppSharedPreferences {
@@ -23,6 +24,7 @@ class AppSharedPreferences {
         const val CN0_MASK: String = "cno_mask"
         const val TUTORIAL_SHOWN = "tutorial shown"
         const val SELECTED_MAP_TYPE = "selected_map_type"
+        const val SELECTED_GRAPH_TYPE = "selected_graph_type"
         const val GNSS_LOGGING_ENABLED = "gnss_logging_enabled"
 
 
@@ -45,6 +47,15 @@ class AppSharedPreferences {
     fun setSelectedMapType(type: Int) {
         mPrefs.edit()
             .putInt(SELECTED_MAP_TYPE, type)
+            .apply()
+    }
+
+    fun getSelectedGraphType(): String =
+        mPrefs.getString(SELECTED_GRAPH_TYPE, StatisticsFragment.GRAPH_AGC_CNO) ?: StatisticsFragment.GRAPH_AGC_CNO
+
+    fun setSelectedGraphType(graphType: String) {
+        mPrefs.edit()
+            .putString(SELECTED_GRAPH_TYPE, graphType)
             .apply()
     }
 
