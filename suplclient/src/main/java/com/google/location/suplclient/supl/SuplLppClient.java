@@ -70,6 +70,11 @@ final class SuplLppClient extends SuplClient {
         SuplLppClientHelper.buildIonoModelProto(
             assistData.getGnss_CommonAssistData().getGnss_IonosphericModel().getKlobucharModel());
 
+    //PC
+    IonosphericModelProto ionoProto2 =
+            SuplLppClientHelper.buildIonoModelProto(
+    assistData.getGnss_CommonAssistData().getGnss_IonosphericModel().getNeQuickModel());
+
     GNSS_SystemTime gnssSystemTime =
         assistData.getGnss_CommonAssistData().getGnss_ReferenceTime().getGnss_SystemTime();
     DateTime gnssDateTime = SuplLppClientHelper.getReferenceGnssTime(gnssSystemTime);
@@ -106,7 +111,7 @@ final class SuplLppClient extends SuplClient {
       }
     }
 
-    return new EphemerisResponse(ephList, ionoProto);
+    return new EphemerisResponse(ephList, ionoProto, ionoProto2);
   }
 
   private DateTime toGloTime(DateTime dateTime) {

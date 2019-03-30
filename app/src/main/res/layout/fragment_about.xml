@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorLightGrayBackground"
+    tools:context=".presentation.ui.about.AboutFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+
+                    <TextView
+                        android:id="@+id/tvVersionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="32dp"
+                        android:text="@string/app_version_title"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvVersion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/app_version_number"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvVersionTitle"
+                        app:layout_constraintStart_toEndOf="@+id/tvVersionTitle"
+                        app:layout_constraintTop_toTopOf="@+id/tvVersionTitle" />
+
+                    <TextView
+                        android:id="@+id/tvContactTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="@dimen/margin_between_lines_about"
+                        android:text="@string/contact_title"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvVersionTitle" />
+
+                    <TextView
+                        android:id="@+id/tvContact"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:clickable="true"
+                        android:text="@string/contact_email"
+                        android:textColor="@color/linkColor"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvContactTitle"
+                        app:layout_constraintStart_toEndOf="@+id/tvContactTitle"
+                        app:layout_constraintTop_toTopOf="@+id/tvContactTitle" />
+
+                    <TextView
+                        android:id="@+id/tvDevelopedTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="@dimen/margin_between_lines_about"
+                        android:text="@string/developed_by_title"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvContactTitle" />
+
+                    <TextView
+                        android:id="@+id/inariTeam"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:drawableStart="@mipmap/ic_launcher_round"
+                        android:drawablePadding="16dp"
+                        android:gravity="center_vertical"
+                        android:text="@string/inari_team"
+                        android:textAllCaps="true"
+                        android:textColor="@color/black"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvDevelopedTitle" />
+
+                    <TextView
+                        android:id="@+id/tvComponentsTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="@string/composed_by_title"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvComponents" />
+
+                    <TextView
+                        android:id="@+id/tvComponents"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="@dimen/margin_between_lines_about"
+                        android:text="@string/team_composers"
+                        app:layout_constraintStart_toEndOf="@+id/tvComponentsTitle"
+                        app:layout_constraintTop_toBottomOf="@id/inariTeam" />
+
+                    <TextView
+                        android:id="@+id/tvAdvisorTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="@string/advisored_by_title"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvAdvisor" />
+
+                    <TextView
+                        android:id="@+id/tvAdvisor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="@dimen/margin_between_lines_about"
+                        android:text="@string/advisors"
+                        app:layout_constraintStart_toEndOf="@id/tvComponentsTitle"
+                        app:layout_constraintTop_toBottomOf="@id/tvComponents" />
+
+                    <Button
+                        android:id="@+id/btSeeTutorial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="32dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="32dp"
+                        android:background="@drawable/bg_corners_accent"
+                        android:paddingHorizontal="50dp"
+                        android:text="@string/see_tutorial_text"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tvAdvisor" />
+
+                </android.support.constraint.ConstraintLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardView2"
+                app:layout_constraintVertical_bias="0">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingVertical="24dp">
+
+                    <TextView
+                        android:id="@+id/tvDevelopedInTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="@string/developed_in_uab_title"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0" />
+
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="@dimen/size_logos_about"
+                        android:layout_height="@dimen/size_logos_about"
+                        android:layout_marginStart="64dp"
+                        android:layout_marginEnd="32dp"
+                        android:src="@mipmap/ic_uab"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvDevelopedInTitle"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/tvDevelopedInTitle"
+                        app:layout_constraintTop_toTopOf="@+id/tvDevelopedInTitle" />
+
+                    <TextView
+                        android:id="@+id/tvSupportedByTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="@dimen/margin_between_lines_about"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/supported_by_the_neuropean_space_agency"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvDevelopedInTitle"
+                        app:layout_constraintVertical_bias="0.0" />
+
+                    <ImageView
+                        android:layout_width="@dimen/size_logos_about"
+                        android:layout_height="@dimen/size_logos_about"
+                        android:src="@mipmap/ic_flag_european_union"
+                        app:layout_constraintBottom_toBottomOf="@+id/tvSupportedByTitle"
+                        app:layout_constraintEnd_toEndOf="@+id/imageView"
+                        app:layout_constraintStart_toStartOf="@+id/imageView"
+                        app:layout_constraintTop_toTopOf="@+id/tvSupportedByTitle" />
+
+                </android.support.constraint.ConstraintLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

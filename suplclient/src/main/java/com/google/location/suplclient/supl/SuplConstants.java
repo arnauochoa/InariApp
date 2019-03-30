@@ -96,6 +96,10 @@ public class SuplConstants {
     public static final double GLO_ORB_ACCELERATION_KMPS2 = Math.pow(2, -30);
     // Details of the following constants can be found in the Galileo ICD issue 1.3, 2016:
     // https://www.gsc-europa.eu/system/files/galileo_documents/Galileo-OS-SIS-ICD.pdf
+    //PC Galileo constants for NeQuick
+    public static final double NEQUICK_ALFA_0_SCALE_FACTOR = Math.pow(2, -2); // sfu
+    public static final double NEQUICK_ALFA_1_SCALE_FACTOR = Math.pow(2, -8); // sfu/deg
+    public static final double NEQUICK_ALFA_2_SCALE_FACTOR = Math.pow(2, -15); // sfu/deg^2
     public static final double GAL_NAV_TOE = 60;
     public static final double GAL_NAV_W = Math.scalb(Math.PI, -31);
     public static final double GAL_NAV_DELTA_N = Math.scalb(Math.PI, -43);
