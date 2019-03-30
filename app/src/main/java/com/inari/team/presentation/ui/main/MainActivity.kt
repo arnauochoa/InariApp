@@ -179,6 +179,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
             }
             3 -> {
                 viewPager.setCurrentItem(pos, false)
+                logsFragment.updateFiles()
                 unSubscribeToGnssEvents(statisticsFragment)
                 unSubscribeToGnssEvents(statusFragment)
             }

@@ -46,7 +46,7 @@ class MeasurementsLogsFragment : BaseFragment() {
         setFiles()
     }
 
-    private fun setFiles() {
+    fun setFiles() {
         val filesList = getFilesList()
 
         adapter?.setLogs(filesList)
