@@ -31,7 +31,7 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
 
         holder.modeName.text = mode.name
         setDescription(holder, mode)
-        initModeSelectedState(holder, mode.isSelected, position)
+        initModeSelectedState(holder, mode.isSelected)
 
         holder.itemView.setOnLongClickListener {
             holder.deleteButton.visibility = VISIBLE
@@ -42,7 +42,7 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             if (holder.deleteButton.visibility == VISIBLE) {
                 holder.deleteButton.visibility = GONE
             } else {
-                if (setSelected(holder, mode.isSelected, position)) {
+                if (setSelected(holder, mode.isSelected)) {
                     modes[position].isSelected = !modes[position].isSelected
                     onModeSelected.invoke()
                 }
@@ -62,7 +62,7 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
 
     }
 
-    private fun initModeSelectedState(holder: ModesViewHolder, selected: Boolean, position: Int) {
+    private fun initModeSelectedState(holder: ModesViewHolder, selected: Boolean) {
         if (selected) {
             holder.modeName.setTextColor(getColor(context, R.color.black))
             holder.cvMode.elevation = 16f
@@ -73,11 +73,10 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             holder.cvMode.elevation = 0f
             holder.cvMode.setCardBackgroundColor(getColor(context, R.color.white))
             holder.checkImage.visibility = GONE
-            modes[position].color = -1
         }
     }
 
-    private fun setSelected(holder: ModesViewHolder, selected: Boolean, position: Int): Boolean {
+    private fun setSelected(holder: ModesViewHolder, selected: Boolean): Boolean {
         val couldSelect: Boolean
 
         if (!selected) {
