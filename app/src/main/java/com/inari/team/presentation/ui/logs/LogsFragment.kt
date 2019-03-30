@@ -13,6 +13,9 @@ import kotlinx.android.synthetic.main.fragment_logs.*
 
 class LogsFragment : BaseFragment() {
 
+    private val positionLogsFragment = PositionLogsFragment()
+    private val measurementLogsFragment = MeasurementsLogsFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fragmentComponent.inject(this)
@@ -31,14 +34,19 @@ class LogsFragment : BaseFragment() {
     private fun setViews() {
         val adapter = BarAdapter(childFragmentManager)
 
-        adapter.addFragments(PositionLogsFragment(), "Position Logs")
-        adapter.addFragments(MeasurementsLogsFragment(), "Measurements Logs")
+        adapter.addFragments(positionLogsFragment, "Position Logs")
+        adapter.addFragments(measurementLogsFragment, "Measurements Logs")
 
         viewPager.adapter = adapter
         tabLayout.addTab(tabLayout.newTab().setText("Position Logs"))
         tabLayout.addTab(tabLayout.newTab().setText("Measurement Logs"))
         tabLayout.setupWithViewPager(viewPager)
 
+    }
+
+    fun updateFiles() {
+        positionLogsFragment.setFiles()
+        measurementLogsFragment.setFiles()
     }
 
 }

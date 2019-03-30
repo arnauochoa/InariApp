@@ -47,7 +47,7 @@ class PositionLogsFragment : BaseFragment() {
         setFiles()
     }
 
-    private fun setFiles() {
+    fun setFiles() {
         val positionsFileList = getPositionsFilesList()
 
         positionsAdapter?.setLogs(positionsFileList)
