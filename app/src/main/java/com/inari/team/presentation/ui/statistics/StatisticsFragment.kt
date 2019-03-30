@@ -159,6 +159,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             yAxisTitle.text = getString(R.string.agcAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
+                chart.legend.isWordWrapEnabled = true
             }
             scatterChart?.axisLeft?.labelCount = 6
         }
@@ -339,7 +340,10 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
                     modePositions.sortBy { point -> point.x }
                     val pointsSet = ScatterDataSet(modePositions, it)
-                    pointsSet.color = ContextCompat.getColor(c, color)
+                    try {
+                        pointsSet.color = ContextCompat.getColor(c, getLegendColor(color))
+                    } catch (e: Exception) {
+                    }
                     pointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
                     dataSets.add(pointsSet)
                 }

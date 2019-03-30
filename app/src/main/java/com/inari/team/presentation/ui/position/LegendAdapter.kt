@@ -10,16 +10,15 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseAdapter
 import com.inari.team.core.utils.extensions.context
 import com.inari.team.core.utils.extensions.inflate
+import com.inari.team.core.utils.getLegendColor
 import com.inari.team.presentation.model.Mode
 import kotlinx.android.synthetic.main.item_legend.view.*
 
 class LegendAdapter : BaseAdapter<LegendAdapter.LegendViewHolder, Mode>() {
 
     override fun onBindViewHolder(holder: LegendViewHolder, item: Mode) {
-
-        holder.color.setCardBackgroundColor(ContextCompat.getColor(context, item.color))
+        holder.color.setCardBackgroundColor(ContextCompat.getColor(context, getLegendColor(item.color)))
         holder.mode.text = item.name
-
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): LegendViewHolder {

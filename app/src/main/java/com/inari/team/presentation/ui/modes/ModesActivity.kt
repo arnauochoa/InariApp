@@ -13,7 +13,6 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.getLegendColor
 import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
@@ -61,9 +60,11 @@ class ModesActivity : BaseActivity() {
         apply_gnss_modes.setOnClickListener {
             mAdapter?.let {
                 val modes = it.getItems()
+                var selectedModes = 0
                 modes.forEachIndexed { index, mode ->
-                    if (mode.isSelected && index < 5) {
-                        mode.color = getLegendColor(index)
+                    if (mode.isSelected && selectedModes < 5) {
+                        selectedModes++
+                        mode.color = index
                     }
                 }
                 mPrefs.saveModes(modes)

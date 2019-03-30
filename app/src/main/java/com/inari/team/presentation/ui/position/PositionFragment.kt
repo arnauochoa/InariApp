@@ -210,6 +210,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
             it.stopComputing()
             btComputeAction.text = getString(R.string.start_computing)
             hideMapLoading()
+            btRecenter.visibility = GONE
         }
     }
 

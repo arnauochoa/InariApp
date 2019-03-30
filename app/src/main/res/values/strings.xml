@@ -88,5 +88,7 @@
     <string name="supported_by_the_neuropean_space_agency">Supported by the \nEuropean Space Agency</string>
     <string name="eastAxisTitle">East [m]</string>
     <string name="northAxisTitle">North [m]</string>
+    <string name="reset_default_modes">Reset default modes</string>
+    <string name="finish">finish</string>
 
 </resources>

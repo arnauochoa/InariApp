@@ -36,8 +36,8 @@ fun convertStreamToString(`is`: InputStream): String {
     return sb.toString()
 }
 
-fun getLegendColor(position: Int): Int{
-    return when(position){
+fun getLegendColor(position: Int): Int {
+    return when (position) {
         0 -> R.color.colorLegend1
         1 -> R.color.colorLegend2
         2 -> R.color.colorLegend3
@@ -49,21 +49,11 @@ fun getLegendColor(position: Int): Int{
 
 fun getModeIcon(color: Int): Float {
     return when (color) {
-        R.color.colorLegend1 -> {
-            BitmapDescriptorFactory.HUE_RED
-        }
-        R.color.colorLegend2 -> {
-            BitmapDescriptorFactory.HUE_ORANGE
-        }
-        R.color.colorLegend3 -> {
-            BitmapDescriptorFactory.HUE_BLUE
-        }
-        R.color.colorLegend4 -> {
-            BitmapDescriptorFactory.HUE_CYAN
-        }
-        R.color.colorLegend5 -> {
-            BitmapDescriptorFactory.HUE_YELLOW
-        }
+        0 -> BitmapDescriptorFactory.HUE_RED
+        1 -> BitmapDescriptorFactory.HUE_ORANGE
+        2 -> BitmapDescriptorFactory.HUE_BLUE
+        3 -> BitmapDescriptorFactory.HUE_CYAN
+        4 -> BitmapDescriptorFactory.HUE_YELLOW
         else -> BitmapDescriptorFactory.HUE_RED
     }
 }

@@ -230,7 +230,7 @@
                     <ImageView
                         android:layout_width="@dimen/size_logos_about"
                         android:layout_height="@dimen/size_logos_about"
-                        android:src="@mipmap/ic_flag_european_union"
+                        android:src="@drawable/ic_esa"
                         app:layout_constraintBottom_toBottomOf="@+id/tvSupportedByTitle"
                         app:layout_constraintEnd_toEndOf="@+id/imageView"
                         app:layout_constraintStart_toStartOf="@+id/imageView"
