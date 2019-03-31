@@ -56,6 +56,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     init {
         // Add C++ library
         System.loadLibrary("pvtEngine-lib")
+        System.loadLibrary("test-lib")
         buildSuplController()
     }
 
@@ -76,6 +77,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isFirstComputedPosition = true
         startedComputingDate = Date()
         computedPositions = arrayListOf()
+
+        val s = testcpp("")
+        position.showError(s)
 
         isLoggingEnabled = mPrefs.isGnssLoggingEnabled()
         if (isLoggingEnabled) {
@@ -278,6 +282,8 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
      * /app/src/main/cpp/pvtEngine-lib.cpp
      */
     private external fun obtainPosition(gnssData: String): String
+
+    private external fun testcpp(gnssData: String): String
 
     companion object {
         const val SUPL_SERVER_HOST = "supl.google.com"

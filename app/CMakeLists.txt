@@ -13,11 +13,22 @@ cmake_minimum_required(VERSION 3.4.1)
 file(GLOB CPP_FILES "./src/main/cpp/*.cpp")
 
 add_library( # Specifies the name of the library.
-             pvtEngine-lib
+        pvtEngine-lib
 
-             # Sets the library as a shared library.
-             SHARED
+        # Sets the library as a shared library.
+        SHARED
 
-             # Provides a relative path to your source file(s).
-             ${CPP_FILES}
-             src/main/cpp/pvtEngine-lib.cpp )
+        # Provides a relative path to your source file(s).
+        ${CPP_FILES}
+        src/main/cpp/pvtEngine-lib.cpp)
+
+add_library( # Specifies the name of the library.
+        test-lib
+
+        # Sets the library as a shared library.
+        SHARED
+
+        # Provides a relative path to your source file(s).
+        ${CPP_FILES}
+        src/main/cpp/test-lib.cpp)
+
