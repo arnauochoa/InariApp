@@ -191,6 +191,7 @@ fun toTopocent(xArray: DoubleArray, dxArray: DoubleArray): Topocentric {
     val dxVec = DMatrixRMaj.wrap(1, 3, dxArray)
     val localVec = DMatrixRMaj.wrap(1, 3, doubleArrayOf(0.0, 0.0, 0.0))
 
+    //localVec = fMat' * dxVec
     MatrixVectorMult_DDRM.multTransA_small(fMat, dxVec, localVec)
 
     val e = localVec[0]
