@@ -4,8 +4,8 @@ import com.inari.team.presentation.model.Mode
 
 const val UNCERTAINTY_THR = 1000000000L
 const val WEEK_NANOS = 604800000000000
-const val GAL_2ND = 100000000
-
+const val GAL_E1C = 100000000L
+const val FREQ_THR = 1400000000
 
 data class AcqInformation(
     val modes: ArrayList<Mode> = arrayListOf(),
