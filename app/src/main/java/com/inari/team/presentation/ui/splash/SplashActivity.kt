@@ -14,6 +14,8 @@ import android.view.animation.ScaleAnimation
 import com.inari.team.R
 import com.inari.team.computation.converters.ecef2lla
 import com.inari.team.computation.converters.lla2ecef
+import com.inari.team.computation.converters.toGeod
+import com.inari.team.computation.converters.toTopocent
 import com.inari.team.computation.data.LlaLocation
 import com.inari.team.computation.utils.applyMod
 import com.inari.team.computation.utils.checkGalState
@@ -113,6 +115,11 @@ class SplashActivity : BaseActivity() {
         val t1 = checkTowDecode(0)
         val t2 = checkTowKnown(0)
         val t3 = checkGalState(0)
+
+        val x = doubleArrayOf(50000.0, 30000.0, 60000.0)
+        val tgd = toGeod(6378137.0, 298.257223563, x[0], x[1], x[2])
+        val dx = doubleArrayOf(200.0, 110.0, 521.0)
+        val topocent = toTopocent(x, dx)
 
         val a = 1
     }
