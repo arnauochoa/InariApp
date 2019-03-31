@@ -1,15 +1,23 @@
 package com.inari.team.computation.data
 
 import com.inari.team.presentation.model.Mode
-import com.inari.team.presentation.model.RefLocation
+
+const val UNCERTAINTY_THR = 1000000000L
+const val WEEK_NANOS = 604800000000000
+const val GAL_2ND = 100000000
+
 
 data class AcqInformation(
-    val svList: ArrayList<SvInfo> = arrayListOf(),
     val modes: ArrayList<Mode> = arrayListOf(),
-    var refLocation: RefLocation = RefLocation(),
-    val timeNanosGnss: Double = 0.0,
-    val tow: Int = 0,
-    val now: Int = 0,
+    var refLocation: RefLocationData = RefLocationData(),
+    var acqInformationMeasurements: ArrayList<AcqInformationMeasurements> = arrayListOf()
+)
+
+data class AcqInformationMeasurements(
+    val svList: ArrayList<SvInfo> = arrayListOf(),
+    var timeNanosGnss: Double = 0.0,
+    var tow: Double = 0.0,
+    var now: Double = 0.0,
     val totalSatNumber: Int = 0,
     val ionoProto: ArrayList<Double> = arrayListOf(),
     val satellites: Satellites = Satellites()
@@ -17,6 +25,11 @@ data class AcqInformation(
 
 data class SvInfo(
     var svIds: ArrayList<Int> = arrayListOf()
+)
+
+data class RefLocationData(
+    val refLocationLla: RefLocationLla = RefLocationLla(),
+    val refLocationEcef: RefLocationEcef = RefLocationEcef()
 )
 
 data class Satellites(
@@ -69,6 +82,10 @@ data class KeplerModel(
     val omegaDot: Double = 0.0,
     val sqrtA: Double = 0.0,
     val toeS: Double = 0.0
+)
+
+data class AcqInformationError(
+    val message: String = "Error Occurred"
 )
 
 
