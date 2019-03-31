@@ -170,6 +170,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             }
             scatterChart?.axisLeft?.labelCount = 6
         }
+
+        tvInformationDetail.text = getString(R.string.agc_cno_information_detail)
     }
 
     private fun setCNoElevGraph() {
@@ -182,6 +184,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             }
             scatterChart?.xAxis?.labelCount = 10
         }
+        tvInformationDetail.text = getString(R.string.elev_cno_information_detail)
     }
 
     private fun setErrorGraph() {
@@ -203,6 +206,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             scatterChart?.axisLeft?.setDrawAxisLine(false)
             plotErrorGraph()
         }
+        tvInformationDetail.text = getString(R.string.error_information_detail)
     }
 
     private fun createTab(title: String): TabLayout.Tab {

@@ -155,7 +155,6 @@ public class GpsTestUtil {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static SatelliteName getSatelliteName(GnssType gnssType, int svid) {
-        // TODO - support more satellite names
         switch (gnssType) {
             case NAVSTAR:
                 return SatelliteName.UNKNOWN;
