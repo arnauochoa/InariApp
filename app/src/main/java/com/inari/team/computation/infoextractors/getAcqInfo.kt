@@ -3,7 +3,6 @@ package com.inari.team.computation.infoextractors
 import android.annotation.SuppressLint
 import com.google.location.suplclient.ephemeris.GalEphemeris
 import com.google.location.suplclient.ephemeris.GpsEphemeris
-import com.inari.team.computation.converters.applyMod
 import com.inari.team.computation.converters.lla2ecef
 import com.inari.team.computation.data.*
 import com.inari.team.computation.utils.*
@@ -22,7 +21,7 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
 
     //Location
     gnssData.location?.let {
-        val refLocationLla = RefLocationLla(it.latitude, it.longitude, it.altitude)
+        val refLocationLla = LlaLocation(it.latitude, it.longitude, it.altitude)
         acqInformation.refLocation = RefLocationData(
             refLocationLla,
             lla2ecef(refLocationLla)

@@ -2,11 +2,12 @@ package com.inari.team.computation.utils
 
 import android.location.GnssMeasurement
 import com.inari.team.computation.Constants.C
-import com.inari.team.computation.converters.applyMod
+
 import com.inari.team.computation.data.AcqInformationMeasurements
 import com.inari.team.computation.data.GAL_E1C
 import com.inari.team.computation.data.Satellite
 import com.inari.team.computation.data.WEEK_NANOS
+import java.math.BigInteger
 
 fun getTowDecodeSatellite(meas: GnssMeasurement, acqInformationMeasurements: AcqInformationMeasurements): Satellite {
     return with(meas) {
@@ -42,20 +43,20 @@ fun getE1CSatellite(meas: GnssMeasurement, acqInformationMeasurements: AcqInform
     }
 }
 
-fun checkTowDecode(tow: Int): Boolean {
 
-
-    return true
+fun checkTowDecode(state: Int): Boolean {
+    // Check if binary state has 3rd bit 1
+    return BigInteger.valueOf(state.toLong()).testBit(3)
 }
 
-fun checkTowKnown(tow: Int): Boolean {
-
-    return true
+fun checkTowKnown(state: Int): Boolean {
+    // Check if binary state has 14th bit 1
+    return BigInteger.valueOf(state.toLong()).testBit(14)
 }
 
-fun checkGalState(tow: Int): Boolean {
-
-    return true
+fun checkGalState(state: Int): Boolean {
+    // Check if binary state has 14th bit 1
+    return BigInteger.valueOf(state.toLong()).testBit(11)
 }
 
 fun getTtx(timeOffsetNanos: Double, receivedSvTimeNanos: Long): Double {
