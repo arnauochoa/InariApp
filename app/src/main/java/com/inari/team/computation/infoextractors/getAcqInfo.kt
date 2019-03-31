@@ -1,6 +1,8 @@
 package com.inari.team.computation.infoextractors
 
-import android.location.GnssMeasurement
+import android.annotation.SuppressLint
+import com.google.location.suplclient.ephemeris.GalEphemeris
+import com.google.location.suplclient.ephemeris.GpsEphemeris
 import com.inari.team.computation.converters.applyMod
 import com.inari.team.computation.converters.lla2ecef
 import com.inari.team.computation.data.*
@@ -8,10 +10,15 @@ import com.inari.team.computation.utils.*
 import com.inari.team.data.GnssStatus
 import com.inari.team.presentation.model.GnssData
 import kotlin.math.floor
+import kotlin.math.roundToInt
 
+@SuppressLint("SwitchIntDef")
 fun getAcqInfo(gnssData: GnssData): AcqInformation {
 
     val acqInformation = AcqInformation()
+
+    //Modes
+    acqInformation.modes.addAll(gnssData.modes)
 
     //Location
     gnssData.location?.let {
@@ -54,10 +61,10 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                                         val sat = getTowDecodeSatellite(gnssMeas, acqInformationMeasurements)
                                         if (carrierFrequencyHz > FREQ_THR) {
                                             //L1
-                                            acqInformationMeasurements.satellites.gpsSatellite.gpsL1.add(sat)
+                                            acqInformationMeasurements.satellites.gpsSatellites.gpsL1.add(sat)
                                         } else {
                                             //L5
-                                            acqInformationMeasurements.satellites.gpsSatellite.gpsL5.add(sat)
+                                            acqInformationMeasurements.satellites.gpsSatellites.gpsL5.add(sat)
                                         }
                                     }
                                 }
@@ -104,46 +111,161 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                     }
                 }
             }
-
-
         }
 
+        it.gnssStatus?.let { status ->
+            for (i in 0 until status.satelliteCount) {
+                val constellation = status.getConstellationType(i)
+                when (constellation) {
+                    GnssStatus.CONSTELLATION_GPS -> {
+                        val satL1List = acqInformationMeasurements.satellites.gpsSatellites.gpsL1
+                        val satL5List = acqInformationMeasurements.satellites.gpsSatellites.gpsL5
+                        satL1List.forEach { satellite ->
+                            if (satellite.svid == status.getSvid(i)) {
+                                satellite.azimuth = status.getAzimuthDegrees(i).roundToInt()
+                                satellite.elevation = status.getElevationDegrees(i).roundToInt()
+                            }
+                        }
+                        satL5List.forEach { satellite ->
+                            if (satellite.svid == status.getSvid(i)) {
+                                satellite.azimuth = status.getAzimuthDegrees(i).roundToInt()
+                                satellite.elevation = status.getElevationDegrees(i).roundToInt()
+                            }
+                        }
+                    }
+                    GnssStatus.CONSTELLATION_GALILEO -> {
+                        val satE1List = acqInformationMeasurements.satellites.galSatellites.galE1
+                        val satE5aList = acqInformationMeasurements.satellites.galSatellites.galE5a
+                        satE1List.forEach { satellite ->
+                            if (satellite.svid == status.getSvid(i)) {
+                                satellite.azimuth = status.getAzimuthDegrees(i).roundToInt()
+                                satellite.elevation = status.getElevationDegrees(i).roundToInt()
+                            }
+                        }
+                        satE5aList.forEach { satellite ->
+                            if (satellite.svid == status.getSvid(i)) {
+                                satellite.azimuth = status.getAzimuthDegrees(i).roundToInt()
+                                satellite.elevation = status.getElevationDegrees(i).roundToInt()
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        //Ephemeris Data
+        gnssData.ephemerisResponse?.let { ephResp ->
+
+            acqInformationMeasurements.ionoProto.addAll(ephResp.ionoProto.alphaList)
+            acqInformationMeasurements.ionoProto.addAll(ephResp.ionoProto.betaList)
+
+            ephResp.ephList.forEach { eph ->
+                when (eph) {
+                    is GpsEphemeris -> {
+                        acqInformationMeasurements.satellites.gpsSatellites.gpsL1.forEach { sat ->
+                            with(eph) {
+                                if (sat.svid == svid) {
+                                    sat.tow = tocS
+                                    sat.now = week
+                                    sat.af0 = af0S
+                                    sat.af1 = af1SecPerSec
+                                    sat.af2 = af2SecPerSec2
+                                    sat.tgdS = tgdS
+
+                                    //Kepler model
+                                    sat.keplerModel = keplerModel
+                                }
+                            }
+                        }
+                        acqInformationMeasurements.satellites.gpsSatellites.gpsL5.forEach { sat ->
+                            with(eph) {
+                                if (sat.svid == svid) {
+                                    sat.tow = tocS
+                                    sat.now = week
+                                    sat.af0 = af0S
+                                    sat.af1 = af1SecPerSec
+                                    sat.af2 = af2SecPerSec2
+                                    sat.tgdS = tgdS
+
+                                    //Kepler model
+                                    sat.keplerModel = keplerModel
+                                }
+                            }
+                        }
+                    }
+                    is GalEphemeris -> {
+                        acqInformationMeasurements.satellites.galSatellites.galE1.forEach { sat ->
+                            with(eph) {
+                                if (isINav) {
+                                    if (sat.svid == svid) {
+                                        sat.tow = tocS
+                                        sat.now = week
+                                        sat.af0 = af0S
+                                        sat.af1 = af1SecPerSec
+                                        sat.af2 = af2SecPerSec2
+                                        sat.tgdS = tgdS
+
+                                        //Kepler model
+                                        sat.keplerModel = keplerModel
+                                    }
+                                }
+                            }
+                        }
+                        acqInformationMeasurements.satellites.galSatellites.galE5a.forEach { sat ->
+                            with(eph) {
+                                if (!isINav) {
+                                    if (sat.svid == svid) {
+                                        sat.tow = tocS
+                                        sat.now = week
+                                        sat.af0 = af0S
+                                        sat.af1 = af1SecPerSec
+                                        sat.af2 = af2SecPerSec2
+                                        sat.tgdS = tgdS
+
+                                        //Kepler model
+                                        sat.keplerModel = keplerModel
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        acqInformation.acqInformationMeasurements.add(acqInformationMeasurements)
     }
+
+    acqInformation.acqInformationMeasurements.forEach { acqMeas ->
+        val resultingL1Satellites = acqMeas.satellites.gpsSatellites.gpsL1.filter {
+            it.tow != -1.0
+        }
+        acqMeas.satellites.gpsSatellites.gpsL1.clear()
+        acqMeas.satellites.gpsSatellites.gpsL1.addAll(resultingL1Satellites)
+
+        val resultingL5Satellites = acqMeas.satellites.gpsSatellites.gpsL5.filter {
+            it.tow != -1.0
+        }
+        acqMeas.satellites.gpsSatellites.gpsL5.clear()
+        acqMeas.satellites.gpsSatellites.gpsL5.addAll(resultingL5Satellites)
+
+        val resultingE1Satellites = acqMeas.satellites.galSatellites.galE1.filter {
+            it.tow != -1.0
+        }
+        acqMeas.satellites.galSatellites.galE1.clear()
+        acqMeas.satellites.galSatellites.galE1.addAll(resultingE1Satellites)
+
+        val resultingE5aSatellites = acqMeas.satellites.galSatellites.galE5a.filter {
+            it.tow != -1.0
+        }
+        acqMeas.satellites.galSatellites.galE5a.clear()
+        acqMeas.satellites.galSatellites.galE5a.addAll(resultingE5aSatellites)
+    }
+
 
     return acqInformation
 
 }
 
-fun getTowDecodeSatellite(meas: GnssMeasurement, acqInformationMeasurements: AcqInformationMeasurements): Satellite {
-    return with(meas) {
-        val tTx = getTtx(timeOffsetNanos, receivedSvTimeNanos)
-        val tRx = applyMod(acqInformationMeasurements.timeNanosGnss, WEEK_NANOS)
-        Satellite(
-            svid = svid,
-            state = state,
-            multipath = multipathIndicator,
-            carrierFreq = carrierFrequencyHz.toDouble(),
-            tTx = tTx,
-            tRx = tRx,
-            cn0 = cn0DbHz,
-            pR = getPseudoRange(tTx, tRx)
-        )
-    }
-}
-
-fun getE1CSatellite(meas: GnssMeasurement, acqInformationMeasurements: AcqInformationMeasurements): Satellite {
-    return with(meas) {
-        val tTx = getTtx(timeOffsetNanos, receivedSvTimeNanos)
-        val tRx = acqInformationMeasurements.timeNanosGnss
-        Satellite(
-            svid = svid,
-            state = state,
-            multipath = multipathIndicator,
-            carrierFreq = carrierFrequencyHz.toDouble(),
-            tTx = tTx,
-            tRx = tRx,
-            cn0 = cn0DbHz,
-            pR = getPseudoRange(applyMod(tTx, GAL_E1C), applyMod(tRx, GAL_E1C))
-        )
-    }
-}
