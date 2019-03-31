@@ -1,8 +1,9 @@
 package com.inari.team.computation
 
-import com.inari.team.computation.Constants.GM
-import com.inari.team.computation.Constants.OMEGA_EARTH_DOT
+
 import com.inari.team.computation.data.Satellite
+import com.inari.team.computation.utils.Constants.GM
+import com.inari.team.computation.utils.Constants.OMEGA_EARTH_DOT
 import com.inari.team.computation.utils.checkTime
 import kotlin.math.*
 
