@@ -11,6 +11,11 @@ private val asq = Math.pow(a, 2.0)
 private val esq = Math.pow(e, 2.0)
 
 
+class Geod(
+    var dphi: Double = 0.0,
+    var dlambda: Double = 0.0,
+    var h: Double = 0.0)
+
 /**
  * Convert location object on Earth-centered Earth-fixed to geodetic coordinates
  * WGS84
@@ -61,4 +66,10 @@ fun lla2ecef(llaLocation: LlaLocation): EcefLocation {
     val z = ((1 - esq) * n + alt) * Math.sin(lat)
 
     return EcefLocation(x, y, z)
+}
+
+
+fun toGeod(): Geod{
+
+    return Geod()
 }
