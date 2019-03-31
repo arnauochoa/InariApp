@@ -12,11 +12,14 @@ import android.support.v7.app.AlertDialog
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import com.inari.team.R
+import com.inari.team.computation.converters.lla2ecef
+import com.inari.team.computation.data.RefLocationLla
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.addDefaultModes
 import com.inari.team.core.utils.extensions.*
+import com.inari.team.presentation.model.RefLocation
 import kotlinx.android.synthetic.main.activity_splash.*
 import java.io.File
 import java.io.IOException
@@ -85,6 +88,16 @@ class SplashActivity : BaseActivity() {
 
         }, TIME_OUT)
 
+        // TODO: remove this
+        testMath()
+    }
+
+    // TODO: remove this
+    private fun testMath() {
+        val llaLocation = RefLocationLla(42.2383729097, 19.3774822039, 100.0)
+        val ecefLocation = lla2ecef(llaLocation)
+
+        val a = 1
     }
 
     override fun onResume() {

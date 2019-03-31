@@ -86,6 +86,9 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
 
+    // EJML
+    implementation group: 'org.ejml', name: 'ejml-all', version: '0.38'
+
     // Other Libraries
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.android.support:multidex:1.0.3'
