@@ -131,7 +131,7 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
         if (cno in 10.00..45.00) {
             seekBar?.setProgress(cno.toInt(), true)
         } else {
-            seekBar?.setProgress(11, true)
+            tvCnoAvg?.text = "$cno"
         }
 
         seekBar?.isEnabled = false
