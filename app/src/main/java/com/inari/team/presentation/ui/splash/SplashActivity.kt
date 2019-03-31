@@ -17,10 +17,7 @@ import com.inari.team.computation.converters.lla2ecef
 import com.inari.team.computation.converters.toGeod
 import com.inari.team.computation.converters.toTopocent
 import com.inari.team.computation.data.LlaLocation
-import com.inari.team.computation.utils.applyMod
-import com.inari.team.computation.utils.checkGalState
-import com.inari.team.computation.utils.checkTowDecode
-import com.inari.team.computation.utils.checkTowKnown
+import com.inari.team.computation.utils.*
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
@@ -120,6 +117,15 @@ class SplashActivity : BaseActivity() {
         val tgd = toGeod(6378137.0, 298.257223563, x[0], x[1], x[2])
         val dx = doubleArrayOf(200.0, 110.0, 521.0)
         val topocent = toTopocent(x, dx)
+
+        val time1 = checkTime(-302420.0)
+        val time2 = checkTime(-3024.0)
+        val time3 = checkTime(3020.0)
+        val time4 = checkTime(302520.0)
+
+        val xSatRot = earthRotCorr(0.5, doubleArrayOf(8000.0, 7000.0, 5000.0))
+
+        val gpst = nsgpst2gpst(62968924186776)
 
         val a = 1
     }
