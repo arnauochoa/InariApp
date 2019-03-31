@@ -217,7 +217,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
         val obtainedPosition = obtainPosition(jsonGnssData.toString(2))
 
-//        val positionJson = JSONArray(obtainedPosition.substringBeforeLast(",") + "]")
         val positionJson = JSONArray(obtainedPosition)
 
         //todo remove this when ref position obtained

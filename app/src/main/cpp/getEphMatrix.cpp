@@ -39,7 +39,7 @@ void getEphMatrix(Info acqInfo, Mode mode,  double **& eph, double *& iono, int 
 
         }
     }
-    
+
     if(mode.gal){
         std::vector<SVMember> Galileo = acqInfo.sv.GALILEO;
         eph = new double *[22];
@@ -75,8 +75,8 @@ void getEphMatrix(Info acqInfo, Mode mode,  double **& eph, double *& iono, int 
             eph[21][i] = Galileo[i].tgds;
         }
     }
-    
-    
+
+
 
     iono = new double [8];
     for(int i = 0; i < 8; i++){

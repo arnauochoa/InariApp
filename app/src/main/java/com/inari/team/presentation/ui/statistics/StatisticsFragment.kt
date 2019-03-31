@@ -91,7 +91,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     private fun setViews() {
 
         //init default graph
-        setAgcCNoGraph()
+        graph = mPrefs.getSelectedGraphType()
+        setGraph()
 
         tabLayout.setSelectedTabIndicatorColor(Color.TRANSPARENT)
         tabLayout.addTab(createTab(L1_E1_text))
