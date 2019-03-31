@@ -9,6 +9,8 @@ const val GAL_E1C = 100000000L
 const val FREQ_THR = 1400000000
 
 data class AcqInformation(
+    var cn0mask: Int = 0,
+    var elevationMask: Int = 0,
     var modes: ArrayList<Mode> = arrayListOf(),
     var refLocation: RefLocationData = RefLocationData(),
     var acqInformationMeasurements: ArrayList<AcqInformationMeasurements> = arrayListOf()
