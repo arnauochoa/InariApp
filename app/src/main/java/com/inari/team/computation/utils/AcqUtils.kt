@@ -1,7 +1,7 @@
 package com.inari.team.computation.utils
 
 import android.location.GnssMeasurement
-import com.inari.team.computation.Constants.C
+import com.inari.team.computation.utils.Constants.C
 
 import com.inari.team.computation.data.AcqInformationMeasurements
 import com.inari.team.computation.data.GAL_E1C
