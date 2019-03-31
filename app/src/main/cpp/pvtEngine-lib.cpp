@@ -23,8 +23,8 @@ Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *en
                                                                               jstring jsonData) {
 
     const char *gnssData = env->GetStringUTFChars(jsonData, nullptr);
-    std::string lat;
-    std::string lng;
+    std::string lat = "null";
+    std::string lng = "null";
 
     // Create aquisistion
     std::vector<Info> vAcqInfo;
@@ -35,12 +35,17 @@ Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *en
 
     double latitude, longitude;
 
+    double refLatitude = 0.0, refLongitude = 0.0;
+    bool error = false;
+
     try {
         // Read json
         json allGnssInfo;
         allGnssInfo = json::parse(gnssData);
 
         extract_info(allGnssInfo, vAcqInfo, modes);
+        refLatitude = allGnssInfo["location"]["latitude"];
+        refLongitude = allGnssInfo["location"]["longitude"];
 
         // Some initializations
         double **eph;
@@ -102,21 +107,48 @@ Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *en
         }
 
     } catch (const std::exception &e) {
+        error = true;
         lat = "null";
         lng = "null";
     }
 
+    std::string slatitude, slongitude;
     std::string position = "[";
     for (int i = 0; i < modes.size(); i++) {
         std::stringstream stream1;
-        stream1 << std::fixed << std::setprecision(10) << modeLatitudes[i];
-        std::string slatitude = stream1.str();
-
         std::stringstream stream2;
-        stream2 << std::fixed << std::setprecision(10) << modeLongitudes[i];
-        std::string slongitude = stream2.str();
 
-        position.append("{ \"lat\":" + slatitude + ", \"lng\": " + slongitude + " }, ");
+        if (error) {
+            slatitude = "null";
+            slongitude = "null";
+        } else if ((abs(modeLatitudes[i] - refLatitude) > 20.5) ||
+                   (abs(modeLongitudes[i] - refLongitude) - refLongitude > 20.5)) {
+            slatitude = "null";
+            slongitude = "null";
+        } else {
+            stream1 << std::fixed << std::setprecision(10) << modeLatitudes[i];
+            stream2 << std::fixed << std::setprecision(10) << modeLongitudes[i];
+        }
+
+        slatitude = stream1.str();
+        slongitude = stream2.str();
+
+        if (slatitude.empty()){
+            slatitude = "null";
+        }
+        if (slongitude.empty()){
+            slongitude = "null";
+        }
+
+        position.append("{ \"lat\":");
+        position.append(slatitude);
+        position.append(", \"lng\": ");
+        position.append(slongitude);
+        position.append("}");
+        if (i != modes.size() -1){
+            position.append(",");
+        }
+
     }
 
     position.append("]");

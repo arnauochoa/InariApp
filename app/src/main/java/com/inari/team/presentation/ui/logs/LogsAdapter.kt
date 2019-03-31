@@ -40,6 +40,7 @@ class LogsAdapter(val context: Context, private val emptyViewAction: () -> Unit)
         holder.layout.setOnClickListener {
             if (holder.delete.visibility == VISIBLE) {
                 holder.delete.visibility = GONE
+                holder.share.visibility = VISIBLE
             } else {
                 val file = getFile(item.name)
                 openFileIntent(file.absolutePath, context)

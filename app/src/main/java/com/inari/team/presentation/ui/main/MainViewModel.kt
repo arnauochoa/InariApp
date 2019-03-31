@@ -10,16 +10,17 @@ import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.*
+import com.inari.team.core.utils.APP_ROOT
+import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
+import com.inari.team.core.utils.getGnssJson
+import com.inari.team.core.utils.root
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.File
@@ -50,6 +51,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     private var isComputing = false
     private var isEphErrorShown = false
+    private var isFirstComputedPosition = true
 
     init {
         // Add C++ library
@@ -71,14 +73,15 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     fun startComputingPosition(selectedModes: List<Mode>) {
         isEphErrorShown = false
         isComputing = true
+        isFirstComputedPosition = true
         startedComputingDate = Date()
         computedPositions = arrayListOf()
 
         isLoggingEnabled = mPrefs.isGnssLoggingEnabled()
         if (isLoggingEnabled) {
-            fileName = Date().toString()
-            saveFile(startedComputingDate.toString(), ResponseBody.create(MediaType.parse("text/plain"), ""))
+            fileName = "${Date()}.txt"
             fileWriter = FileWriter(File(root.absolutePath + APP_ROOT + fileName))
+            fileWriter?.write("[")
         }
 
         position.showLoading()
@@ -96,6 +99,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     fun stopComputingPosition() {
         isComputing = false
         ephemeris.updateData("")
+        fileWriter?.write("]")
         fileWriter?.close()
     }
 
@@ -213,14 +217,14 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
         val obtainedPosition = obtainPosition(jsonGnssData.toString(2))
 
-        //todo remove when alfonso changes
-        val positionJson = JSONArray(obtainedPosition.substringBeforeLast(",") + "]")
+//        val positionJson = JSONArray(obtainedPosition.substringBeforeLast(",") + "]")
+        val positionJson = JSONArray(obtainedPosition)
 
         //todo remove this when ref position obtained
         // >>>>>
         val alt = 100f
         refPos?.let { pos ->
-        // <<<<<<
+            // <<<<<<
             for (i in 0 until positionJson.length()) {
                 positionJson.getJSONObject(i)?.let {
                     val latitude = it.get("lat") as? Double
@@ -247,15 +251,25 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     }
 
     private fun saveGnssLogs() {
-        val pvtInfoString: String = try {
+        var pvtInfoString = ""
+        if (isFirstComputedPosition) {
+            isFirstComputedPosition = false
+        } else {
+            pvtInfoString += ","
+        }
+        pvtInfoString += try {
             val json = getGnssJson(gnssData)
             json.toString(2)
         } catch (e: JSONException) {
-            ""
+            "{}"
         }
 
         if (pvtInfoString.isNotBlank()) {
-            fileWriter?.write(pvtInfoString)
+            try {
+                fileWriter?.write(pvtInfoString)
+            } catch (e: Exception) {
+
+            }
         }
     }
 

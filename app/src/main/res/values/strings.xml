@@ -91,4 +91,9 @@
     <string name="reset_default_modes">Reset default modes</string>
     <string name="finish">finish</string>
 
+
+    <string name="agc_cno_information_detail">Informació del graph AGC CNO</string>
+    <string name="elev_cno_information_detail">Informació del grapch elev cno</string>
+    <string name="error_information_detail">informació del error</string>
+
 </resources>
