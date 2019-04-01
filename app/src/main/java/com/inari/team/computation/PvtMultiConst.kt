@@ -1,9 +1,13 @@
 package com.inari.team.computation
 
 import com.inari.team.computation.converters.ecef2lla
+import com.inari.team.computation.corrections.getCtrlCorr
+import com.inari.team.computation.corrections.getPropCorr
 import com.inari.team.computation.data.*
 import com.inari.team.computation.utils.Constants
 import com.inari.team.computation.utils.Constants.C
+import com.inari.team.computation.utils.Constants.GALILEO
+import com.inari.team.computation.utils.Constants.GPS
 import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.outliers
 import com.inari.team.presentation.model.Mode
@@ -20,6 +24,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
     val responseList = arrayListOf<ResponsePvtMultiConst>()
 
+    val isMultiConst = mode.constellations.contains(Constants.GPS) && mode.constellations.contains(Constants.GALILEO)
+
     acqInformation.acqInformationMeasurements.forEach { epoch ->
 
         var position = PvtEcef()
@@ -27,7 +33,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         var responsePvtMultiConst = ResponsePvtMultiConst()
 
         var nGps = 0
-        val gpsA = arrayListOf<DoubleArray>()
+        val gpsA = arrayListOf<ArrayList<Double>>()
         val gpsP = arrayListOf<Double>()
         val gpsTcorr = arrayListOf<Double>()
         var gpsPcorr = arrayListOf<Double>()
@@ -36,30 +42,30 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val gpsSvn = arrayListOf<Int>()
         val gpsCn0 = arrayListOf<Double>()
         val gpsSatellites = arrayListOf<Satellite>()
-        var gpsCorr: Double = 0.0
-        var gpsPrC: Double = 0.0
-        var gpsD0: Double = 0.0
-        var gpsAx: Double = 0.0
-        var gpsAy: Double = 0.0
-        var gpsAz: Double = 0.0
+        var gpsCorr: Double
+        var gpsPrC: Double
+        var gpsD0: Double
+        var gpsAx: Double
+        var gpsAy: Double
+        var gpsAz: Double
 
 
-        var nGal = 0
-        var galA = arrayListOf<DoubleArray>()
-        var galP = arrayListOf<Double>()
-        var galTcorr = arrayListOf<Double>()
+        val nGal = 0
+        val galA = arrayListOf<ArrayList<Double>>()
+        val galP = arrayListOf<Double>()
+        val galTcorr = arrayListOf<Double>()
         var galPcorr = arrayListOf<Double>()
-        var galX = ArrayList<EcefLocation>()
-        var galPr = arrayListOf<Double>()
-        var galSvn = arrayListOf<Int>()
-        var galCn0 = arrayListOf<Double>()
+        val galX = ArrayList<EcefLocation>()
+        val galPr = arrayListOf<Double>()
+        val galSvn = arrayListOf<Int>()
+        val galCn0 = arrayListOf<Double>()
         val galSatellites = arrayListOf<Satellite>()
-        var galCorr: Double = 0.0
-        var galPrC: Double = 0.0
-        var galD0: Double = 0.0
-        var galAx: Double = 0.0
-        var galAy: Double = 0.0
-        var galAz: Double = 0.0
+        var galCorr: Double
+        var galPrC: Double
+        var galD0: Double
+        var galAx: Double
+        var galAy: Double
+        var galAz: Double
 
         repeat(PVT_ITER) { i ->
             //LS
@@ -76,6 +82,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                 iono = epoch.ionoProto
             }
 
+            //LOOP FOR GPS
             if (mode.constellations.contains(Constants.GPS)) {
 
                 if (i == 0) {
@@ -101,16 +108,16 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                 for (j in 0 until nGps) {
                     if (i == 0) {
-                        val ctrlCorr = getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j])
+                        val ctrlCorr =
+                            getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j])
                         gpsX.add(ctrlCorr.ecefLocation)
                         gpsTcorr.add(ctrlCorr.tCorr)
                     }
 
                     gpsCorr = C * gpsTcorr[j]
 
-                    //iono corrections
-
-                    //tropo corrections
+                    //Propagation corrections
+                    val propCorr = getPropCorr(gpsX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
 
                     //2freq corrections
 
@@ -130,10 +137,14 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         gpsAy = -(gpsX[j].y - position.y) / gpsD0
                         gpsAz = -(gpsX[j].z - position.z) / gpsD0
 
-                        gpsA.add(doubleArrayOf(gpsAx, gpsAy, gpsAz, 1.0))
+                        val row = arrayListOf(gpsAx, gpsAy, gpsAz, 1.0)
+                        if (isMultiConst) row.add(0.0)
+                        gpsA.add(row)
 
                     }
                 }
+
+                //pseudorange "RAIM"
                 val cleanSatsInd = outliers(gpsP)
                 cleanSatsInd.forEach {
                     gpsP.removeAt(it)
@@ -141,14 +152,9 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     gpsCn0.removeAt(it)
                 }
 
-                try {
-                    responsePvtMultiConst = leastSquares(position, gpsP, gpsA, false)
-                } catch (e: Exception) {
-                    Timber.d(e.localizedMessage)
-                }
-
             }
 
+            //LOOP FOR GALILEO
             if (mode.constellations.contains(Constants.GALILEO)) {
 
                 if (i == 0) {
@@ -174,16 +180,16 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                 for (j in 0 until nGal) {
                     if (i == 0) {
-                        val ctrlCorr = getCtrlCorr(galSatellites[j], epoch.tow, galPr[j])
+                        val ctrlCorr =
+                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j])
                         galX.add(ctrlCorr.ecefLocation)
                         galTcorr.add(ctrlCorr.tCorr)
                     }
 
                     galCorr = C * galTcorr[j]
 
-                    //iono corrections
-
-                    //tropo corrections
+                    //Propagation corrections
+                    val propCorr = getPropCorr(galX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
 
                     //2freq corrections
 
@@ -203,27 +209,45 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         galAy = -(galX[j].y - position.y) / galD0
                         galAz = -(galX[j].z - position.z) / galD0
 
-                        galA.add(doubleArrayOf(galAx, galAy, galAz, 1.0))
+                        val row = arrayListOf(galAx, galAy, galAz, 1.0)
+                        if (isMultiConst) row.add(1.0)
+                        galA.add(row)
 
                     }
                 }
+
+                //pseudorange "RAIM"
                 val cleanSatsInd = outliers(galP)
                 cleanSatsInd.forEach {
                     galP.removeAt(it)
                     galA.removeAt(it)
                     galCn0.removeAt(it)
                 }
+            }
 
-                try {
-                    responsePvtMultiConst = leastSquares(position, galP, galA, false)
-                } catch (e: Exception) {
-                    Timber.d(e.localizedMessage)
+            //Least Squares
+            try {
+                if (isMultiConst) {
+                    val multiConstP = gpsP + galP
+                    val multiconstA = gpsA + galA
+                    val multiConstcn0 = gpsCn0 + galCn0
+
+                    responsePvtMultiConst = leastSquares(position, multiConstP, multiconstA, isMultiConst)
+                } else {
+                    when {
+                        mode.constellations.contains(GPS) -> {
+                            responsePvtMultiConst = leastSquares(position, gpsP, gpsA, isMultiConst)
+                        }
+                        mode.constellations.contains(GALILEO) -> {
+                            responsePvtMultiConst = leastSquares(position, galP, galA, isMultiConst)
+                        }
+                    }
                 }
-
+            } catch (e: Exception) {
+                Timber.d(e.localizedMessage)
             }
 
         }
-
 
 
         if (responsePvtMultiConst.pvt.lat != 360.0) {
@@ -235,10 +259,10 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
     val nEpoch = responseList.size
     if (nEpoch > 0) {
         val pvtLatLng = PvtLatLng(0.0, 0.0, 0.0, 0.0)
-        var dop = Dop(0.0, 0.0, 0.0)
+        val dop = Dop(0.0, 0.0, 0.0)
         var residue = 0.0
         var nSats = 0f
-        var corrections = Corrections(0.0, 0.0, 0.0, 0.0, 0.0)
+        val corrections = Corrections(0.0, 0.0, 0.0, 0.0, 0.0)
         responseList.forEach {
             pvtLatLng.lat += it.pvt.lat
             pvtLatLng.lng += it.pvt.lng
@@ -276,8 +300,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 @Throws(Exception::class)
 fun leastSquares(
     position: PvtEcef,
-    arrayPr: ArrayList<Double>,
-    arrayA: ArrayList<DoubleArray>,
+    arrayPr: List<Double>,
+    arrayA: List<ArrayList<Double>>,
     multiC: Boolean
 ): ResponsePvtMultiConst {
     val nSats = arrayPr.size

@@ -6,12 +6,18 @@ object Constants {
     const val OMEGA_EARTH_DOT = 7.2921151467e-5
     const val GM = 3.986008e14
     const val HALF_WEEK = 302400
-
+    //Standard atmosphere - Berg, 1948 (Bernese)
+    const val PRESSURE = 1013.25 //Pressure [mbar]
+    const val TEMPERATURE = 291.15 //Temperature [K]
 
     const val L1_FREQ = 157542000000.0
     const val L5_FREQ = 117645000000.0
 
     const val PVT_ITER = 5
+
+    // Iono Models
+    const val KLOBUCHAR = 1
+    const val NE_QUICK = 2
 
     //Modes constants
     const val CN0_MASK = 1
