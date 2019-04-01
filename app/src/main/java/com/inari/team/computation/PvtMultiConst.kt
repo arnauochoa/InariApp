@@ -45,7 +45,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
 
         var nGal = 0
-        var galA = arrayListOf<XYZ>()
+        var galA = arrayListOf<DoubleArray>()
         var galP = arrayListOf<Double>()
         var galTcorr = arrayListOf<Double>()
         var galPcorr = arrayListOf<Double>()
@@ -141,15 +141,90 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     gpsCn0.removeAt(it)
                 }
 
+                try {
+                    responsePvtMultiConst = leastSquares(position, gpsP, gpsA, false)
+                } catch (e: Exception) {
+                    Timber.d(e.localizedMessage)
+                }
+
             }
 
-            try {
-                responsePvtMultiConst = leastSquares(position, gpsP, gpsA, false)
-            } catch (e: Exception) {
+            if (mode.constellations.contains(Constants.GALILEO)) {
+
+                if (i == 0) {
+                    if (mode.bands.contains(Constants.E1)) {
+                        epoch.satellites.galSatellites.galE1.forEach {
+                            galPr.add(it.pR)
+                            galSvn.add(it.svid)
+                            galCn0.add(it.cn0)
+                        }
+                        nGps = epoch.satellites.galSatellites.galE1.size
+                        gpsSatellites.addAll(epoch.satellites.galSatellites.galE1)
+                    } else {
+                        //L5
+                        epoch.satellites.galSatellites.galE5a.forEach {
+                            galPr.add(it.pR)
+                            galSvn.add(it.svid)
+                            galCn0.add(it.cn0)
+                        }
+                        nGps = epoch.satellites.galSatellites.galE5a.size
+                        gpsSatellites.addAll(epoch.satellites.galSatellites.galE5a)
+                    }
+                }
+
+                for (j in 0 until nGal) {
+                    if (i == 0) {
+                        val ctrlCorr = getCtrlCorr(galSatellites[j], epoch.tow, galPr[j])
+                        galX.add(ctrlCorr.ecefLocation)
+                        galTcorr.add(ctrlCorr.tCorr)
+                    }
+
+                    galCorr = C * galTcorr[j]
+
+                    //iono corrections
+
+                    //tropo corrections
+
+                    //2freq corrections
+
+                    galPrC = galPr[j] + galCorr
+
+                    //gps GeometricMatrix
+                    if (galPrC != 0.0) {
+                        galD0 = sqrt(
+                            (galX[j].x - position.x).pow(2) +
+                                    (galX[j].y - position.y).pow(2) +
+                                    (galX[j].z - position.z).pow(2)
+                        )
+
+                        galP.add(j, galPrC - galD0)
+
+                        galAx = -(galX[j].x - position.x) / galD0
+                        galAy = -(galX[j].y - position.y) / galD0
+                        galAz = -(galX[j].z - position.z) / galD0
+
+                        galA.add(doubleArrayOf(galAx, galAy, galAz, 1.0))
+
+                    }
+                }
+                val cleanSatsInd = outliers(galP)
+                cleanSatsInd.forEach {
+                    galP.removeAt(it)
+                    galA.removeAt(it)
+                    galCn0.removeAt(it)
+                }
+
+                try {
+                    responsePvtMultiConst = leastSquares(position, galP, galA, false)
+                } catch (e: Exception) {
+                    Timber.d(e.localizedMessage)
+                }
 
             }
 
         }
+
+
 
         if (responsePvtMultiConst.pvt.lat != 360.0) {
             responseList.add(responsePvtMultiConst)
@@ -158,43 +233,43 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
     // Compute mean
     val nEpoch = responseList.size
-    val pvtLatLng = PvtLatLng()
-    var dop = Dop()
-    var residue = 0.0
-    var nSats = 0f
-    var corrections = Corrections()
-    responseList.forEach {
-        pvtLatLng.lat += it.pvt.lat
-        pvtLatLng.lng += it.pvt.lng
-        pvtLatLng.altitude += it.pvt.altitude
-        pvtLatLng.time += it.pvt.time
+    if (nEpoch > 0) {
+        val pvtLatLng = PvtLatLng(0.0, 0.0, 0.0, 0.0)
+        var dop = Dop(0.0, 0.0, 0.0)
+        var residue = 0.0
+        var nSats = 0f
+        var corrections = Corrections(0.0, 0.0, 0.0, 0.0, 0.0)
+        responseList.forEach {
+            pvtLatLng.lat += it.pvt.lat
+            pvtLatLng.lng += it.pvt.lng
+            pvtLatLng.altitude += it.pvt.altitude
+            pvtLatLng.time += it.pvt.time
 
-        dop.gDop += it.dop.gDop
-        dop.pDop += it.dop.pDop
-        dop.tDop += it.dop.tDop
+            dop.gDop += it.dop.gDop
+            dop.pDop += it.dop.pDop
+            dop.tDop += it.dop.tDop
 
-        residue += it.residue
+            residue += it.residue
 
-        nSats += it.nSats
+            nSats += it.nSats
+        }
+        pvtLatLng.lat = pvtLatLng.lat / nEpoch
+        pvtLatLng.lng = pvtLatLng.lng / nEpoch
+        pvtLatLng.altitude = pvtLatLng.altitude / nEpoch
+        pvtLatLng.time = pvtLatLng.time / nEpoch
+
+        dop.gDop = dop.gDop / nEpoch
+        dop.pDop = dop.pDop / nEpoch
+        dop.tDop = dop.tDop / nEpoch
+
+        residue /= nEpoch
+
+        nSats /= nEpoch
+
+        pvtResponsePvtMultiConst = ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats)
     }
 
-    pvtLatLng.lat = pvtLatLng.lat / nEpoch
-    pvtLatLng.lng = pvtLatLng.lng / nEpoch
-    pvtLatLng.altitude = pvtLatLng.altitude / nEpoch
-    pvtLatLng.time = pvtLatLng.time / nEpoch
-
-    dop.gDop = dop.gDop / nEpoch
-    dop.pDop = dop.pDop / nEpoch
-    dop.tDop = dop.tDop / nEpoch
-
-    residue /= nEpoch
-
-    nSats /= nEpoch
-
-    pvtResponsePvtMultiConst = ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats)
-
     return pvtResponsePvtMultiConst
-
 }
 
 
@@ -208,7 +283,7 @@ fun leastSquares(
     val nSats = arrayPr.size
     val nCols = if (multiC) 5 else 4
     var response = ResponsePvtMultiConst()
-    if (nSats < nCols) {
+    if (nSats >= nCols) {
         if (arrayA.size != nSats) {
             Timber.d("A and p are not the same length")
         }
@@ -246,16 +321,17 @@ fun leastSquares(
         position.x += dArray[0]
         position.y += dArray[1]
         position.z += dArray[2]
-        position.time += dArray[3]
+        position.time += dArray[3] / C
 
         val llaLocation = ecef2lla(EcefLocation(position.x, position.y, position.z))
         val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
 
         // DOP computation
-        val gDop = sqrt(invMat[1, 1] + invMat[2, 2] + invMat[3, 3] + invMat[4, 4])
-        val pDop = sqrt(invMat[1, 1] + invMat[2, 2] + invMat[3, 3])
-        val tDop = sqrt(invMat[4, 4])
-        val dop = Dop(gDop, pDop, tDop)
+//        val gDop = sqrt(invMat[0, 0] + invMat[1, 1] + invMat[2, 2] + invMat[3, 3])
+//        val pDop = sqrt(invMat[0, 0] + invMat[1, 1] + invMat[2, 2])
+//        val tDop = sqrt(invMat[3, 3])
+//        val dop = Dop(gDop, pDop, tDop)
+        val dop = Dop()
 
         // Residue computation
         temp = doubleArrayOf()
