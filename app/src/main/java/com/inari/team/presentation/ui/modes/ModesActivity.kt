@@ -234,6 +234,34 @@ class ModesActivity : BaseActivity() {
             it.correctionsOption3.setOnClickListener { l ->
                 it.correctionsOption1.isEnabled = !l.correctionsOption3.isChecked
             }
+
+            it.rgGpsBands.isEnabled = it.constOption1.isChecked
+            it.rgGalBands.isEnabled = it.constOption2.isChecked
+
+            it.constOption1.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    it.rbL1.isEnabled = true
+                    it.rbL5.isEnabled = true
+                    it.rbL1.isChecked = true
+                } else {
+                    it.rbL1.isEnabled = false
+                    it.rbL5.isEnabled = false
+
+                }
+            }
+
+            it.constOption2.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    it.rbE1.isEnabled = true
+                    it.rbE5a.isEnabled = true
+                    it.rbE1.isChecked = true
+                } else {
+                    it.rbE1.isEnabled = false
+                    it.rbE5a.isEnabled = false
+                }
+            }
+
+
         }
         dialog.show()
 
@@ -250,8 +278,10 @@ class ModesActivity : BaseActivity() {
             name = it.modeNameTextEdit.text.toString() // set the name
             if (it.constOption1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
             if (it.constOption2.isChecked) constellations.add(PositionParameters.CONST_GAL)
-            if (it.bandsOption1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
-            if (it.bandsOption2.isChecked) bands.add(PositionParameters.BAND_L5)
+            if (it.isEnabled && it.rbL1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
+            if (it.isEnabled && it.rbL5.isChecked) bands.add(PositionParameters.BAND_L5)
+            if (it.isEnabled && it.rbE1.isChecked) bands.add(PositionParameters.BAND_E1)
+            if (it.isEnabled && it.rbE5a.isChecked) bands.add(PositionParameters.BAND_E5A)
             if (it.correctionsOption1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
             if (it.correctionsOption2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
             if (it.correctionsOption3.isChecked) corrections.add(PositionParameters.CORR_IONOFREE)
