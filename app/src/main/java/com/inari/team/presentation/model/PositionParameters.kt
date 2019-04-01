@@ -7,6 +7,8 @@ object PositionParameters {
 
     const val BAND_L1: Int = 1
     const val BAND_L5: Int = 2
+    const val BAND_E1: Int = 3
+    const val BAND_E5A: Int = 4
 
     const val CORR_IONOSPHERE: Int = 1
     const val CORR_TROPOSPHERE: Int = 2

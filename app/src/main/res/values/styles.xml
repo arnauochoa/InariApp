@@ -8,6 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/raleway</item>
         <item name="android:fontFeatureSettings">lnum</item>
+        <item name="android:textViewStyle">@style/AppTextViewStyle</item>
+    </style>
+
+    <style name="AppTextViewStyle" parent="android:Widget.TextView">
+
+        <item name="android:fontFamily">@font/raleway</item>
+        <item name="android:fontFeatureSettings">lnum</item>
     </style>
 
     <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">

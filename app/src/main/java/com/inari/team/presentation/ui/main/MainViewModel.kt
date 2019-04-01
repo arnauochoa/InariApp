@@ -43,7 +43,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var suplController: SuplController? = null
     private var refPos: LatLng? = null
 
-    private var isLoggingEnabled = true
     private var startedComputingDate = Date()
 
     private var fileName = Date().toString()
@@ -54,9 +53,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var isFirstComputedPosition = true
 
     init {
-        // Add C++ library
-        System.loadLibrary("pvtEngine-lib")
-        System.loadLibrary("test-lib")
         buildSuplController()
     }
 
@@ -78,17 +74,10 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         startedComputingDate = Date()
         computedPositions = arrayListOf()
 
-        val s = testcpp("")
-        position.showError(s)
-
-        isLoggingEnabled = mPrefs.isGnssLoggingEnabled()
-        if (isLoggingEnabled) {
-            fileName = "${Date()}.txt"
-            fileWriter = FileWriter(File(root.absolutePath + APP_ROOT + fileName))
-            fileWriter?.write("[")
+        if (mPrefs.isGnssLoggingEnabled()) {
+            openGnssLogFile()
         }
 
-        position.showLoading()
         //init gnss
         gnssData = GnssData()
         gnssData.modes = selectedModes
@@ -96,8 +85,15 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         gnssData.elevationMask = mPrefs.getSelectedMask()
         gnssData.avgEnabled = mPrefs.isAverageEnabled()
         gnssData.cnoMask = mPrefs.getSelectedCnoMask()
+        position.showLoading()
 
         obtainEphemerisData()
+    }
+
+    private fun openGnssLogFile() {
+        fileName = "${Date()}.txt"
+        fileWriter = FileWriter(File(root.absolutePath + APP_ROOT + fileName))
+        fileWriter?.write("[")
     }
 
     fun stopComputingPosition() {
@@ -197,7 +193,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             if (coordinates.isNotEmpty()) {
                 position.updateData(coordinates)
                 computedPositions.addAll(coordinates)
-                if (isLoggingEnabled) {
+                if (mPrefs.isGnssLoggingEnabled()) {
                     saveGnssLogs()
                 }
             } else {
@@ -208,47 +204,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             startedComputingDate = Date()
         }
 
-    }
-
-    private fun computePosition(): List<ResponsePvtMode>? {
-        val responses = arrayListOf<ResponsePvtMode>()
-
-//        computePvt(gnssData)
-
-//        val jsonGnssData = getGnssJson(gnssData)
-//
-//        val obtainedPosition = obtainPosition(jsonGnssData.toString(2))
-//
-//        val positionJson = JSONArray(obtainedPosition)
-//
-//        //todo remove this when ref position obtained
-//        // >>>>>
-//        val alt = 100f
-//        refPos?.let { pos ->
-//            // <<<<<<
-//            for (i in 0 until positionJson.length()) {
-//                positionJson.getJSONObject(i)?.let {
-//                    val latitude = it.get("lat") as? Double
-//                    val longitude = it.get("lng") as? Double
-//                    latitude?.let { lat ->
-//                        longitude?.let { lon ->
-//                            // todo add ref position
-//                            responses.add(
-//                                ResponsePvtMode(
-//                                    pos,
-//                                    alt,
-//                                    LatLng(lat, lon),
-//                                    gnssData.modes[i].color,
-//                                    gnssData.modes[i].name
-//                                )
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        } // <<<<
-
-        return responses
     }
 
     private fun saveGnssLogs() {
@@ -273,15 +228,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             }
         }
     }
-
-
-    /**
-     * C++ function used to compute the PVT. This function is defined in Project view modes at the path:
-     * /app/src/main/cpp/pvtEngine-lib.cpp
-     */
-    private external fun obtainPosition(gnssData: String): String
-
-    private external fun testcpp(gnssData: String): String
 
     companion object {
         const val SUPL_SERVER_HOST = "supl.google.com"
