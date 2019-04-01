@@ -25,7 +25,8 @@ fun getPropCorr(satPos: EcefLocation, refPos: PvtEcef, iono: ArrayList<Double>, 
     val llaRefPos = ecef2lla(EcefLocation(refPos.x, refPos.y, refPos.z))
 
     // Get tropospheric correction (Saastamoinen model)
-    val tropoCorr = tropoErrorCorrection(topoSatPos.elevation, llaRefPos.altitude)
+    val tropoCorr = tropoErrorCorrection(arrayListOf(topoSatPos.elevation), arrayListOf(llaRefPos.altitude))
+
 
     // Get ionospheric correction
     val ionoCorr = if (iono.isNotEmpty()) {

@@ -13,12 +13,16 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import com.google.location.suplclient.ephemeris.KeplerianModel
 import com.inari.team.R
-import com.inari.team.computation.converters.*
-import com.inari.team.computation.data.LlaLocation
-import com.inari.team.computation.data.Satellite
+import com.inari.team.computation.converters.Topocentric
+import com.inari.team.computation.converters.ecef2lla
+import com.inari.team.computation.converters.lla2ecef
+import com.inari.team.computation.converters.toGeod
 import com.inari.team.computation.corrections.getCtrlCorr
 import com.inari.team.computation.corrections.ionoErrorCorrections
 import com.inari.team.computation.corrections.klobucharModel
+import com.inari.team.computation.corrections.tropoErrorCorrection
+import com.inari.team.computation.data.LlaLocation
+import com.inari.team.computation.data.Satellite
 import com.inari.team.computation.satPos
 import com.inari.team.computation.utils.*
 import com.inari.team.computation.utils.Constants.KLOBUCHAR
@@ -249,6 +253,7 @@ class SplashActivity : BaseActivity() {
             KLOBUCHAR
         )
 
+        val torpoErr = tropoErrorCorrection(arrayListOf(41.093229197678930), arrayListOf(1.834025183355422e+02))
 
         val a = 1
     }
