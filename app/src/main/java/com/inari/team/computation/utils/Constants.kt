@@ -2,7 +2,7 @@ package com.inari.team.computation.utils
 
 object Constants {
 
-    const val C = 299792458
+    const val C: Long = 299792458
 
     const val L1_FREQ = 157542000000.0
     const val L5_FREQ = 117645000000.0
