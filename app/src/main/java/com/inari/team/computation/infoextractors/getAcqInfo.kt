@@ -59,7 +59,7 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                                     if (receivedSvTimeUncertaintyNanos != UNCERTAINTY_THR) {
                                         if (checkTowDecode(state)) {
                                             val sat = getTowDecodeSatellite(gnssMeas, acqInformationMeasurements)
-                                            if (carrierFrequencyHz > FREQ_THR) {
+                                            if (!hasCarrierFrequencyHz() || carrierFrequencyHz > FREQ_THR) {
                                                 //L1
                                                 acqInformationMeasurements.satellites.gpsSatellites.gpsL1.add(sat)
                                             } else {
@@ -75,7 +75,7 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                                     if (receivedSvTimeUncertaintyNanos != UNCERTAINTY_THR) {
                                         if (checkTowDecode(state)) {
                                             val sat = getTowDecodeSatellite(gnssMeas, acqInformationMeasurements)
-                                            if (carrierFrequencyHz > FREQ_THR) {
+                                            if (!hasCarrierFrequencyHz() || carrierFrequencyHz > FREQ_THR) {
                                                 //GAL E1
                                                 acqInformationMeasurements.satellites.galSatellites.galE1.add(sat)
                                             } else {
@@ -86,7 +86,7 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                                             if (checkTowKnown(gnssMeas.state)) {
                                                 val sat =
                                                     getTowDecodeSatellite(gnssMeas, acqInformationMeasurements)
-                                                if (carrierFrequencyHz > FREQ_THR) {
+                                                if (!hasCarrierFrequencyHz() || carrierFrequencyHz > FREQ_THR) {
                                                     //GAL E1
                                                     acqInformationMeasurements.satellites.galSatellites.galE1.add(sat)
                                                 } else {
@@ -96,7 +96,7 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                                             } else {
                                                 if (checkGalState(gnssMeas.state)) {
                                                     val sat = getE1CSatellite(gnssMeas, acqInformationMeasurements)
-                                                    if (carrierFrequencyHz > FREQ_THR) {
+                                                    if (!hasCarrierFrequencyHz() || carrierFrequencyHz > FREQ_THR) {
                                                         //GAL E1
                                                         acqInformationMeasurements.satellites.galSatellites.galE1.add(
                                                             sat

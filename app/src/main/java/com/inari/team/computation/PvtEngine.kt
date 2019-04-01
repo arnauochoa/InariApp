@@ -1,6 +1,7 @@
 package com.inari.team.computation
 
 import com.google.android.gms.maps.model.LatLng
+import com.inari.team.computation.data.ResponsePvtMultiConst
 import com.inari.team.computation.infoextractors.getAcqInfo
 import com.inari.team.computation.utils.Constants.CN0_MASK
 import com.inari.team.computation.utils.Constants.ELEVATION_MASK
@@ -25,20 +26,27 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
 
     acqInformation.modes.forEach {
 
-        val pvtMultiConst = pvtMultiConst(acqInformation, it)
+        val pvtMultiConst =  try {
+            pvtMultiConst(acqInformation, it)
+        } catch (e: Exception){
+            ResponsePvtMultiConst()
+        }
 
-        val pvtResponse = ResponsePvtMode(
-            LatLng(
-                acqInformation.refLocation.refLocationLla.latitude,
-                acqInformation.refLocation.refLocationLla.longitude
-            ),
-            acqInformation.refLocation.refLocationLla.altitude.toFloat(),
-            LatLng(pvtMultiConst.pvt.lat, pvtMultiConst.pvt.lng),
-            it.color,
-            it.name
-        )
+        if (pvtMultiConst.pvt.lat != 360.0) {
 
-        responses.add(pvtResponse)
+            val pvtResponse = ResponsePvtMode(
+                LatLng(
+                    acqInformation.refLocation.refLocationLla.latitude,
+                    acqInformation.refLocation.refLocationLla.longitude
+                ),
+                acqInformation.refLocation.refLocationLla.altitude.toFloat(),
+                LatLng(pvtMultiConst.pvt.lat, pvtMultiConst.pvt.lng),
+                it.color,
+                it.name
+            )
+
+            responses.add(pvtResponse)
+        }
 
     }
 

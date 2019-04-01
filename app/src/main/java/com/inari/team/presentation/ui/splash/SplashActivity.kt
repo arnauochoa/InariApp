@@ -180,12 +180,12 @@ class SplashActivity : BaseActivity() {
             8.0,
             9,
             10,
-            7200.0,
+            144000.0,
             2057,
+            -1.724963076412678e-4,
+            -9.549694368615746e-12,
             0.0,
-            0.0,
-            15.0,
-            16.0,
+            -2.048909664154053e-8,
             keplerModel = KeplerianModel(KeplerianModel.newBuilder()
                 .setCic(2.533197402954102e-07)
                 .setCis(-3.352761268615723e-08)
@@ -205,7 +205,7 @@ class SplashActivity : BaseActivity() {
                 .setToeS(144000.0)
             )
 
-        ),5181.0, 2.150608414775135e7)
+        ),139333.0, 2.339905407194209e7)
 
         val a = 1
     }
