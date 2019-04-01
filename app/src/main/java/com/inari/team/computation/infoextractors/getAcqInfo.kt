@@ -22,7 +22,7 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
 
         //Location
         gnssData.location?.let {
-            val refLocationLla = LlaLocation(it.latitude, it.longitude, it.altitude)
+            val refLocationLla = LlaLocation(it.latitude ?: 0.0, it.longitude ?: 0.0, it.altitude ?: 0.0)
             acqInformation.refLocation = RefLocationData(
                 refLocationLla,
                 lla2ecef(refLocationLla)
