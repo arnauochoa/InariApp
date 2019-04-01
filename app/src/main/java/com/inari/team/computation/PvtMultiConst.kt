@@ -9,7 +9,6 @@ import com.inari.team.computation.utils.Constants.C
 import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.outliers
 import com.inari.team.presentation.model.Mode
-import com.inari.team.presentation.model.PositionParameters
 import org.ejml.data.DMatrixRMaj
 import org.ejml.dense.row.CommonOps_DDRM
 import timber.log.Timber
@@ -39,30 +38,30 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val gpsSvn = arrayListOf<Int>()
         val gpsCn0 = arrayListOf<Double>()
         val gpsSatellites = arrayListOf<Satellite>()
-        var gpsCorr: Double = 0.0
-        var gpsPrC: Double = 0.0
-        var gpsD0: Double = 0.0
-        var gpsAx: Double = 0.0
-        var gpsAy: Double = 0.0
-        var gpsAz: Double = 0.0
+        var gpsCorr: Double
+        var gpsPrC: Double
+        var gpsD0: Double
+        var gpsAx: Double
+        var gpsAy: Double
+        var gpsAz: Double
 
 
-        var nGal = 0
-        var galA = arrayListOf<DoubleArray>()
-        var galP = arrayListOf<Double>()
-        var galTcorr = arrayListOf<Double>()
+        val nGal = 0
+        val galA = arrayListOf<DoubleArray>()
+        val galP = arrayListOf<Double>()
+        val galTcorr = arrayListOf<Double>()
         var galPcorr = arrayListOf<Double>()
-        var galX = ArrayList<EcefLocation>()
-        var galPr = arrayListOf<Double>()
-        var galSvn = arrayListOf<Int>()
-        var galCn0 = arrayListOf<Double>()
+        val galX = ArrayList<EcefLocation>()
+        val galPr = arrayListOf<Double>()
+        val galSvn = arrayListOf<Int>()
+        val galCn0 = arrayListOf<Double>()
         val galSatellites = arrayListOf<Satellite>()
-        var galCorr: Double = 0.0
-        var galPrC: Double = 0.0
-        var galD0: Double = 0.0
-        var galAx: Double = 0.0
-        var galAy: Double = 0.0
-        var galAz: Double = 0.0
+        var galCorr: Double
+        var galPrC: Double
+        var galD0: Double
+        var galAx: Double
+        var galAy: Double
+        var galAz: Double
 
         repeat(PVT_ITER) { i ->
             //LS
@@ -112,15 +111,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                     gpsCorr = C * gpsTcorr[j]
 
-                    //iono corrections
-                    if (mode.corrections.contains(PositionParameters.CORR_IONOSPHERE) ||
-                        mode.corrections.contains(PositionParameters.CORR_TROPOSPHERE)
-                    ) {
-                        val propCorr = getPropCorr(gpsX[j], position, epoch.ionoProto, epoch.tow)
-                    }
-
-
-                    //tropo corrections
+                    //Propagation corrections
+                    val propCorr = getPropCorr(gpsX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
 
                     //2freq corrections
 
