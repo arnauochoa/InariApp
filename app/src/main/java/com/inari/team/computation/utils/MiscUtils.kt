@@ -3,6 +3,7 @@ package com.inari.team.computation.utils
 import org.ejml.data.DMatrixRMaj
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM
 import java.lang.Math.*
+import kotlin.math.pow
 
 /**
  * Repairs over- and underflow of GPS time
@@ -52,4 +53,11 @@ fun nsgpst2gpst(timeNanos: Long): LongArray {
     val tow = round(timeSec.rem(weekSeconds))
 
     return longArrayOf(tow, now)
+}
+
+/**
+ * Compute Weighted Matrix
+ */
+fun computeWeightedMatrix(weight: ArrayList<Double>){
+
 }
