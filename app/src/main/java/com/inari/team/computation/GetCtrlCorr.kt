@@ -27,9 +27,9 @@ fun getCtrlCorr(
     tCorr -= satellite.tgdS
 
     // Get the satellite coordinates (corrected) and velocity
-    // todo: satPos
-    var x = doubleArrayOf(0.0, 0.0, 0.0)
-    val vel = doubleArrayOf(0.0, 0.0, 0.0)
+    val satPos = satPos(txRaw, satellite)
+    var x = satPos.x
+    val vel = satPos.vel
 
     val xVec = DMatrixRMaj.wrap(3, 1, x)
     val velVec = DMatrixRMaj.wrap(3, 1, vel)
@@ -50,7 +50,7 @@ fun getCtrlCorr(
 }
 
 fun satClockErrorCorrection(time: Double, satellite: Satellite): Double {
-    var corr = 0.0
+    var corr: Double
     with(satellite) {
         var dt = 0.0
         keplerModel?.let {

@@ -19,6 +19,7 @@ import com.inari.team.computation.converters.toGeod
 import com.inari.team.computation.converters.toTopocent
 import com.inari.team.computation.data.LlaLocation
 import com.inari.team.computation.data.Satellite
+import com.inari.team.computation.getCtrlCorr
 import com.inari.team.computation.satPos
 import com.inari.team.computation.utils.*
 import com.inari.team.core.base.BaseActivity
@@ -167,6 +168,44 @@ class SplashActivity : BaseActivity() {
                 )
 
         ))
+
+        val ctrlCorr = getCtrlCorr(Satellite(
+            1,
+            2,
+            3,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9,
+            10,
+            7200.0,
+            2057,
+            0.0,
+            0.0,
+            15.0,
+            16.0,
+            keplerModel = KeplerianModel(KeplerianModel.newBuilder()
+                .setCic(2.533197402954102e-07)
+                .setCis(-3.352761268615723e-08)
+                .setCrc(1.889687500000000e+02)
+                .setCrs(-23.031250000000000)
+                .setCuc(-1.097097992897034e-06)
+                .setCus(9.521842002868652e-06)
+                .setDeltaN(4.345538151963753e-09)
+                .setEccentricity(0.018924818490632)
+                .setI0(0.953742579229515)
+                .setIDot(4.253748614275359e-10)
+                .setM0(-2.851940672902162)
+                .setOmega(-1.756671707742028)
+                .setOmega0(-1.918848428767706)
+                .setOmegaDot(-7.638889618985842e-09)
+                .setSqrtA(5.153678335189819e+03)
+                .setToeS(144000.0)
+            )
+
+        ),5181.0, 2.150608414775135e7)
 
         val a = 1
     }
