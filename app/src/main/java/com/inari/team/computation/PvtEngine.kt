@@ -24,9 +24,7 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
 
     acqInformation.modes.forEach {
 
-        val ephMat = getEphMatrix(acqInformation, it)
-
-        pvtMultiConst(acqInformation, ephMat, it)
+        pvtMultiConst(acqInformation, it)
 
     }
 
