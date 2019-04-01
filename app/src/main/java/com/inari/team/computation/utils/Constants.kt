@@ -13,6 +13,10 @@ object Constants {
 
     const val PVT_ITER = 5
 
+    // Iono Models
+    const val KLOBUCHAR = 1
+    const val NE_QUICK = 2
+
     //Modes constants
     const val CN0_MASK = 1
     const val ELEVATION_MASK = 2
