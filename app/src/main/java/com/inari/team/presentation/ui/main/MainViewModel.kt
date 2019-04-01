@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.location.suplclient.ephemeris.EphemerisResponse
 import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
+import com.inari.team.computation.computePvt
 import com.inari.team.core.base.BaseViewModel
 import com.inari.team.core.utils.APP_ROOT
 import com.inari.team.core.utils.AppSharedPreferences
@@ -21,7 +22,6 @@ import com.inari.team.core.utils.root
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import org.json.JSONException
 import java.io.File
 import java.io.FileWriter
@@ -56,6 +56,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     init {
         // Add C++ library
         System.loadLibrary("pvtEngine-lib")
+        System.loadLibrary("test-lib")
         buildSuplController()
     }
 
@@ -76,6 +77,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isFirstComputedPosition = true
         startedComputingDate = Date()
         computedPositions = arrayListOf()
+
+        val s = testcpp("")
+        position.showError(s)
 
         isLoggingEnabled = mPrefs.isGnssLoggingEnabled()
         if (isLoggingEnabled) {
@@ -188,19 +192,15 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     private fun calculatePositionWithGnss() {
         GlobalScope.launch {
-            val coordinates = computePosition()
+            val coordinates = computePvt(gnssData)
 
-            coordinates?.let {
-                if (it.isNotEmpty()) {
-                    position.updateData(it)
-                    computedPositions.addAll(it)
-                    if (isLoggingEnabled) {
-                        saveGnssLogs()
-                    }
-                } else {
-                    position.showError("Position could not be obtained.")
+            if (coordinates.isNotEmpty()) {
+                position.updateData(coordinates)
+                computedPositions.addAll(coordinates)
+                if (isLoggingEnabled) {
+                    saveGnssLogs()
                 }
-            } ?: kotlin.run {
+            } else {
                 position.showError("Position could not be obtained.")
             }
 
@@ -213,39 +213,40 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private fun computePosition(): List<ResponsePvtMode>? {
         val responses = arrayListOf<ResponsePvtMode>()
 
-        val jsonGnssData = getGnssJson(gnssData)
+//        computePvt(gnssData)
 
-        val obtainedPosition = obtainPosition(jsonGnssData.toString(2))
-
-//        val positionJson = JSONArray(obtainedPosition.substringBeforeLast(",") + "]")
-        val positionJson = JSONArray(obtainedPosition)
-
-        //todo remove this when ref position obtained
-        // >>>>>
-        val alt = 100f
-        refPos?.let { pos ->
-            // <<<<<<
-            for (i in 0 until positionJson.length()) {
-                positionJson.getJSONObject(i)?.let {
-                    val latitude = it.get("lat") as? Double
-                    val longitude = it.get("lng") as? Double
-                    latitude?.let { lat ->
-                        longitude?.let { lon ->
-                            // todo add ref position
-                            responses.add(
-                                ResponsePvtMode(
-                                    pos,
-                                    alt,
-                                    LatLng(lat, lon),
-                                    gnssData.modes[i].color,
-                                    gnssData.modes[i].name
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        } // <<<<
+//        val jsonGnssData = getGnssJson(gnssData)
+//
+//        val obtainedPosition = obtainPosition(jsonGnssData.toString(2))
+//
+//        val positionJson = JSONArray(obtainedPosition)
+//
+//        //todo remove this when ref position obtained
+//        // >>>>>
+//        val alt = 100f
+//        refPos?.let { pos ->
+//            // <<<<<<
+//            for (i in 0 until positionJson.length()) {
+//                positionJson.getJSONObject(i)?.let {
+//                    val latitude = it.get("lat") as? Double
+//                    val longitude = it.get("lng") as? Double
+//                    latitude?.let { lat ->
+//                        longitude?.let { lon ->
+//                            // todo add ref position
+//                            responses.add(
+//                                ResponsePvtMode(
+//                                    pos,
+//                                    alt,
+//                                    LatLng(lat, lon),
+//                                    gnssData.modes[i].color,
+//                                    gnssData.modes[i].name
+//                                )
+//                            )
+//                        }
+//                    }
+//                }
+//            }
+//        } // <<<<
 
         return responses
     }
@@ -279,6 +280,8 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
      * /app/src/main/cpp/pvtEngine-lib.cpp
      */
     private external fun obtainPosition(gnssData: String): String
+
+    private external fun testcpp(gnssData: String): String
 
     companion object {
         const val SUPL_SERVER_HOST = "supl.google.com"

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import com.inari.team.R
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.context
-import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import org.jetbrains.anko.toast
 
@@ -49,16 +48,16 @@ class ModesAdapter(private val onModeSelected: () -> Unit) : RecyclerView.Adapte
             }
         }
 
-        holder.deleteButton.setOnClickListener {
-            holder.deleteButton.visibility = GONE
-            toast("Mode '" + modes[position].name + "' deleted")
-            mPrefs.deleteMode(mode)
-            if (mode.isSelected) {
-                onModeSelected.invoke()
-            }
-            modes.removeAt(position)
-            notifyDataSetChanged()
-        }
+//        holder.deleteButton.setOnClickListener {
+//            holder.deleteButton.visibility = GONE
+//            toast("Mode '" + modes[position].name + "' deleted")
+//            mPrefs.deleteMode(mode)
+//            if (mode.isSelected) {
+//                onModeSelected.invoke()
+//            }
+//            modes.removeAt(position)
+//            notifyDataSetChanged()
+//        }
 
     }
 

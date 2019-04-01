@@ -12,9 +12,8 @@ double mean_vector(std::vector<double> theVector) {
     double theSum = 0;
     for (auto element : theVector)
         theSum = theSum + element;
-    return (double) theSum / theVector.size();
+    return  theSum / theVector.size();
 }
-
 
 extern "C" JNIEXPORT jstring JNICALL
 
@@ -48,8 +47,8 @@ Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *en
         refLongitude = allGnssInfo["location"]["longitude"];
 
         // Some initializations
-        double **eph;
-        double *iono;
+        double ** eph;
+        double * iono;
         int ephN, ephM;
 
         // Number of iterations used to obtain the PVT solution
@@ -69,22 +68,22 @@ Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *en
         std::vector<double> latitudes;
         std::vector<double> longitudes;
 
-        for (auto mode : modes) {
+        for(auto mode : modes){
 
             latitudes.clear();
             longitudes.clear();
 
-            for (auto acqInfo : vAcqInfo) {
+            for(auto acqInfo : vAcqInfo){
 
-                // eph Matrix 
-                getEphMatrix(acqInfo, mode, eph, iono, ephN, ephM);
+                // eph Matrix
+                getEphMatrix(acqInfo, mode ,eph, iono, ephN, ephM);
 
                 //TODO: get preliminay guess, from obs header?
                 PVT0[0] = acqInfo.RefLocation.XYZ.x;
                 PVT0[1] = acqInfo.RefLocation.XYZ.y;
                 PVT0[2] = acqInfo.RefLocation.XYZ.z;
 
-                PVT_recls(acqInfo, mode, eph, ephN, ephM, iono, Nit, PVT0, enabCorr, PVT);
+                PVT_recls(acqInfo, mode, eph, ephN, ephM, iono, Nit, PVT0, enabCorr, PVT );
 
                 xyz2llh(PVT, posllh);     // Getting position in Latitude, Longitude, Height format
 
@@ -96,10 +95,10 @@ Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *en
 
             }
 
-            latitude = mean_vector(latitudes);
+            latitude  = mean_vector(latitudes);
             longitude = mean_vector(longitudes);
 
-            // std::cout << latitude << ", " << longitude << std::endl;    
+            std::cout << latitude << ", " << longitude << std::endl;
 
             modeLatitudes.push_back(latitude);
             modeLongitudes.push_back(longitude);
@@ -126,6 +125,8 @@ Java_com_inari_team_presentation_ui_main_MainViewModel_obtainPosition(JNIEnv *en
             slatitude = "null";
             slongitude = "null";
         } else {
+            std::cout << modeLatitudes[i];
+            std::cout << modeLongitudes[i];
             stream1 << std::fixed << std::setprecision(10) << modeLatitudes[i];
             stream2 << std::fixed << std::setprecision(10) << modeLongitudes[i];
         }

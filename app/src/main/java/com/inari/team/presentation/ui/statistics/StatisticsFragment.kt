@@ -91,7 +91,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     private fun setViews() {
 
         //init default graph
-        setAgcCNoGraph()
+        graph = mPrefs.getSelectedGraphType()
+        setGraph()
 
         tabLayout.setSelectedTabIndicatorColor(Color.TRANSPARENT)
         tabLayout.addTab(createTab(L1_E1_text))
@@ -519,8 +520,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MIN_AGC_L1 = 30f // dB-Hz
         const val MAX_AGC_L5 = 15f // dB-Hz
         const val MIN_AGC_L5 = -5f // dB-Hz
-        const val NORTH_LIM = 200f // m
-        const val EAST_LIM = 200f // m
+        const val NORTH_LIM = 1000f // m // TODO: change
+        const val EAST_LIM = 1000f // m
 
         // AGC-CNO threshold values: y=mx+n
         const val AGC_CNO_M = -0.1f

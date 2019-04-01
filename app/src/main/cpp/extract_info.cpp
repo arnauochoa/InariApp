@@ -1,17 +1,18 @@
 #include "extract_info.h"
 
 void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mode>& modes){
-    
+
     // Initial declarations
     Info acqInfo;
     json gnssInfo;
-    Mode mode;
     json infoMode;
     int c = 299792458;
 
     for(int m = 0; m < allGnssInfo["modes"].size(); m++){
+        Mode mode;
+
         infoMode =  allGnssInfo["modes"][m];
-        
+
         mode.algorithm = (int)infoMode["algorithm"];
 
         for(int i = 0; i < infoMode["bands"].size(); i++){
@@ -43,9 +44,9 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
 
 
     for (int k = 0; k < allGnssInfo["MeasData"].size(); k++){
-        
+
         gnssInfo = allGnssInfo["MeasData"][k];
-        
+
         // Location
         acqInfo.RefLocation.LLH.latitute = allGnssInfo["location"]["latitude"];
         acqInfo.RefLocation.LLH.longitude = allGnssInfo["location"]["longitude"];
@@ -82,7 +83,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
             switch (constellationType)
             {
                 case 1:
-                SVMember GPS; 
+                SVMember GPS;
                 GPS.svid            = gnssInfo["Meas"][i]["svid"];
                 GPS.carrierFreq     = gnssInfo["Meas"][i]["carrierFrequencyHz"];
                 GPS.t_tx            = gnssInfo["Meas"][i]["receivedSvTimeNanos"];
@@ -92,7 +93,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
                     break;
 
                 case 2:
-                SVMember SBAS; 
+                SVMember SBAS;
                 SBAS.svid            = gnssInfo["Meas"][i]["svid"];
                 SBAS.carrierFreq     = gnssInfo["Meas"][i]["carrierFrequencyHz"];
                 SBAS.t_tx            = gnssInfo["Meas"][i]["receivedSvTimeNanos"];
@@ -101,7 +102,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
                 acqInfo.sv.SBAS.push_back(SBAS);
 
                 case 3:
-                SVMember GLONASS; 
+                SVMember GLONASS;
                 GLONASS.svid            = gnssInfo["Meas"][i]["svid"];
                 GLONASS.carrierFreq     = gnssInfo["Meas"][i]["carrierFrequencyHz"];
                 GLONASS.t_tx            = gnssInfo["Meas"][i]["receivedSvTimeNanos"];
@@ -110,7 +111,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
                 acqInfo.sv.GLONASS.push_back(GLONASS);
 
                 case 4:
-                SVMember QZSS; 
+                SVMember QZSS;
                 QZSS.svid            = gnssInfo["Meas"][i]["svid"];
                 QZSS.carrierFreq     = gnssInfo["Meas"][i]["carrierFrequencyHz"];
                 QZSS.t_tx            = gnssInfo["Meas"][i]["receivedSvTimeNanos"];
@@ -119,7 +120,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
                 acqInfo.sv.QZSS.push_back(QZSS);
 
                 case 5:
-                SVMember BEIDU; 
+                SVMember BEIDU;
                 BEIDU.svid            = gnssInfo["Meas"][i]["svid"];
                 BEIDU.carrierFreq     = gnssInfo["Meas"][i]["carrierFrequencyHz"];
                 BEIDU.t_tx            = gnssInfo["Meas"][i]["receivedSvTimeNanos"];
@@ -128,16 +129,16 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
                 acqInfo.sv.BEIDU.push_back(BEIDU);
 
                 case 6:
-                SVMember GALILEO; 
+                SVMember GALILEO;
                 GALILEO.svid            = gnssInfo["Meas"][i]["svid"];
                 GALILEO.carrierFreq     = gnssInfo["Meas"][i]["carrierFrequencyHz"];
                 GALILEO.t_tx            = gnssInfo["Meas"][i]["receivedSvTimeNanos"];
                 GALILEO.pseudorangeRate = gnssInfo["Meas"][i]["pseudorangeRateMetersPerSecond"];
                 GALILEO.CNO             = gnssInfo["Meas"][i]["cn0DbHz"];
                 acqInfo.sv.GALILEO.push_back(GALILEO);
-            
+
                 default:
-                SVMember UNK; 
+                SVMember UNK;
                 UNK.svid            = gnssInfo["Meas"][i]["svid"];
                 UNK.carrierFreq     = gnssInfo["Meas"][i]["carrierFrequencyHz"];
                 UNK.t_tx            = gnssInfo["Meas"][i]["receivedSvTimeNanos"];
@@ -162,7 +163,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
                     acqInfo.sv.GPS[j].af1 = allGnssInfo["ephData"]["GPS"][i]["af1SecPerSec"];
                     acqInfo.sv.GPS[j].af2 = allGnssInfo["ephData"]["GPS"][i]["af2SecPerSec2"];
                     acqInfo.sv.GPS[j].tgds = allGnssInfo["ephData"]["GPS"][i]["tgdS"];
-                    
+
                     // kepler model
                     acqInfo.sv.GPS[j].keplerModel.cic = allGnssInfo["ephData"]["GPS"][i]["keplerModel"]["cic"];
                     acqInfo.sv.GPS[j].keplerModel.cis = allGnssInfo["ephData"]["GPS"][i]["keplerModel"]["cis"];
@@ -190,7 +191,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
             for(int j = 0; j < acqInfo.sv.GALILEO.size(); j++){
                 int ephDataSvid = allGnssInfo["ephData"]["Galileo"][i]["svid"];
                 if(acqInfo.sv.GALILEO[j].svid == ephDataSvid){
-                    
+
                     acqInfo.sv.GALILEO[j].tow = allGnssInfo["ephData"]["Galileo"][i]["tocS"];
                     acqInfo.sv.GALILEO[j].now = allGnssInfo["ephData"]["Galileo"][i]["week"];
                     acqInfo.sv.GALILEO[j].af0 = allGnssInfo["ephData"]["Galileo"][i]["af0S"];
@@ -215,7 +216,7 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
                     acqInfo.sv.GALILEO[j].keplerModel.omegaDot = allGnssInfo["ephData"]["Galileo"][i]["keplerModel"]["omegaDot"];
                     acqInfo.sv.GALILEO[j].keplerModel.sqrtA = allGnssInfo["ephData"]["Galileo"][i]["keplerModel"]["sqrtA"];
                     acqInfo.sv.GALILEO[j].keplerModel.toeS = allGnssInfo["ephData"]["Galileo"][i]["keplerModel"]["toeS"];
-                    
+
                 }
             }
         }
@@ -235,5 +236,5 @@ void extract_info(json allGnssInfo, std::vector<Info>& vAcqInfo, std::vector<Mod
         vAcqInfo.push_back(acqInfo);
 
     }
-    
+
 }
