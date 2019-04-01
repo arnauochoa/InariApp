@@ -2,6 +2,7 @@ package com.inari.team.computation
 
 import com.inari.team.computation.converters.ecef2lla
 import com.inari.team.computation.corrections.getCtrlCorr
+import com.inari.team.computation.corrections.getIonoCorrDualFreq
 import com.inari.team.computation.corrections.getPropCorr
 import com.inari.team.computation.data.*
 import com.inari.team.computation.utils.Constants
@@ -11,6 +12,7 @@ import com.inari.team.computation.utils.Constants.GPS
 import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.outliers
 import com.inari.team.presentation.model.Mode
+import com.inari.team.presentation.model.PositionParameters
 import org.ejml.data.DMatrixRMaj
 import org.ejml.dense.row.CommonOps_DDRM
 import timber.log.Timber
@@ -118,8 +120,32 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                     //Propagation corrections
                     val propCorr = getPropCorr(gpsX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
+                    gpsCorr = gpsCorr - propCorr.tropoCorr - propCorr.ionoCorr
 
                     //2freq corrections
+                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+                        var pr1 = 0.0
+                        var freq1 = 0.0
+                        var pr2 = 0.0
+                        var freq2 = 0.0
+
+                        epoch.satellites.gpsSatellites.gpsL1.forEach { s ->
+                            if (s.svid == gpsSvn[j]) {
+                                pr1 = s.pR
+                                freq1 = s.carrierFreq
+                            }
+                        }
+                        epoch.satellites.gpsSatellites.gpsL5.forEach { s ->
+                            if (s.svid == gpsSvn[j]) {
+                                pr2 = s.pR
+                                freq2 = s.carrierFreq
+                            }
+                        }
+
+                        if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
+                            gpsPrC = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                        }
+                    }
 
                     gpsPrC = gpsPr[j] + gpsCorr
 
@@ -190,8 +216,33 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                     //Propagation corrections
                     val propCorr = getPropCorr(galX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
+                    galCorr = galCorr - propCorr.tropoCorr - propCorr.ionoCorr
+
 
                     //2freq corrections
+                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+                        var pr1 = 0.0
+                        var freq1 = 0.0
+                        var pr2 = 0.0
+                        var freq2 = 0.0
+
+                        epoch.satellites.galSatellites.galE1.forEach { s ->
+                            if (s.svid == gpsSvn[j]) {
+                                pr1 = s.pR
+                                freq1 = s.carrierFreq
+                            }
+                        }
+                        epoch.satellites.galSatellites.galE5a.forEach { s ->
+                            if (s.svid == gpsSvn[j]) {
+                                pr2 = s.pR
+                                freq2 = s.carrierFreq
+                            }
+                        }
+
+                        if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
+                            galPrC = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                        }
+                    }
 
                     galPrC = galPr[j] + galCorr
 
