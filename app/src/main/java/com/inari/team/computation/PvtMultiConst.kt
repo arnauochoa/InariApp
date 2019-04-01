@@ -1,12 +1,15 @@
 package com.inari.team.computation
 
 import com.inari.team.computation.converters.ecef2lla
+import com.inari.team.computation.corrections.getCtrlCorr
+import com.inari.team.computation.corrections.getPropCorr
 import com.inari.team.computation.data.*
 import com.inari.team.computation.utils.Constants
 import com.inari.team.computation.utils.Constants.C
 import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.outliers
 import com.inari.team.presentation.model.Mode
+import com.inari.team.presentation.model.PositionParameters
 import org.ejml.data.DMatrixRMaj
 import org.ejml.dense.row.CommonOps_DDRM
 import timber.log.Timber
@@ -101,7 +104,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                 for (j in 0 until nGps) {
                     if (i == 0) {
-                        val ctrlCorr = getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j])
+                        val ctrlCorr =
+                            getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j])
                         gpsX.add(ctrlCorr.ecefLocation)
                         gpsTcorr.add(ctrlCorr.tCorr)
                     }
@@ -109,6 +113,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     gpsCorr = C * gpsTcorr[j]
 
                     //iono corrections
+                    if (mode.corrections.contains(PositionParameters.CORR_IONOSPHERE) ||
+                        mode.corrections.contains(PositionParameters.CORR_TROPOSPHERE)
+                    ) {
+                        val propCorr = getPropCorr(gpsX[j], position, epoch.ionoProto, epoch.tow)
+                    }
+
 
                     //tropo corrections
 
@@ -174,7 +184,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                 for (j in 0 until nGal) {
                     if (i == 0) {
-                        val ctrlCorr = getCtrlCorr(galSatellites[j], epoch.tow, galPr[j])
+                        val ctrlCorr =
+                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j])
                         galX.add(ctrlCorr.ecefLocation)
                         galTcorr.add(ctrlCorr.tCorr)
                     }

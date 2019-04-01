@@ -172,8 +172,6 @@ fun toTopocent(xArray: DoubleArray, dxArray: DoubleArray): Topocentric {
     var az: Double
     val el: Double
 
-    val dtr = PI / 180.0
-
     val geod = toGeod(6378137.0, 298.257223563, xArray[0], xArray[1], xArray[2])
 
     val cl = cos(toRadians(geod.dlambda))

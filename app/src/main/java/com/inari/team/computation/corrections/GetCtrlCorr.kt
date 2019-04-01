@@ -1,7 +1,8 @@
-package com.inari.team.computation
+package com.inari.team.computation.corrections
 
 import com.inari.team.computation.data.EcefLocation
 import com.inari.team.computation.data.Satellite
+import com.inari.team.computation.satPos
 import com.inari.team.computation.utils.Constants.C
 import com.inari.team.computation.utils.checkTime
 import com.inari.team.computation.utils.earthRotCorr
