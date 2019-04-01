@@ -1,9 +1,9 @@
 package com.inari.team.computation.utils
 
 import org.ejml.data.DMatrixRMaj
+import org.ejml.dense.row.CommonOps_DDRM
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM
 import java.lang.Math.*
-import kotlin.math.pow
 
 /**
  * Repairs over- and underflow of GPS time
@@ -56,8 +56,23 @@ fun nsgpst2gpst(timeNanos: Long): LongArray {
 }
 
 /**
- * Compute Weighted Matrix
+ * Compute Weight Matrix
  */
-fun computeWeightedMatrix(weight: ArrayList<Double>){
+fun computeCNoWeightMatrix(cnos: List<Double>, isWeight: Boolean): DMatrixRMaj {
 
+    var wMat = CommonOps_DDRM.identity(cnos.size, cnos.size)
+    if (isWeight) {
+        val diagonal = arrayListOf<Double>()
+        val tmp = arrayListOf<Double>()
+        cnos.forEach { cno ->
+            tmp.add(pow(10.0, -cno / 10))
+        }
+        val sum = tmp.sum()
+        tmp.forEach {
+            diagonal.add(1 / (it / sum))
+        }
+        wMat = CommonOps_DDRM.diag(*diagonal.toDoubleArray())
+    }
+
+    return wMat
 }
