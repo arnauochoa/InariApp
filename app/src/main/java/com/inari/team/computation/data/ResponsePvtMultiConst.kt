@@ -3,8 +3,9 @@ package com.inari.team.computation.data
 data class ResponsePvtMultiConst(
     var pvt: PvtLatLng = PvtLatLng(),
     var dop: Dop = Dop(),
+    var residue: Double = 0.0,
     var corrections: Corrections = Corrections(),
-    var nSats: Int = 0
+    var nSats: Float = 0f
 )
 
 data class PvtLatLng(

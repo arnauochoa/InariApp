@@ -7,6 +7,7 @@ object Constants {
     const val GM = 3.986008e14
     const val HALF_WEEK = 302400
 
+
     const val L1_FREQ = 157542000000.0
     const val L5_FREQ = 117645000000.0
 
