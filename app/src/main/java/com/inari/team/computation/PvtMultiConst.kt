@@ -8,11 +8,12 @@ import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.outliers
 import com.inari.team.presentation.model.Mode
 import org.ejml.data.DMatrixRMaj
-import org.ejml.simple.SimpleMatrix
+import org.ejml.dense.row.CommonOps_DDRM
 import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+@Throws(Exception::class)
 fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiConst {
 
     var pvtResponsePvtMultiConst = ResponsePvtMultiConst()
@@ -123,7 +124,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                                     (gpsX[j].z - position.z).pow(2)
                         )
 
-                        gpsP[j] = gpsPrC - gpsD0
+                        gpsP.add(j, gpsPrC - gpsD0)
 
                         gpsAx = -(gpsX[j].x - position.x) / gpsD0
                         gpsAy = -(gpsX[j].y - position.y) / gpsD0
@@ -142,11 +143,17 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
             }
 
-            responsePvtMultiConst = leastSquares(position, gpsP, gpsA, false)
+            try {
+                responsePvtMultiConst = leastSquares(position, gpsP, gpsA, false)
+            } catch (e: Exception) {
+
+            }
 
         }
 
-        responseList.add(responsePvtMultiConst)
+        if (responsePvtMultiConst.pvt.lat != 360.0) {
+            responseList.add(responsePvtMultiConst)
+        }
     }
 
     // Compute mean
@@ -171,14 +178,14 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         nSats += it.nSats
     }
 
-    pvtLatLng.lat = pvtLatLng.lat/nEpoch
-    pvtLatLng.lng = pvtLatLng.lng/nEpoch
-    pvtLatLng.altitude = pvtLatLng.altitude/nEpoch
-    pvtLatLng.time = pvtLatLng.time/nEpoch
+    pvtLatLng.lat = pvtLatLng.lat / nEpoch
+    pvtLatLng.lng = pvtLatLng.lng / nEpoch
+    pvtLatLng.altitude = pvtLatLng.altitude / nEpoch
+    pvtLatLng.time = pvtLatLng.time / nEpoch
 
-    dop.gDop = dop.gDop/nEpoch
-    dop.pDop = dop.pDop/nEpoch
-    dop.tDop = dop.tDop/nEpoch
+    dop.gDop = dop.gDop / nEpoch
+    dop.pDop = dop.pDop / nEpoch
+    dop.tDop = dop.tDop / nEpoch
 
     residue /= nEpoch
 
@@ -191,6 +198,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 }
 
 
+@Throws(Exception::class)
 fun leastSquares(
     position: PvtEcef,
     arrayPr: ArrayList<Double>,
@@ -199,53 +207,70 @@ fun leastSquares(
 ): ResponsePvtMultiConst {
     val nSats = arrayPr.size
     val nCols = if (multiC) 5 else 4
-    if (arrayA.size != nSats) {
-        Timber.d("A and p are not the same length")
+    var response = ResponsePvtMultiConst()
+    if (nSats < nCols) {
+        if (arrayA.size != nSats) {
+            Timber.d("A and p are not the same length")
+        }
+
+        // PVT computation
+        val daPr = arrayPr.toDoubleArray()
+        var daA = doubleArrayOf()
+        repeat(nSats) { ind ->
+            daA += arrayA[ind]
+        }
+
+        val prMat = DMatrixRMaj.wrap(nSats, 1, daPr)
+        val aMat = DMatrixRMaj.wrap(nSats, nCols, daA)
+
+        var temp = doubleArrayOf()
+        repeat(nCols * nSats) {
+            temp += 0.0
+        }
+        val invMat = DMatrixRMaj.wrap(nCols, nSats, temp)
+
+        CommonOps_DDRM.pinv(aMat, invMat)
+        temp = doubleArrayOf()
+        repeat(nCols) {
+            temp += 0.0
+        }
+        val dMat = DMatrixRMaj.wrap(nCols, 1, temp)
+        CommonOps_DDRM.mult(invMat, prMat, dMat)
+
+
+        val dArray = arrayListOf<Double>()
+        repeat(nCols) { i ->
+            dArray.add(dMat[i])
+        }
+
+        position.x += dArray[0]
+        position.y += dArray[1]
+        position.z += dArray[2]
+        position.time += dArray[3]
+
+        val llaLocation = ecef2lla(EcefLocation(position.x, position.y, position.z))
+        val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
+
+        // DOP computation
+        val gDop = sqrt(invMat[1, 1] + invMat[2, 2] + invMat[3, 3] + invMat[4, 4])
+        val pDop = sqrt(invMat[1, 1] + invMat[2, 2] + invMat[3, 3])
+        val tDop = sqrt(invMat[4, 4])
+        val dop = Dop(gDop, pDop, tDop)
+
+        // Residue computation
+        temp = doubleArrayOf()
+        repeat(nSats) {
+            temp += 0.0
+        }
+        val pEstMat = DMatrixRMaj.wrap(nSats, 1, temp)
+        CommonOps_DDRM.mult(aMat, dMat, pEstMat)
+        val resMat = DMatrixRMaj.wrap(nSats, 1, temp)
+        CommonOps_DDRM.subtract(prMat, pEstMat, resMat)
+
+        val residue = sqrt(resMat[0].pow(2) + resMat[1].pow(2) + resMat[2].pow(2))
+
+        response = ResponsePvtMultiConst(pvtLatLng, dop, residue, Corrections(), nSats.toFloat())
     }
-
-    // PVT computation
-    val daPr = arrayPr.toDoubleArray()
-    val daA = doubleArrayOf()
-    repeat(nSats) { ind ->
-        daA + arrayA[ind]
-    }
-
-    val prMat = DMatrixRMaj.wrap(nSats, 1, daPr)
-    val aMat = DMatrixRMaj.wrap(nSats, nCols, daA)
-
-    val prSMat = SimpleMatrix.wrap(prMat)
-    val aSMat = SimpleMatrix.wrap(aMat)
-
-    val invMat = aSMat.pseudoInverse()
-    val dMat = invMat.mult(prSMat)
-
-    val dArray = arrayListOf<Double>()
-    repeat(nCols) { i ->
-        dArray.add(dMat[i])
-    }
-
-    position.x += dArray[0]
-    position.y += dArray[1]
-    position.z += dArray[2]
-    position.time += dArray[3]
-
-    val llaLocation = ecef2lla(EcefLocation(position.x, position.y, position.z))
-    val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
-
-    // DOP computation
-    val gDop = sqrt(invMat[1, 1] + invMat[2, 2] + invMat[3, 3] + invMat[4, 4])
-    val pDop = sqrt(invMat[1, 1] + invMat[2, 2] + invMat[3, 3])
-    val tDop = sqrt(invMat[4, 4])
-    val dop = Dop(gDop, pDop, tDop)
-
-    // Resdiue computation
-    val pEstMat = aSMat.mult(dMat)
-    val resMat = prSMat.minus(pEstMat)
-
-    val residue = sqrt(resMat[0].pow(2) + resMat[1].pow(2) + resMat[2].pow(2))
-
-
-    val response = ResponsePvtMultiConst(pvtLatLng, dop, residue, Corrections(), nSats.toFloat())
 
     return response
 }
