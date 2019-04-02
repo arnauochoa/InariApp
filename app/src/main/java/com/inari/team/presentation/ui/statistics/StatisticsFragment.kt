@@ -123,7 +123,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             showGraphTypeDialog()
         }
 
-        ivGraphInformation.setOnClickListener {
+        tvInformationTitle.setOnClickListener {
             if (tvInformationDetail.visibility == VISIBLE) {
                 tvInformationDetail.visibility = GONE
             } else {

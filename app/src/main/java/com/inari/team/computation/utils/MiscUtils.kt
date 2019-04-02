@@ -59,7 +59,6 @@ fun nsgpst2gpst(timeNanos: Long): LongArray {
  * Compute Weight Matrix
  */
 fun computeCNoWeightMatrix(cnos: List<Double>, isWeight: Boolean): DMatrixRMaj {
-
     var wMat = CommonOps_DDRM.identity(cnos.size, cnos.size)
     if (isWeight) {
         val diagonal = arrayListOf<Double>()

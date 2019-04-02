@@ -36,7 +36,7 @@
                     android:gravity="center_vertical"
                     android:paddingStart="16dp"
                     android:paddingEnd="0dp"
-                    android:text="Enable GNSS logs"
+                    android:text="@string/enable_gnss_logs"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -51,7 +51,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="A file with raw mesurements will be created every time you start computing if enabled."
+                    android:text="@string/enable_logs_description"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/switchGnssLogs"
                     app:layout_constraintStart_toStartOf="parent"
@@ -124,7 +124,7 @@
                     android:layout_marginTop="12dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="0dp"
-                    android:text="Average Time:"
+                    android:text="@string/average_time_title"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
