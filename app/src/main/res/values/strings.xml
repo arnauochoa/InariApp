@@ -98,5 +98,8 @@
     <string name="elev_cno_information_detail">This plot informs the user of Satellite contributions in terms of Carrier to Noise Ratio and geometry. Satellites with poor CNO or low elevations may introduce severe errors in user’s position. Thus, masks based on this metrics are applied to avoid their contribution in the Positioning algorithm. </string>
     <string name="error_information_detail">The error plot displays the relative error between the Position derived from the App’s algorithm with the selected configuration and the Position provided by Google’s API. In this case, there is not a reference position as both algorithms perform differently depending on the user’s scenario. </string>
     <string name="graph_information">Graph Information</string>
+    <string name="enable_gnss_logs">Enable GNSS logs</string>
+    <string name="enable_logs_description">A file with raw mesurements will be created every time you start computing if enabled.</string>
+    <string name="average_time_title">Average Time:</string>
 
 </resources>
