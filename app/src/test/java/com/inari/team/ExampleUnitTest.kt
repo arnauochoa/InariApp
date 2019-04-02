@@ -15,9 +15,6 @@ import com.inari.team.computation.satPos
 import com.inari.team.computation.utils.*
 import org.junit.Test
 
-import org.junit.Assert.*
-import java.util.concurrent.TimeUnit
-
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -26,8 +23,13 @@ import java.util.concurrent.TimeUnit
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
-        testMath()
+//        testMath()
+
+        val a = this.javaClass.classLoader?.getResourceAsStream("lastJSON1218.txt")
+        val str = a?.bufferedReader().use { it?.readText() }
+
+        print(str)
+
     }
 
     private fun testMath() {
@@ -197,8 +199,6 @@ class ExampleUnitTest {
                 17.849727630615234
             ), true
         )
-        print(wMat)
 
-        val a = 1
     }
 }
