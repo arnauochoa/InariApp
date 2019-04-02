@@ -26,13 +26,13 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
 
     acqInformation.modes.forEach {
 
-        val pvtMultiConst =  try {
+        val pvtMultiConst = try {
             pvtMultiConst(acqInformation, it)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             ResponsePvtMultiConst()
         }
 
-        if (pvtMultiConst.pvt.lat != 360.0) {
+        if (pvtMultiConst.pvt.lat in -180.0..180.0 && pvtMultiConst.pvt.lng in -180.0..180.0) {
 
             val pvtResponse = ResponsePvtMode(
                 LatLng(
