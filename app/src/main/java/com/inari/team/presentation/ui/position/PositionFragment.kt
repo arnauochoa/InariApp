@@ -158,9 +158,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
         mMap?.let {
             with(it) {
-                if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    isMyLocationEnabled = true
-                }
                 uiSettings?.isMyLocationButtonEnabled = false
                 uiSettings?.isMapToolbarEnabled = false
                 mapType = mSharedPreferences.getSelectedMapType()
