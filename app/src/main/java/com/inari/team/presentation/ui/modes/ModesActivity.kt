@@ -87,8 +87,8 @@ class ModesActivity : BaseActivity() {
                 var selectedModes = 0
                 modes.forEachIndexed { index, mode ->
                     if (mode.isSelected && selectedModes < 5) {
-                        selectedModes++
                         mode.color = selectedModes
+                        selectedModes++
                     }
                 }
                 mPrefs.saveModes(modes)
