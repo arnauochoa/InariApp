@@ -16,7 +16,6 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
 
     try {
 
-
         //Modes
         acqInformation.modes.addAll(gnssData.modes)
 
@@ -71,8 +70,8 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                                 }
                             }
                             GnssStatus.CONSTELLATION_GALILEO -> {
-                                if (multipathIndicator != 1) {
-                                    if (receivedSvTimeUncertaintyNanos != UNCERTAINTY_THR) {
+                                if (multipathIndicator != 100000000) {
+                                    if (receivedSvTimeUncertaintyNanos != UNCERTAINTY_THR + 1) {
                                         if (checkTowDecode(state)) {
                                             val sat = getTowDecodeSatellite(gnssMeas, acqInformationMeasurements)
                                             if (!hasCarrierFrequencyHz() || carrierFrequencyHz > FREQ_THR) {

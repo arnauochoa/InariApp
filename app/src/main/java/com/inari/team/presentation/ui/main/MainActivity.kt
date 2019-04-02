@@ -19,6 +19,7 @@ import android.widget.Toast
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.google.gson.Gson
 import com.inari.team.R
+import com.inari.team.computation.utils.outliers
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
@@ -187,6 +188,9 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 viewPager.setCurrentItem(pos, false)
                 unSubscribeToGnssEvents(statisticsFragment)
                 unSubscribeToGnssEvents(statusFragment)
+                val outline = outliers(arrayListOf(1.0, 3.0, 5.0, 2.0, 50.0, 500.0))
+
+                val a = ""
             }
         }
     }

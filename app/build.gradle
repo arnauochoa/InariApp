@@ -87,6 +87,8 @@ dependencies {
     // Other Libraries
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'org.nield:kotlin-statistics:1.2.1'
+
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     implementation 'com.ryanjeffreybrooks:indefinitepagerindicator:1.0.10'
