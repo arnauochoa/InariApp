@@ -26,11 +26,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    externalNativeBuild {
-        cmake {
-            path file('CMakeLists.txt')
-        }
-    }
+
+    sourceSets.test.resources.srcDirs += ["src/test/resources/"]
+
 }
 
 dependencies {
@@ -86,14 +84,18 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
 
+    // EJML
+    implementation group: 'org.ejml', name: 'ejml-all', version: '0.38'
+
     // Other Libraries
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'org.nield:kotlin-statistics:1.2.1'
+
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
     implementation 'com.ryanjeffreybrooks:indefinitepagerindicator:1.0.10'
     implementation 'com.aurelhubert:ahbottomnavigation:2.1.0'
-
 
     implementation "com.google.maps.android:android-maps-utils:0.5"
 

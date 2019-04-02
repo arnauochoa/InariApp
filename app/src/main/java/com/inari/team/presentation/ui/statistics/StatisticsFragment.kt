@@ -91,7 +91,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
     private fun setViews() {
 
         //init default graph
-        setAgcCNoGraph()
+        graph = mPrefs.getSelectedGraphType()
+        setGraph()
 
         tabLayout.setSelectedTabIndicatorColor(Color.TRANSPARENT)
         tabLayout.addTab(createTab(L1_E1_text))
@@ -122,7 +123,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             showGraphTypeDialog()
         }
 
-        ivGraphInformation.setOnClickListener {
+        tvInformationTitle.setOnClickListener {
             if (tvInformationDetail.visibility == VISIBLE) {
                 tvInformationDetail.visibility = GONE
             } else {
@@ -356,6 +357,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     } catch (e: Exception) {
                     }
                     pointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                    pointsSet.scatterShapeSize = 20f
                     dataSets.add(pointsSet)
                 }
                 val scatterData = ScatterData(dataSets)
@@ -505,7 +507,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val GRAPH_ERROR = "Error plot"
 
         // Maximum number of points
-        const val MAX_AGC_CNO_POINTS = 200
+        const val MAX_AGC_CNO_POINTS = 500
         const val MAX_POS_POINTS = 500
 
         // Limit values for graphs
@@ -515,12 +517,12 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MIN_CNO_L1 = 0f // dB
         const val MAX_CNO_L5 = 30f // dB
         const val MIN_CNO_L5 = -5f // dB
-        const val MAX_AGC_L1 = 45f // dB-Hz
+        const val MAX_AGC_L1 = 50f // dB-Hz
         const val MIN_AGC_L1 = 30f // dB-Hz
         const val MAX_AGC_L5 = 15f // dB-Hz
         const val MIN_AGC_L5 = -5f // dB-Hz
-        const val NORTH_LIM = 200f // m
-        const val EAST_LIM = 200f // m
+        const val NORTH_LIM = 900f // m
+        const val EAST_LIM = 900f // m
 
         // AGC-CNO threshold values: y=mx+n
         const val AGC_CNO_M = -0.1f

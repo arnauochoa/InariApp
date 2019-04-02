@@ -8,6 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/raleway</item>
         <item name="android:fontFeatureSettings">lnum</item>
+        <item name="android:textViewStyle">@style/AppTextViewStyle</item>
+    </style>
+
+    <style name="AppTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/raleway</item>
+        <item name="android:fontFeatureSettings">lnum</item>
     </style>
 
     <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -19,7 +25,6 @@
     <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_screen</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:fontFamily">@font/rubik</item>
     </style>
 
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">

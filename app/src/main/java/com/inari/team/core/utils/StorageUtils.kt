@@ -13,6 +13,8 @@ const val APP_ROOT: String = "/Inari/Logs/"
 
 const val POSITION_ROOT: String = "/Inari/Positions/"
 
+const val GNSS_ROOT: String = "/Inari/Gnss/"
+
 
 @SuppressLint("SetWorldReadable")
 fun saveFile(
@@ -126,6 +128,42 @@ fun savePositionFile(url: String, responseBody: ResponseBody) {
     } catch (e: IOException) {
     }
 }
+
+@SuppressLint("SetWorldReadable")
+fun saveGnssFile(url: String, responseBody: ResponseBody) {
+    val dir =
+        File(root.absolutePath + GNSS_ROOT)
+    dir.mkdirs()
+
+    val file = File(dir, url)
+    file.setReadable(true, false)
+
+    var inputStream: InputStream? = null
+    var outputStream: OutputStream? = null
+
+    try {
+        val fileReader = ByteArray(4096)
+
+        inputStream = responseBody.byteStream()
+        outputStream = FileOutputStream(file)
+
+        while (true) {
+            val read = inputStream!!.read(fileReader)
+
+            if (read == -1) {
+                break
+            }
+            outputStream.write(fileReader, 0, read)
+        }
+        outputStream.flush()
+
+    } catch (e: IOException) {
+    } finally {
+        inputStream?.close()
+        outputStream?.close()
+    }
+}
+
 
 fun getFile(fileName: String): File = File(root.absolutePath + APP_ROOT + fileName)
 

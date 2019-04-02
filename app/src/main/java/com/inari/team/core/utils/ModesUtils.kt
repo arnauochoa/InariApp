@@ -16,23 +16,43 @@ fun addDefaultModes(): List<Mode> {
     )
     val mode2 = Mode(
         1,
-        "Galileo WLS",
+        "Galileo E1",
         arrayListOf(PositionParameters.CONST_GAL),
+        arrayListOf(PositionParameters.BAND_E1),
+        arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
+        PositionParameters.ALG_LS,
+        isSelected = false
+    )
+    val mode3 = Mode(
+        2,
+        "GPS WLS",
+        arrayListOf(PositionParameters.CONST_GPS),
         arrayListOf(PositionParameters.BAND_L1),
         arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
         PositionParameters.ALG_WLS,
         isSelected = false
     )
-    val mode3 = Mode(
-        2,
-        "Multiconst Iono-Free",
-        arrayListOf(PositionParameters.CONST_GPS, PositionParameters.CONST_GAL),
-        arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_L5),
-        arrayListOf(PositionParameters.CORR_TROPOSPHERE, PositionParameters.CORR_IONOFREE),
+
+    val mode4 = Mode(
+        3,
+        "Galileo WLS",
+        arrayListOf(PositionParameters.CONST_GAL),
+        arrayListOf(PositionParameters.BAND_E1),
+        arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
         PositionParameters.ALG_WLS,
         isSelected = false
     )
 
-    return arrayListOf(mode, mode2, mode3)
+    val mode5 = Mode(
+        4,
+        "Multiconst Iono-Free",
+        arrayListOf(PositionParameters.CONST_GPS, PositionParameters.CONST_GAL),
+        arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_E1),
+        arrayListOf(PositionParameters.CORR_TROPOSPHERE, PositionParameters.CORR_IONOFREE),
+        PositionParameters.ALG_LS,
+        isSelected = false
+    )
+
+    return arrayListOf(mode, mode2, mode3, mode4, mode5)
 
 }
