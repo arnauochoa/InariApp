@@ -16,9 +16,9 @@ fun addDefaultModes(): List<Mode> {
     )
     val mode2 = Mode(
         1,
-        "Galileo LS",
+        "Galileo E1",
         arrayListOf(PositionParameters.CONST_GAL),
-        arrayListOf(PositionParameters.BAND_L1),
+        arrayListOf(PositionParameters.BAND_E1),
         arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
         PositionParameters.ALG_LS,
         isSelected = false
@@ -37,7 +37,7 @@ fun addDefaultModes(): List<Mode> {
         3,
         "Galileo WLS",
         arrayListOf(PositionParameters.CONST_GAL),
-        arrayListOf(PositionParameters.BAND_L1),
+        arrayListOf(PositionParameters.BAND_E1),
         arrayListOf(PositionParameters.CORR_IONOSPHERE, PositionParameters.CORR_TROPOSPHERE),
         PositionParameters.ALG_WLS,
         isSelected = false
@@ -49,7 +49,7 @@ fun addDefaultModes(): List<Mode> {
         arrayListOf(PositionParameters.CONST_GPS, PositionParameters.CONST_GAL),
         arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_L5),
         arrayListOf(PositionParameters.CORR_TROPOSPHERE, PositionParameters.CORR_IONOFREE),
-        PositionParameters.ALG_WLS,
+        PositionParameters.ALG_LS,
         isSelected = false
     )
 
