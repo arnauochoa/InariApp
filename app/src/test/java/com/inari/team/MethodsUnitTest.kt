@@ -15,22 +15,10 @@ import com.inari.team.computation.satPos
 import com.inari.team.computation.utils.*
 import org.junit.Test
 
-import org.junit.Assert.*
-import java.util.concurrent.TimeUnit
+class MethodsUnitTest {
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
-        testMath()
-    }
-
-    private fun testMath() {
+    fun methods_areCorrect() {
         //test lla2ecef
         val llaLocation = LlaLocation(42.2383729097, 19.3774822039, 100.0)
         val llaLocation2 = LlaLocation(-53.9828324342, -2.3774822039, 1200.0)
@@ -99,7 +87,7 @@ class ExampleUnitTest {
                         .setToeS(144000.0)
                 )
 
-            )
+            ), Constants.GPS
         )
 
         val ctrlCorr = getCtrlCorr(
@@ -140,7 +128,7 @@ class ExampleUnitTest {
                         .setToeS(144000.0)
                 )
 
-            ), 139333.0, 2.339905407194209e7
+            ), 139333.0, 2.339905407194209e7, Constants.GPS
         )
 
         val klobuchar =
@@ -197,8 +185,10 @@ class ExampleUnitTest {
                 17.849727630615234
             ), true
         )
+
         print(wMat)
 
-        val a = 1
+
+
     }
 }

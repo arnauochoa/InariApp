@@ -4,7 +4,8 @@ object Constants {
 
     const val C = 299792458L
     const val OMEGA_EARTH_DOT = 7.2921151467e-5
-    const val GM = 3.986008e14
+    const val GM_GPS = 3.986005e14
+    const val GM_GAL = 3.986004418e14
     const val HALF_WEEK = 302400
     //Standard atmosphere - Berg, 1948 (Bernese)
     const val PRESSURE = 1013.25 //Pressure [mbar]

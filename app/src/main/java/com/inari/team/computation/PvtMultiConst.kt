@@ -15,8 +15,8 @@ import com.inari.team.computation.utils.outliers
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
 import com.inari.team.presentation.model.PositionParameters.ALG_WLS
-import org.ejml.data.DMatrixRMaj
-import org.ejml.dense.row.CommonOps_DDRM
+import kotlinx.coroutines.processNextEventInCurrentThread
+import org.ejml.simple.SimpleMatrix
 import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -31,9 +31,9 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
     val isMultiConst = mode.constellations.contains(Constants.GPS) && mode.constellations.contains(Constants.GALILEO)
     val isWeight = mode.algorithm == ALG_WLS
 
+    var position = PvtEcef()
     acqInformation.acqInformationMeasurements.forEach { epoch ->
 
-        var position = PvtEcef()
         var iono = arrayListOf<Double>()
         var responsePvtMultiConst = ResponsePvtMultiConst()
 
@@ -65,12 +65,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val galSvn = arrayListOf<Int>()
         val galCn0 = arrayListOf<Double>()
         val galSatellites = arrayListOf<Satellite>()
-        var galCorr: Double
-        var galPrC: Double
-        var galD0: Double
-        var galAx: Double
-        var galAy: Double
-        var galAz: Double
+        var galCorr: Double = 0.0
+        var galPrC: Double = 0.0
+        var galD0: Double = 0.0
+        var galAx: Double = 0.0
+        var galAy: Double = 0.0
+        var galAz: Double = 0.0
 
         repeat(PVT_ITER) { i ->
             //LS
@@ -114,7 +114,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                 for (j in 0 until nGps) {
                     if (i == 0) {
                         val ctrlCorr =
-                            getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j])
+                            getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j], Constants.GPS)
                         gpsX.add(ctrlCorr.ecefLocation)
                         gpsTcorr.add(ctrlCorr.tCorr)
                     }
@@ -209,8 +209,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                 for (j in 0 until nGal) {
                     if (i == 0) {
-                        val ctrlCorr =
-                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j])
+                        val ctrlCorr = if (mode.bands.contains(Constants.E5A)) {
+                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j], Constants.GALILEO, Constants.E5A)
+                        } else {
+                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j], Constants.GALILEO)
+                        }
                         galX.add(ctrlCorr.ecefLocation)
                         galTcorr.add(ctrlCorr.tCorr)
                     }
@@ -271,12 +274,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                 }
 
                 //pseudorange "RAIM"
-                val cleanSatsInd = outliers(galP)
-                cleanSatsInd.forEach {
-                    galP.removeAt(it)
-                    galA.removeAt(it)
-                    galCn0.removeAt(it)
-                }
+//                val cleanSatsInd = outliers(galP)
+//                cleanSatsInd.forEach {
+//                    galP.removeAt(it)
+//                    galA.removeAt(it)
+//                    galCn0.removeAt(it)
+//                }
             }
 
             //Least Squares
@@ -346,7 +349,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         nSats /= nEpoch
 
         pvtResponsePvtMultiConst = ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats)
+        // todo update next ref position
+//        acqInformation.refLocation.refLocationEcef =
+//            lla2ecef(LlaLocation(pvtLatLng.lat, pvtLatLng.lng, pvtLatLng.altitude))
     }
+
 
     return pvtResponsePvtMultiConst
 }
@@ -361,84 +368,127 @@ fun leastSquares(
     cnos: List<Double>,
     isWeight: Boolean
 ): ResponsePvtMultiConst {
-    val nSats = arrayPr.size
-    val nCols = if (isMultiC) 5 else 4
+    val nSatellites = arrayPr.size
+    val nUnknowns = if (isMultiC) 5 else 4
     var response = ResponsePvtMultiConst()
-    if (nSats >= nCols) {
-        if (arrayA.size != nSats) {
+    if (nSatellites >= nUnknowns) {
+        if (arrayA.size != nSatellites) {
             Timber.d("A and p are not the same length")
         }
 
-        // PVT computation
-        val daPr = arrayPr.toDoubleArray()
-        var daA = doubleArrayOf()
-        repeat(nSats) { ind ->
-            daA += arrayA[ind]
+        // Weighted Least Squares: d = inv(G'*W*G)*G'*W*p
+
+        val pVector = SimpleMatrix(nSatellites, 1, true, arrayPr.toDoubleArray())  // Column vector p of nSatellites rows
+        val gMatrix = SimpleMatrix(nSatellites, nUnknowns)   // Matrix G of nSatellites rows and nUnknowns columns
+        val wMatrix = computeCNoWeightMatrix(cnos, isWeight) // Matrix W of nSatellites rows and nSatellites columns, identity if isWeight = false
+
+        for (row in 0 until arrayA.size){
+            gMatrix.set(row, 0, arrayA[row][0])
+            gMatrix.set(row, 1, arrayA[row][1])
+            gMatrix.set(row, 2, arrayA[row][2])
+            gMatrix.set(row, 3, arrayA[row][3])
+            if (nUnknowns == 5) gMatrix.set(row, 4, arrayA[row][4])
         }
 
-        val prMat = DMatrixRMaj.wrap(nSats, 1, daPr)
-        val gMat = DMatrixRMaj.wrap(nSats, nCols, daA)
-
-        // Weight Matrix
-        val wMat = computeCNoWeightMatrix(cnos, isWeight)
-
-        // gwMat = gMat' * wMat
-        var temp = DoubleArray(nCols * nSats)
-        val gwMat = DMatrixRMaj.wrap(nSats, nCols, temp)
-        CommonOps_DDRM.multTransA(gMat, wMat, gwMat)
-
-        // gwgMat = (gMat' * wMat * gMat)
-        val temp2 = DoubleArray(nCols * nCols)
-        val gwgMat = DMatrixRMaj.wrap(nCols, nCols, temp2)
-        CommonOps_DDRM.mult(gwMat, gMat, gwgMat)
-
-        // hMat = inv(gwgMat)
-        val hMat = DMatrixRMaj.wrap(nCols, nCols, temp2)
-        CommonOps_DDRM.invert(gwgMat, hMat)
-
-        // hgwMat = hMat*gMat'*wMat
-        val hgwMat = DMatrixRMaj.wrap(nCols, nSats, temp)
-        CommonOps_DDRM.mult(hMat, gwMat, hgwMat)
-
-        // Compute d vector
-        val dMat = DMatrixRMaj.wrap(nCols, 1, temp)
-        CommonOps_DDRM.mult(hgwMat, prMat, dMat)
-
-
-        val dArray = arrayListOf<Double>()
-        repeat(nCols) { i ->
-            dArray.add(dMat[i])
-        }
-
-        // Obtain position
-        position.x += dArray[0]
-        position.y += dArray[1]
-        position.z += dArray[2]
-        position.time += dArray[3] / C
-
-        val llaLocation = ecef2lla(EcefLocation(position.x, position.y, position.z))
-        val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
-
-        // DOP computation
-//        val gDop = sqrt(hgwMat[0, 0] + hgwMat[1, 1] + hgwMat[2, 2] + hgwMat[3, 3])
-//        val pDop = sqrt(hgwMat[0, 0] + hgwMat[1, 1] + hgwMat[2, 2])
-//        val tDop = sqrt(hgwMat[3, 3])
-//        val dop = Dop(gDop, pDop, tDop)
-        val dop = Dop()
+        // H = G'*W*G
+        val hMatrix = (gMatrix.transpose().mult(wMatrix).mult(gMatrix)).invert()
+        // d = H*G'*W*p
+        val dVector = hMatrix.mult(gMatrix.transpose()).mult(wMatrix).mult(pVector)
 
         // Residue computation
-        temp = doubleArrayOf()
-        repeat(nSats) {
-            temp += 0.0
-        }
-        val pEstMat = DMatrixRMaj.wrap(nSats, 1, temp)
-        CommonOps_DDRM.mult(gMat, dMat, pEstMat)
-        val resMat = DMatrixRMaj.wrap(nSats, 1, temp)
-        CommonOps_DDRM.subtract(prMat, pEstMat, resMat)
 
-        val residue = sqrt(resMat[0].pow(2) + resMat[1].pow(2) + resMat[2].pow(2))
 
-        response = ResponsePvtMultiConst(pvtLatLng, dop, residue, Corrections(), nSats.toFloat())
+        // Save results
+        position.x += dVector[0, 0]
+        position.y += dVector[1, 0]
+        position.z += dVector[2, 0]
+        position.time = dVector[3, 0]
+        if (nUnknowns == 5) position.interSystemBias = dVector[4, 0]
+
+        val pvtEecf = EcefLocation(position.x, position.y, position.z)
+        val llaLocation = ecef2lla(pvtEecf)
+        val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
+
+        //todo compute dop and residue
+        val dop = Dop()
+        val residue = 0.0
+
+        response = ResponsePvtMultiConst(pvtLatLng, dop, residue, Corrections(), nSatellites.toFloat())
+
+
+//        // PVT computation
+//        val daPr = arrayPr.toDoubleArray()
+//        var daA = doubleArrayOf()
+//        repeat(nSats) { ind ->
+//            daA += arrayA[ind]
+//        }
+//
+//        val prMat = DMatrixRMaj.wrap(nSats, 1, daPr)
+//        val gMat = DMatrixRMaj.wrap(nSats, nCols, daA)
+//
+//        // Weight Matrix
+//        val wMat = computeCNoWeightMatrix(cnos, isWeight)
+//
+//        // gwMat = gMat' * wMat
+//        var temp = DoubleArray(nCols * nSats)
+//        val gwMat = DMatrixRMaj.wrap(nSats, nCols, temp)
+//        val gtMat = DMatrixRMaj(gMat)
+//        CommonOps_DDRM.transpose(gtMat)
+//        CommonOps_DDRM.mult(gtMat, wMat, gwMat)
+//
+//        // gwgMat = (gMat' * wMat * gMat)
+//        val temp2 = DoubleArray(nCols * nCols)
+//        val gwgMat = DMatrixRMaj.wrap(nCols, nCols, temp2)
+//        CommonOps_DDRM.mult(gwMat, gMat, gwgMat)
+//
+//        // hMat = inv(gwgMat)
+//        val hMat = DMatrixRMaj(gwgMat)
+//        CommonOps_DDRM.invert(hMat)
+//
+//        // hgwMat = hMat*gMat'*wMat
+//        val hgwMat = DMatrixRMaj.wrap(nCols, nSats, temp)
+//        CommonOps_DDRM.mult(hMat, gwMat, hgwMat)
+//
+//        // Compute d vector
+//        val dMat = DMatrixRMaj.wrap(nCols, 1, temp)
+//        CommonOps_DDRM.mult(hgwMat, prMat, dMat)
+//
+//
+//        val dArray = arrayListOf<Double>()
+//        repeat(nCols) { i ->
+//            dArray.add(dMat[i])
+//        }
+//
+//        // Obtain position
+//        position.x += dArray[0]
+//        position.y += dArray[1]
+//        position.z += dArray[2]
+//        position.time = dArray[3] / C
+//
+//        val pvtEecf = EcefLocation(position.x, position.y, position.z)
+//        val llaLocation = ecef2lla(pvtEecf)
+//        val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
+//
+//        // DOP computation
+////        val gDop = sqrt(hgwMat[0, 0] + hgwMat[1, 1] + hgwMat[2, 2] + hgwMat[3, 3])
+////        val pDop = sqrt(hgwMat[0, 0] + hgwMat[1, 1] + hgwMat[2, 2])
+////        val tDop = sqrt(hgwMat[3, 3])
+////        val dop = Dop(gDop, pDop, tDop)
+//        val dop = Dop()
+//
+//        // Residue computation
+//        temp = doubleArrayOf()
+//        repeat(nSats) {
+//            temp += 0.0
+//        }
+//        val pEstMat = DMatrixRMaj.wrap(nSats, 1, temp)
+//        CommonOps_DDRM.mult(gMat, dMat, pEstMat)
+//        val resMat = DMatrixRMaj.wrap(nSats, 1, temp)
+//        CommonOps_DDRM.subtract(prMat, pEstMat, resMat)
+//
+//        val residue = sqrt(resMat[0].pow(2) + resMat[1].pow(2) + resMat[2].pow(2))
+//
+//        response = ResponsePvtMultiConst(pvtLatLng, dop, residue, Corrections(), nSats.toFloat())
     }
 
     return response

@@ -25,7 +25,6 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.showAlert
@@ -336,6 +335,28 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                         showAlert(
                             ivAlert.context, "Something went wrong",
                             "Ephemeris data could not be obtained, check your connection",
+                            "Stop Computing", {
+                                stopComputing()
+                            }, true
+                        )
+                    }
+                }
+            }
+        } else {
+            ivAlert?.visibility = GONE
+        }
+    }
+
+    //todo remove is tested and not working properly
+    fun showMeasurementsAlert(show: Boolean, message: String) {
+        if (show) {
+            ivAlert?.let {
+                if (ivAlert.visibility != VISIBLE) {
+                    ivAlert.visibility = VISIBLE
+                    ivAlert.setOnClickListener {
+                        showAlert(
+                            ivAlert.context, "Something went wrong",
+                            message,
                             "Stop Computing", {
                                 stopComputing()
                             }, true
