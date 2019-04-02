@@ -47,7 +47,7 @@ fun addDefaultModes(): List<Mode> {
         4,
         "Multiconst Iono-Free",
         arrayListOf(PositionParameters.CONST_GPS, PositionParameters.CONST_GAL),
-        arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_L5),
+        arrayListOf(PositionParameters.BAND_L1, PositionParameters.BAND_E1),
         arrayListOf(PositionParameters.CORR_TROPOSPHERE, PositionParameters.CORR_IONOFREE),
         PositionParameters.ALG_LS,
         isSelected = false
