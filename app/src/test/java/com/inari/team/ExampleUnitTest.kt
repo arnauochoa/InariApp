@@ -30,7 +30,6 @@ class ExampleUnitTest {
         testMath()
     }
 
-    // TODO: remove this
     private fun testMath() {
         //test lla2ecef
         val llaLocation = LlaLocation(42.2383729097, 19.3774822039, 100.0)

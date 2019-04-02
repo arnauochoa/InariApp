@@ -115,7 +115,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                 ephResponse = suplController?.generateEphResponse(latE7, lngE7)
                 gnssData.ephemerisResponse = ephResponse
                 gnssData.lastEphemerisDate = Date()
-                ephemeris.updateData("")
             }
             if (ephResponse == null) {
                 if (isComputing) {
@@ -130,7 +129,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                     }
                     obtainEphemerisData()
                 }
-            }
+            } else ephemeris.updateData("")
         }
     }
 
