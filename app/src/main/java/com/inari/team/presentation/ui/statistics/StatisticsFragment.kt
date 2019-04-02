@@ -357,6 +357,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     } catch (e: Exception) {
                     }
                     pointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                    pointsSet.scatterShapeSize = 20f
                     dataSets.add(pointsSet)
                 }
                 val scatterData = ScatterData(dataSets)
@@ -520,8 +521,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MIN_AGC_L1 = 30f // dB-Hz
         const val MAX_AGC_L5 = 15f // dB-Hz
         const val MIN_AGC_L5 = -5f // dB-Hz
-        const val NORTH_LIM = 1000f // m // TODO: change
-        const val EAST_LIM = 1000f // m
+        const val NORTH_LIM = 900f // m
+        const val EAST_LIM = 900f // m
 
         // AGC-CNO threshold values: y=mx+n
         const val AGC_CNO_M = -0.1f
