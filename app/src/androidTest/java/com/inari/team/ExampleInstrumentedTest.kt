@@ -2,11 +2,10 @@ package com.inari.team
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-
+import com.inari.team.core.utils.AppSharedPreferences
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -19,6 +18,14 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("com.inari.team", appContext.packageName)
+
+
+
+        val mPrefs = appContext.getSharedPreferences(AppSharedPreferences.MY_PREFS, 0)
+
+        val s = mPrefs.getString(AppSharedPreferences.CN0_MASK, "faf")?: "vfdsva"
+
+        print(s)
+
     }
 }

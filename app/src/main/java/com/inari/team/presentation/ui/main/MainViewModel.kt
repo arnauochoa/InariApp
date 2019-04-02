@@ -91,9 +91,19 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     }
 
     private fun openGnssLogFile() {
-        fileName = "${Date()}.txt"
-        fileWriter = FileWriter(File(root.absolutePath + APP_ROOT + fileName))
-        fileWriter?.write("[")
+
+        try {
+            val dir =
+                File(root.absolutePath + APP_ROOT)
+            dir.mkdirs()
+            fileName = "${Date()}.txt"
+            fileWriter = FileWriter(File(dir, fileName))
+            fileWriter?.write("[")
+        } catch (e: Exception) {
+            fileWriter = null
+            position.showError("Could not create log file")
+        }
+
     }
 
     fun stopComputingPosition() {
@@ -182,6 +192,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             if (Date().time - gnssData.lastEphemerisDate.time >= TimeUnit.MINUTES.toMillis(EPHEMERIS_UPDATE_TIME_MINUTES)) {
                 obtainEphemerisData()
             }
+
         }
     }
 

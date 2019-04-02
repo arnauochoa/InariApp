@@ -1,12 +1,12 @@
 package com.inari.team.computation.utils
 
 import android.location.GnssMeasurement
-import com.inari.team.computation.utils.Constants.C
-
 import com.inari.team.computation.data.AcqInformationMeasurements
 import com.inari.team.computation.data.GAL_E1C
 import com.inari.team.computation.data.Satellite
 import com.inari.team.computation.data.WEEK_NANOS
+import com.inari.team.computation.utils.Constants.C
+import com.inari.team.computation.utils.Constants.L1_FREQ
 import java.math.BigInteger
 
 fun getTowDecodeSatellite(meas: GnssMeasurement, acqInformationMeasurements: AcqInformationMeasurements): Satellite {
@@ -17,7 +17,7 @@ fun getTowDecodeSatellite(meas: GnssMeasurement, acqInformationMeasurements: Acq
             svid = svid,
             state = state,
             multiPath = multipathIndicator,
-            carrierFreq = carrierFrequencyHz.toDouble(),
+            carrierFreq = if (meas.hasCarrierFrequencyHz()) carrierFrequencyHz.toDouble() else L1_FREQ,
             tTx = tTx,
             tRx = tRx,
             cn0 = cn0DbHz,
