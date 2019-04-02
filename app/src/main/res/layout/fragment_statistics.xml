@@ -125,10 +125,10 @@
                         android:drawableStart="@drawable/ic_info"
                         android:drawablePadding="16dp"
                         android:gravity="center_vertical"
-                        android:text="Graph Information"
+                        android:text="@string/graph_information"
                         android:textColor="@color/black"
                         android:textSize="16sp"
-                        app:layout_constraintEnd_toStartOf="@+id/ivGraphInformation"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -151,11 +151,11 @@
                         android:layout_marginEnd="28dp"
                         android:layout_marginBottom="16dp"
                         android:visibility="visible"
-                        android:text="This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tvInformationTitle" />
+                        app:layout_constraintTop_toBottomOf="@+id/tvInformationTitle"
+                        tools:text="This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now This graph contains some information that we are ging to explain right now" />
 
                     <android.support.constraint.ConstraintLayout
                         android:id="@+id/clGraphType"
