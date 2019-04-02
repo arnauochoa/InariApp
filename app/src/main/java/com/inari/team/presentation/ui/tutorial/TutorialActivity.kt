@@ -26,19 +26,17 @@ class TutorialActivity : AppCompatActivity() {
         tlSlider.setupWithViewPager(viewPager)
 
         val tutorialSteps = arrayListOf(
-            R.drawable.tutorial_screen_position,
-            R.drawable.tutorial_screen_position,
-            R.drawable.tutorial_screen_position,
-            R.drawable.tutorial_screen_position,
-            R.drawable.tutorial_screen_position
-        )
+            R.drawable.ic_tutorial_1,
+            R.drawable.ic_tutorial_2,
+            R.drawable.ic_tutorial_3,
+            R.drawable.ic_tutorial_4
+            )
 
         val titles = arrayListOf(
             getString(R.string.position_bottom),
             getString(R.string.gnss_state_bottom),
             getString(R.string.statistics_bottom),
-            getString(R.string.logs_bottom),
-            getString(R.string.about_bottom)
+            getString(R.string.logs_bottom)
         )
 
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {

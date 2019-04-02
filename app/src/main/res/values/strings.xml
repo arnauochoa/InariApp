@@ -64,8 +64,10 @@
     <string name="sky_legend_cno_high">45</string>
     <string name="sky_legend_shape_navstar">GPS (USA)</string>
     <string name="sky_legend_shape_galileo">Galileo (EU)</string>
-    <string name="band_l1">L1/E1</string>
-    <string name="band_l5">L5/E5a</string>
+    <string name="band_l1">L1</string>
+    <string name="band_l5">L5</string>
+    <string name="band_e1">E1</string>
+    <string name="band_e5a">E5a</string>
     <string name="about_bottom">About</string>
     <string name="logs_bottom">Logs</string>
     <string name="positioning_settings">Positioning Settings</string>
@@ -92,8 +94,12 @@
     <string name="finish">finish</string>
 
 
-    <string name="agc_cno_information_detail">Informació del graph AGC CNO</string>
-    <string name="elev_cno_information_detail">Informació del grapch elev cno</string>
-    <string name="error_information_detail">informació del error</string>
+    <string name="agc_cno_information_detail">Whilst Carrier to Noise Ratio (CNO) depends specifically on the received satellite signal strength, the Automatic Gain control (AGC) defines the gain applied to received signals so that the power in the AC/DC converser is relatively constant. Therefore, if AGC and CNO levels are low, an external and stronger source of interference may be present. </string>
+    <string name="elev_cno_information_detail">This plot informs the user of Satellite contributions in terms of Carrier to Noise Ratio and geometry. Satellites with poor CNO or low elevations may introduce severe errors in user’s position. Thus, masks based on this metrics are applied to avoid their contribution in the Positioning algorithm. </string>
+    <string name="error_information_detail">The error plot displays the relative error between the Position derived from the App’s algorithm with the selected configuration and the Position provided by Google’s API. In this case, there is not a reference position as both algorithms perform differently depending on the user’s scenario. </string>
+    <string name="graph_information">Graph Information</string>
+    <string name="enable_gnss_logs">Enable GNSS logs</string>
+    <string name="enable_logs_description">A file with raw mesurements will be created every time you start computing if enabled.</string>
+    <string name="average_time_title">Average Time:</string>
 
 </resources>
