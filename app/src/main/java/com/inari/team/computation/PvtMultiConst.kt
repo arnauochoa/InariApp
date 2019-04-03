@@ -1,6 +1,7 @@
 package com.inari.team.computation
 
 import com.inari.team.computation.converters.ecef2lla
+import com.inari.team.computation.converters.lla2ecef
 import com.inari.team.computation.corrections.getCtrlCorr
 import com.inari.team.computation.corrections.getIonoCorrDualFreq
 import com.inari.team.computation.corrections.getPropCorr
@@ -31,9 +32,9 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
     val isMultiConst = mode.constellations.contains(Constants.GPS) && mode.constellations.contains(Constants.GALILEO)
     val isWeight = mode.algorithm == ALG_WLS
 
+    var position = PvtEcef()
     acqInformation.acqInformationMeasurements.forEach { epoch ->
 
-        var position = PvtEcef()
         var iono = arrayListOf<Double>()
         var responsePvtMultiConst = ResponsePvtMultiConst()
 
@@ -346,7 +347,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         nSats /= nEpoch
 
         pvtResponsePvtMultiConst = ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats)
+        // todo update next ref position
+//        acqInformation.refLocation.refLocationEcef =
+//            lla2ecef(LlaLocation(pvtLatLng.lat, pvtLatLng.lng, pvtLatLng.altitude))
     }
+
 
     return pvtResponsePvtMultiConst
 }
@@ -416,7 +421,8 @@ fun leastSquares(
         position.z += dArray[2]
         position.time += dArray[3] / C
 
-        val llaLocation = ecef2lla(EcefLocation(position.x, position.y, position.z))
+        val pvtEecf = EcefLocation(position.x, position.y, position.z)
+        val llaLocation = ecef2lla(pvtEecf)
         val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
 
         // DOP computation

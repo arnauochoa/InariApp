@@ -18,7 +18,7 @@ import org.junit.Test
 class MethodsUnitTest {
 
     @Test
-    private fun methods_areCorrect() {
+    fun methods_areCorrect() {
         //test lla2ecef
         val llaLocation = LlaLocation(42.2383729097, 19.3774822039, 100.0)
         val llaLocation2 = LlaLocation(-53.9828324342, -2.3774822039, 1200.0)
@@ -185,6 +185,10 @@ class MethodsUnitTest {
                 17.849727630615234
             ), true
         )
+
+        print(wMat)
+
+
 
     }
 }
