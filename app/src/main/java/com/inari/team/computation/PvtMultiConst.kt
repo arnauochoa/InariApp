@@ -124,9 +124,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     //Propagation corrections
                     val propCorr = getPropCorr(gpsX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
                     gpsCorr = gpsCorr - propCorr.tropoCorr - propCorr.ionoCorr
+                    gpsPrC = gpsPr[j]
 
                     //2freq corrections
                     if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+                        // todo if there are no measurements with two frequencies, use ephemeris iono corrections
                         var pr1 = 0.0
                         var freq1 = 0.0
                         var pr2 = 0.0
@@ -146,11 +148,13 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         }
 
                         if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
+                            pr1 += gpsCorr
+                            pr2 += gpsCorr
                             gpsPrC = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
                         }
+                    } else {
+                        gpsPrC = gpsPr[j] + gpsCorr
                     }
-
-                    gpsPrC = gpsPr[j] + gpsCorr
 
                     //gps GeometricMatrix
                     if (gpsPrC != 0.0) {
