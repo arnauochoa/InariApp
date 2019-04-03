@@ -31,7 +31,6 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
         //Gnss Raw Measurements
         gnssData.measurements.forEach {
             val acqInformationMeasurements = AcqInformationMeasurements()
-
             //Clock Info
             it.gnssClock?.let { gnssClock ->
 
@@ -51,6 +50,7 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
             it.gnssMeasurements?.let { meas ->
 
                 meas.forEach { gnssMeas ->
+
                     with(gnssMeas) {
                         when (constellationType) {
                             GnssStatus.CONSTELLATION_GPS -> {
