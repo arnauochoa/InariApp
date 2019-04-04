@@ -20,7 +20,7 @@ class PvtUnitTest {
     fun pvt_isCorrect() {
 
         //list of files that we want to compute
-        val filesList = arrayListOf("badia.txt", "badia.txt")
+        val filesList = arrayListOf("GPS_L1_1.txt", "GAL_E1_1.txt", "GAL_E5a_1.txt")
 
         //for each file added in the list, compute the position
         filesList.forEach { fileName ->
@@ -35,7 +35,7 @@ class PvtUnitTest {
 
             //print the reference position from google in order to know the approximate position tha we should be getting
             print(
-                "====================================================\n" +
+                "\n====================================================\n" +
                         "Reference Position: ${acqInfo.refLocation.refLocationLla.latitude}," +
                         " ${acqInfo.refLocation.refLocationLla.longitude}\n"
             )
