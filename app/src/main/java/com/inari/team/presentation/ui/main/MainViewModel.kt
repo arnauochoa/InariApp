@@ -11,14 +11,11 @@ import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.computation.computePvt
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.APP_ROOT
-import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.*
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
-import com.inari.team.core.utils.getGnssJson
-import com.inari.team.core.utils.root
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -36,6 +33,8 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     val position = MutableLiveData<Data<List<ResponsePvtMode>>>()
     val ephemeris = MutableLiveData<Data<String>>()
+    //todo remove when tested
+    val testLogs = MutableLiveData<Data<String>>()
 
     private var gnssData = GnssData()
     private var computedPositions: ArrayList<ResponsePvtMode> = arrayListOf()
@@ -153,6 +152,18 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     fun setGnssStatus(status: GnssStatus?) {
         gnssData.lastGnssStatus = status
+
+        //todo test and if it not works remove
+        if (Date().time - startedComputingDate.time >=
+            TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT) + TimeUnit.SECONDS.toMillis(
+                5
+            )
+        ) {
+            if (!isEphErrorShown && gnssData.measurements.isEmpty()) {
+                isEphErrorShown = true
+                ephemeris.showError("Gnss Measurements are not being obtained, try to change position")
+            }
+        }
     }
 
     fun setGnssMeasurementsEvent(gnssMeasurementsEvent: GnssMeasurementsEvent?) {
@@ -183,6 +194,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             gnssData.ephemerisResponse != null
         ) {
 
+            ephemeris.updateData("Gnss Measurements obtained")
             if (Date().time - startedComputingDate.time >=
                 TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT)
             ) {
@@ -199,6 +211,8 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private fun calculatePositionWithGnss() {
         GlobalScope.launch {
             val coordinates = computePvt(gnssData)
+            //todo remove when tested
+            testLogs.updateData(generateMeasurementsTestingLogs(gnssData))
 
             if (coordinates.isNotEmpty()) {
                 position.updateData(coordinates)
@@ -209,6 +223,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             } else {
                 position.showError("Position could not be obtained.")
             }
+
 
             gnssData.measurements = arrayListOf()
             startedComputingDate = Date()
