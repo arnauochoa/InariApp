@@ -1,7 +1,6 @@
 package com.inari.team.computation
 
 import com.inari.team.computation.converters.ecef2lla
-import com.inari.team.computation.converters.lla2ecef
 import com.inari.team.computation.corrections.getCtrlCorr
 import com.inari.team.computation.corrections.getIonoCorrDualFreq
 import com.inari.team.computation.corrections.getPropCorr
@@ -66,12 +65,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val galSvn = arrayListOf<Int>()
         val galCn0 = arrayListOf<Double>()
         val galSatellites = arrayListOf<Satellite>()
-        var galCorr: Double
-        var galPrC: Double
-        var galD0: Double
-        var galAx: Double
-        var galAy: Double
-        var galAz: Double
+        var galCorr: Double = 0.0
+        var galPrC: Double = 0.0
+        var galD0: Double = 0.0
+        var galAx: Double = 0.0
+        var galAy: Double = 0.0
+        var galAz: Double = 0.0
 
         repeat(PVT_ITER) { i ->
             //LS
@@ -115,7 +114,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                 for (j in 0 until nGps) {
                     if (i == 0) {
                         val ctrlCorr =
-                            getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j])
+                            getCtrlCorr(gpsSatellites[j], epoch.tow, gpsPr[j], Constants.GPS)
                         gpsX.add(ctrlCorr.ecefLocation)
                         gpsTcorr.add(ctrlCorr.tCorr)
                     }
@@ -210,8 +209,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                 for (j in 0 until nGal) {
                     if (i == 0) {
-                        val ctrlCorr =
-                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j])
+                        val ctrlCorr = if (mode.bands.contains(Constants.E5A)) {
+                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j], Constants.GALILEO, Constants.E5A)
+                        } else {
+                            getCtrlCorr(galSatellites[j], epoch.tow, galPr[j], Constants.GALILEO)
+                        }
                         galX.add(ctrlCorr.ecefLocation)
                         galTcorr.add(ctrlCorr.tCorr)
                     }

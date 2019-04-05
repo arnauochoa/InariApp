@@ -20,7 +20,7 @@ class PvtUnitTest {
     fun pvt_isCorrect() {
 
         //list of files that we want to compute
-        val filesList = arrayListOf("GPS_L1_1.txt", "GAL_E1_1.txt", "GAL_E5a_1.txt")
+        val filesList = arrayListOf("galileo/E1/GAL_E1_1.txt")
 
         //for each file added in the list, compute the position
         filesList.forEach { fileName ->
