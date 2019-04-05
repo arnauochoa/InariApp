@@ -98,6 +98,11 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         viewModel = withViewModel(viewModelFactory) {
             observe(position, ::updatePosition)
             observe(ephemeris, ::updateEphemeris)
+            observe(testLogs) {
+                it?.data?.let {
+                    logsFragment.addMeasurementLog(it)
+                }
+            }
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -357,10 +362,23 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 DataState.LOADING -> {
                 }
                 DataState.SUCCESS -> {
-                    positionFragment.showEphemerisAlert(false)
+                    it.data?.let {
+                        if (it.isNotBlank()) {
+                            positionFragment.showMeasurementsAlert(false, "")
+                        } else {
+                            positionFragment.showEphemerisAlert(false)
+                        }
+                    }
                 }
                 DataState.ERROR -> {
-                    positionFragment.showEphemerisAlert(true)
+                    it.message?.let {
+                        if (it.isNotBlank()) {
+                            positionFragment.showMeasurementsAlert(true, it)
+                        } else {
+
+                            positionFragment.showEphemerisAlert(true)
+                        }
+                    }
                 }
             }
         }
@@ -369,6 +387,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     override fun startComputing(selectedModes: List<Mode>) {
         viewModel?.startComputingPosition(selectedModes)
         isComputing = true
+        logsFragment.clearMeasurements()
     }
 
     override fun stopComputing() {
