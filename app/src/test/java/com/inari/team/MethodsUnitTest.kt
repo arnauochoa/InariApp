@@ -87,7 +87,7 @@ class MethodsUnitTest {
                         .setToeS(144000.0)
                 )
 
-            )
+            ), Constants.GPS
         )
 
         val ctrlCorr = getCtrlCorr(
@@ -128,7 +128,7 @@ class MethodsUnitTest {
                         .setToeS(144000.0)
                 )
 
-            ), 139333.0, 2.339905407194209e7
+            ), 139333.0, 2.339905407194209e7, Constants.GPS
         )
 
         val klobuchar =
