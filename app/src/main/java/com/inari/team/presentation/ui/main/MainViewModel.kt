@@ -224,7 +224,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                 position.showError("Position could not be obtained.")
             }
 
-
             gnssData.measurements = arrayListOf()
             startedComputingDate = Date()
         }
