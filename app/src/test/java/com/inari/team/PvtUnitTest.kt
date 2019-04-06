@@ -22,7 +22,7 @@ class PvtUnitTest {
         //list of files that we want to compute
         val filesList = arrayListOf<String>()
         repeat(13){
-            filesList.add("galileo/E1/GAL_E1_${it+1}.txt")
+            filesList.add("tests_jardi_2/jardi_2_${it+1}.txt")
         }
 
 
