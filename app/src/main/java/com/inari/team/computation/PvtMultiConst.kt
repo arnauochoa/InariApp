@@ -165,12 +165,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                             }
                         }
 
-                        if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
+                        gpsCorr -= if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
                             val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
                             gpsElevIono.add(Pair(elev, ionoCorr))
-                            gpsCorr -= ionoCorr
+                            ionoCorr
                         } else { // If the current satellite has not 2 frequencies, correct with eph iono corrections
-                            gpsCorr -= propCorr.ionoCorr
+                            propCorr.ionoCorr
                         }
                     } else { // If iono-free has not been selected, apply eph iono corrections to all satellites
                         gpsCorr -= propCorr.ionoCorr
@@ -269,12 +269,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                             }
                         }
 
-                        if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
+                        galCorr -= if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
                             val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
                             galElevIono.add(Pair(elev, ionoCorr))
-                            galCorr -= ionoCorr
+                            ionoCorr
                         } else {
-                            galCorr -= propCorr.ionoCorr
+                            propCorr.ionoCorr
                         }
                     } else {
                         galCorr -= propCorr.ionoCorr
@@ -374,7 +374,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
         nSats /= nEpoch
 
-        pvtResponsePvtMultiConst = ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats, gpsElevIono, galElevIono)
+        pvtResponsePvtMultiConst =
+            ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats, gpsElevIono, galElevIono)
         // Update next reference position
         acqInformation.refLocation.refLocationEcef = EcefLocation(position.x, position.y, position.z)
     }
