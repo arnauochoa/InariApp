@@ -308,10 +308,10 @@ class ModesActivity : BaseActivity() {
             name = it.modeNameTextEdit.text.toString() // set the name
             if (it.constOption1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
             if (it.constOption2.isChecked) constellations.add(PositionParameters.CONST_GAL)
-            if (it.isEnabled && it.rbL1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
-            if (it.isEnabled && it.rbL5.isChecked) bands.add(PositionParameters.BAND_L5)
-            if (it.isEnabled && it.rbE1.isChecked) bands.add(PositionParameters.BAND_E1)
-            if (it.isEnabled && it.rbE5a.isChecked) bands.add(PositionParameters.BAND_E5A)
+            if (it.rbL1.isEnabled && it.rbL1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
+            if (it.rbL5.isEnabled && it.rbL5.isChecked) bands.add(PositionParameters.BAND_L5)
+            if (it.rbE1.isEnabled && it.rbE1.isChecked) bands.add(PositionParameters.BAND_E1)
+            if (it.rbE5a.isEnabled && it.rbE5a.isChecked) bands.add(PositionParameters.BAND_E5A)
             if (it.correctionsOption1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
             if (it.correctionsOption2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
             if (it.correctionsOption3.isChecked) corrections.add(PositionParameters.CORR_IONOFREE)
