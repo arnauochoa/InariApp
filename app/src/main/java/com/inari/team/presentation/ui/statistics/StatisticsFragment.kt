@@ -619,7 +619,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MAX_AGC_L5 = 15f // dB-Hz
         const val MIN_AGC_L5 = -5f // dB-Hz
         const val MIN_IONO = 0f // m
-        const val MAX_IONO = 1000f // m
+        const val MAX_IONO = 500f // m
         const val NORTH_LIM = 90f // m
         const val EAST_LIM = 90f // m
 

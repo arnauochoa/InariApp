@@ -9,7 +9,7 @@ import java.io.*
 val root: File =
     android.os.Environment.getExternalStorageDirectory()
 
-const val APP_ROOT: String = "/Inari-/Nmea/"
+const val APP_ROOT: String = "/Inari/Nmea/Logs/"
 
 const val POSITION_ROOT: String = "/Inari/Positions/"
 
