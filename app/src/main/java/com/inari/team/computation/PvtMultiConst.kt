@@ -11,6 +11,7 @@ import com.inari.team.computation.utils.Constants.GALILEO
 import com.inari.team.computation.utils.Constants.GPS
 import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.computeCNoWeightMatrix
+import com.inari.team.computation.utils.pvtLla2PvtEcef
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
 import com.inari.team.presentation.model.PositionParameters.ALG_WLS
@@ -29,12 +30,15 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
     val isMultiConst = mode.constellations.contains(Constants.GPS) && mode.constellations.contains(Constants.GALILEO)
     val isWeight = mode.algorithm == ALG_WLS
 
+    val gpsElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
+    val galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
+
     var position = PvtEcef()
     acqInformation.acqInformationMeasurements.forEach { epoch ->
-
-        val gpsIono = arrayListOf<Pair<Int, Double>>()
-        val galIono = arrayListOf<Pair<Int, Double>>()
         var responsePvtMultiConst = ResponsePvtMultiConst()
+
+        gpsElevIono.clear()
+        galElevIono.clear()
 
         var nGps = 0
         var gpsCorr: Double
@@ -81,12 +85,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
             gpsA.clear()
             gpsP.clear()
             gpsCleanCn0.clear()
-            gpsIono.clear()
+            gpsElevIono.clear()
 
             galA.clear()
             galP.clear()
             galCleanCn0.clear()
-            galIono.clear()
+            galElevIono.clear()
 
             if (i == 0) {
                 //Initialize to the ref position
@@ -95,9 +99,6 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     acqInformation.refLocation.refLocationEcef.y,
                     acqInformation.refLocation.refLocationEcef.z
                 )
-
-                //initialize iono
-//                gpsIono = epoch.ionoProto
             }
 
             //LOOP FOR GPS
@@ -147,22 +148,26 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         var pr2 = 0.0
                         var freq2 = 0.0
 
+                        var elev = -1
+
                         epoch.satellites.gpsSatellites.gpsL1.forEach { s ->
                             if (s.svid == gpsCleanSvn[j]) {
                                 pr1 = s.pR
                                 freq1 = s.carrierFreq
+                                elev = s.elevation
                             }
                         }
                         epoch.satellites.gpsSatellites.gpsL5.forEach { s ->
                             if (s.svid == gpsCleanSvn[j]) {
                                 pr2 = s.pR
                                 freq2 = s.carrierFreq
+                                elev = s.elevation
                             }
                         }
 
                         if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
                             val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
-                            gpsIono.add(Pair(gpsCleanSvn[j], ionoCorr))
+                            gpsElevIono.add(Pair(elev, ionoCorr))
                             gpsCorr -= ionoCorr
                         } else { // If the current satellite has not 2 frequencies, correct with eph iono corrections
                             gpsCorr -= propCorr.ionoCorr
@@ -194,14 +199,6 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         gpsCleanSvn.add(gpsSvn[j])
                     }
                 }
-
-                //pseudorange "RAIM"
-//                val cleanSatsInd = outliers(gpsP)
-//                cleanSatsInd.forEach {
-//                    gpsP.removeAt(it)
-//                    gpsA.removeAt(it)
-//                    if (i == 0) gpsCn0.removeAt(it)
-//                }
 
             }
 
@@ -249,29 +246,32 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     galCorr -= propCorr.tropoCorr
 
                     //2freq corrections
-//                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
-                    if (true) {
+                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
                         var pr1 = 0.0
                         var freq1 = 0.0
                         var pr2 = 0.0
                         var freq2 = 0.0
 
+                        var elev = -1
+
                         epoch.satellites.galSatellites.galE1.forEach { s ->
                             if (s.svid == galCleanSvn[j]) {
                                 pr1 = s.pR
                                 freq1 = s.carrierFreq
+                                elev = s.elevation
                             }
                         }
                         epoch.satellites.galSatellites.galE5a.forEach { s ->
                             if (s.svid == galCleanSvn[j]) {
                                 pr2 = s.pR
                                 freq2 = s.carrierFreq
+                                elev = s.elevation
                             }
                         }
 
                         if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
                             val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
-                            galIono.add(Pair(galCleanSvn[j], ionoCorr))
+                            galElevIono.add(Pair(elev, ionoCorr))
                             galCorr -= ionoCorr
                         } else {
                             galCorr -= propCorr.ionoCorr
@@ -303,17 +303,6 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         galCleanSvn.add(galSvn[j])
                     }
                 }
-
-                // Get rid of pseudorange outliers
-//                val cleanSatsInd = outliers(galP)
-//                val nUnknowns = if (isMultiConst) 5 else 4
-//                if ((galP.size - cleanSatsInd.size) >= nUnknowns) {
-//                    cleanSatsInd.forEach {
-//                        galP.removeAt(it)
-//                        galA.removeAt(it)
-//                        galCleanCn0.removeAt(it)
-//                    }
-//                }
             }
 
             //Least Squares
@@ -334,14 +323,14 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         mode.constellations.contains(GALILEO) -> {
                             responsePvtMultiConst =
                                 leastSquares(position, galP, galA, isMultiConst, galCleanCn0, isWeight)
-                            val a = 0
                         }
                     }
                 }
             } catch (e: Exception) {
                 print("LS ERROR:::${e.localizedMessage}")
             }
-
+            // Update next reference pvt
+            position = pvtLla2PvtEcef(responsePvtMultiConst.pvt)
         }
 
 
@@ -385,10 +374,9 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
         nSats /= nEpoch
 
-        pvtResponsePvtMultiConst = ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats)
-        // todo update next ref position
-//        acqInformation.refLocation.refLocationEcef =
-//            lla2ecef(LlaLocation(pvtLatLng.lat, pvtLatLng.lng, pvtLatLng.altitude))
+        pvtResponsePvtMultiConst = ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats, gpsElevIono, galElevIono)
+        // Update next reference position
+        acqInformation.refLocation.refLocationEcef = EcefLocation(position.x, position.y, position.z)
     }
 
 
@@ -432,13 +420,7 @@ fun leastSquares(
         }
 
         // H = inv(G'*W*G)
-        var hMatrix = SimpleMatrix(nUnknowns, nUnknowns)
-        try {
-            hMatrix = gMatrix.transpose().mult(wMatrix).mult(gMatrix).invert()
-        } catch (e: Exception) {
-            print("LS ERROR:::${e.localizedMessage}")
-        }
-        hMatrix = gMatrix.transpose().mult(wMatrix).mult(gMatrix).invert()
+        val hMatrix = gMatrix.transpose().mult(wMatrix).mult(gMatrix).invert()
 
         // d = inv(H)*G'*W*p
         val dHatVector = hMatrix.mult(gMatrix.transpose()).mult(wMatrix).mult(pVector)
@@ -447,7 +429,6 @@ fun leastSquares(
         val wgMatrix = wMatrix.mult(gMatrix)
 
         // Residue computation: res = p - WG*d
-        // todo check this
         val resVector = pVector.minus(wgMatrix.mult(dHatVector))
 
         // Residue =  |res| = |p - pHat|
