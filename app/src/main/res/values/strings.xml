@@ -101,5 +101,34 @@
     <string name="enable_gnss_logs">Enable GNSS logs</string>
     <string name="enable_logs_description">A file with raw mesurements will be created every time you start computing if enabled.</string>
     <string name="average_time_title">Average Time:</string>
+    <string name="information">Information</string>
+    <string name="elevation_info_title">· Enable GNSS Logs:</string>
+    <string name="elevation_info_detail">If enabled</string>
+    <string name="gnss_logs_info_title">· Enable GNSS Logs:</string>
+    <string name="gnss_logs_info_detail">If enabled</string>
+    <string name="cno_info_detail">fvdmsamvds</string>
+    <string name="cn0_info_title">Cn0 title</string>
+    <string name="avg_info_title">Avg info title</string>
+    <string name="avg_info_detail">Avg info detail</string>
+    <string name="position_info_title">Position info title</string>
+    <string name="position_info_detail">position info detail</string>
+    <string name="enable_recommendation">* This setting is highly recommended to be enabled</string>
+    <string name="create">create</string>
+    <string name="wls">WLS</string>
+    <string name="ls">LS</string>
+    <string name="algorithm">Algorithm</string>
+    <string name="dual_frequency_iono_free">Dual-frequency iono-free</string>
+    <string name="asterisk">*</string>
+    <string name="troposphere">Troposphere</string>
+    <string name="ionosphere">Ionosphere</string>
+    <string name="corrections">Corrections</string>
+    <string name="bands">Bands</string>
+    <string name="constellations">Constellations</string>
+    <string name="gps">GPS</string>
+    <string name="galileo">Galileo</string>
+    <string name="graph_type">Graph Type</string>
+    <string name="error_plot">Error plot</string>
+    <string name="ionosphere_elevation">Ionosphere/Elevation</string>
+    <string name="iono_information_detail">The iono elev plot displays....</string>
 
 </resources>

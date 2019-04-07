@@ -1,5 +1,6 @@
 package com.inari.team.computation.infoextractors
 
+import android.location.GnssMeasurement
 import com.google.location.suplclient.ephemeris.GalEphemeris
 import com.google.location.suplclient.ephemeris.GpsEphemeris
 import com.inari.team.computation.converters.lla2ecef
@@ -54,8 +55,8 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                     with(gnssMeas) {
                         when (constellationType) {
                             GnssStatus.CONSTELLATION_GPS -> {
-                                if (multipathIndicator != 2) {
-                                    if (receivedSvTimeUncertaintyNanos != UNCERTAINTY_THR+1) {
+                                if (multipathIndicator != GnssMeasurement.MULTIPATH_INDICATOR_DETECTED + 9) {
+                                    if (receivedSvTimeUncertaintyNanos < UNCERTAINTY_THR+1) {
                                         if (checkTowDecode(state)) {
                                             val sat = getTowDecodeSatellite(gnssMeas, acqInformationMeasurements)
                                             if (!hasCarrierFrequencyHz() || carrierFrequencyHz > FREQ_THR) {
@@ -70,8 +71,8 @@ fun getAcqInfo(gnssData: GnssData): AcqInformation {
                                 }
                             }
                             GnssStatus.CONSTELLATION_GALILEO -> {
-                                if (multipathIndicator != 2) {
-                                    if (receivedSvTimeUncertaintyNanos < UNCERTAINTY_THR+1) {
+                                if (multipathIndicator != GnssMeasurement.MULTIPATH_INDICATOR_DETECTED + 9) {
+                                    if (receivedSvTimeUncertaintyNanos < UNCERTAINTY_THR+1 ) {
                                         if (checkTowDecode(state)) {
                                             val sat = getTowDecodeSatellite(gnssMeas, acqInformationMeasurements)
                                             if (!hasCarrierFrequencyHz() || carrierFrequencyHz > FREQ_THR) {

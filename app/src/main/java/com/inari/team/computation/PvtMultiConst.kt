@@ -305,7 +305,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     }
                 }
             } catch (e: Exception) {
-                Timber.d(e.localizedMessage)
+                Timber.d("LS ERROR:::${e.localizedMessage}")
             }
 
         }
@@ -433,6 +433,9 @@ fun leastSquares(
 
         response = ResponsePvtMultiConst(pvtLatLng, dop, residue, Corrections(), nSatellites.toFloat())
 
+    } else {
+        Timber.d("LS ERROR:::not enough satellites")
+        print("LS ERROR:::not enough satellites\n")
     }
 
     return response
