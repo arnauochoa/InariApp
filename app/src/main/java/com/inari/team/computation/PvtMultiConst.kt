@@ -1,6 +1,7 @@
 package com.inari.team.computation
 
 import com.inari.team.computation.converters.ecef2lla
+import com.inari.team.computation.converters.lla2ecef
 import com.inari.team.computation.corrections.getCtrlCorr
 import com.inari.team.computation.corrections.getIonoCorrDualFreq
 import com.inari.team.computation.corrections.getPropCorr
@@ -37,6 +38,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         var responsePvtMultiConst = ResponsePvtMultiConst()
 
         var nGps = 0
+        var gpsCorr: Double
+        var gpsPrC: Double
+        var gpsD0: Double
+        var gpsAx: Double
+        var gpsAy: Double
+        var gpsAz: Double
         val gpsA = arrayListOf<ArrayList<Double>>()
         val gpsP = arrayListOf<Double>()
         val gpsTcorr = arrayListOf<Double>()
@@ -45,16 +52,17 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val gpsPr = arrayListOf<Double>()
         val gpsSvn = arrayListOf<Int>()
         val gpsCn0 = arrayListOf<Double>()
+        val gpsCleanCn0 = arrayListOf<Double>()
         val gpsSatellites = arrayListOf<Satellite>()
-        var gpsCorr: Double
-        var gpsPrC: Double
-        var gpsD0: Double
-        var gpsAx: Double
-        var gpsAy: Double
-        var gpsAz: Double
 
 
         var nGal = 0
+        var galCorr: Double = 0.0
+        var galPrC: Double = 0.0
+        var galD0: Double = 0.0
+        var galAx: Double = 0.0
+        var galAy: Double = 0.0
+        var galAz: Double = 0.0
         val galA = arrayListOf<ArrayList<Double>>()
         val galP = arrayListOf<Double>()
         val galTcorr = arrayListOf<Double>()
@@ -63,16 +71,19 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val galPr = arrayListOf<Double>()
         val galSvn = arrayListOf<Int>()
         val galCn0 = arrayListOf<Double>()
+        val galCleanCn0 = arrayListOf<Double>()
         val galSatellites = arrayListOf<Satellite>()
-        var galCorr: Double = 0.0
-        var galPrC: Double = 0.0
-        var galD0: Double = 0.0
-        var galAx: Double = 0.0
-        var galAy: Double = 0.0
-        var galAz: Double = 0.0
 
         repeat(PVT_ITER) { i ->
             //LS
+
+            gpsA.clear()
+            gpsP.clear()
+            gpsCleanCn0.clear()
+
+            galA.clear()
+            galP.clear()
+            galCleanCn0.clear()
 
             if (i == 0) {
                 //Initialize to the ref position
@@ -172,17 +183,17 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         val row = arrayListOf(gpsAx, gpsAy, gpsAz, 1.0)
                         if (isMultiConst) row.add(0.0)
                         gpsA.add(row)
-
+                        gpsCleanCn0.add(gpsCn0[j])
                     }
                 }
 
                 //pseudorange "RAIM"
-                val cleanSatsInd = outliers(gpsP)
-                cleanSatsInd.forEach {
-                    gpsP.removeAt(it)
-                    gpsA.removeAt(it)
-                    gpsCn0.removeAt(it)
-                }
+//                val cleanSatsInd = outliers(gpsP)
+//                cleanSatsInd.forEach {
+//                    gpsP.removeAt(it)
+//                    gpsA.removeAt(it)
+//                    if (i == 0) gpsCn0.removeAt(it)
+//                }
 
             }
 
@@ -272,16 +283,20 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         val row = arrayListOf(galAx, galAy, galAz, 1.0)
                         if (isMultiConst) row.add(1.0)
                         galA.add(row)
+                        galCleanCn0.add(galCn0[j])
 
                     }
                 }
 
-                //pseudorange "RAIM"
+                // Get rid of pseudorange outliers
 //                val cleanSatsInd = outliers(galP)
-//                cleanSatsInd.forEach {
-//                    galP.removeAt(it)
-//                    galA.removeAt(it)
-//                    galCn0.removeAt(it)
+//                val nUnknowns = if (isMultiConst) 5 else 4
+//                if ((galP.size - cleanSatsInd.size) >= nUnknowns) {
+//                    cleanSatsInd.forEach {
+//                        galP.removeAt(it)
+//                        galA.removeAt(it)
+//                        galCleanCn0.removeAt(it)
+//                    }
 //                }
             }
 
@@ -290,22 +305,22 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                 if (isMultiConst) {
                     val multiConstP = gpsP + galP
                     val multiconstA = gpsA + galA
-                    val multiConstcn0 = gpsCn0 + galCn0
+                    val multiConstcn0 = gpsCleanCn0 + galCleanCn0
 
                     responsePvtMultiConst =
                         leastSquares(position, multiConstP, multiconstA, isMultiConst, multiConstcn0, isWeight)
                 } else {
                     when {
                         mode.constellations.contains(GPS) -> {
-                            responsePvtMultiConst = leastSquares(position, gpsP, gpsA, isMultiConst, gpsCn0, isWeight)
+                            responsePvtMultiConst = leastSquares(position, gpsP, gpsA, isMultiConst, gpsCleanCn0, isWeight)
                         }
                         mode.constellations.contains(GALILEO) -> {
-                            responsePvtMultiConst = leastSquares(position, galP, galA, isMultiConst, galCn0, isWeight)
+                            responsePvtMultiConst = leastSquares(position, galP, galA, isMultiConst, galCleanCn0, isWeight)
                         }
                     }
                 }
             } catch (e: Exception) {
-                Timber.d("LS ERROR:::${e.localizedMessage}")
+                print("LS ERROR:::${e.localizedMessage}")
             }
 
         }
@@ -398,8 +413,13 @@ fun leastSquares(
         }
 
         // H = inv(G'*W*G)
-        val hMatrix = gMatrix.transpose().mult(wMatrix).mult(gMatrix).invert()
-
+        var hMatrix = SimpleMatrix(nUnknowns, nUnknowns)
+        try {
+            hMatrix = gMatrix.transpose().mult(wMatrix).mult(gMatrix).invert()
+        } catch (e: Exception) {
+            print("LS ERROR:::${e.localizedMessage}")
+        }
+        hMatrix = gMatrix.transpose().mult(wMatrix).mult(gMatrix).invert()
 
         // d = inv(H)*G'*W*p
         val dHatVector = hMatrix.mult(gMatrix.transpose()).mult(wMatrix).mult(pVector)
@@ -418,7 +438,7 @@ fun leastSquares(
         val gDop = sqrt(hMatrix[0, 0] + hMatrix[1, 1] + hMatrix[2, 2] + hMatrix[3, 3])
         val pDop = sqrt(hMatrix[0, 0] + hMatrix[1, 1] + hMatrix[2, 2])
         val tDop = sqrt(hMatrix[3, 3])
-        val dop  = Dop(gDop, pDop, tDop)
+        val dop = Dop(gDop, pDop, tDop)
 
         // Save results
         position.x += dHatVector[0, 0]
