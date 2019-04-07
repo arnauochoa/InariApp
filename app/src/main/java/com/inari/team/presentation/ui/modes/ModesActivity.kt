@@ -8,8 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.widget.SeekBar
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
@@ -20,6 +19,7 @@ import com.inari.team.core.utils.toast
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
 import kotlinx.android.synthetic.main.activity_modes.*
+import kotlinx.android.synthetic.main.dialog_modes_info.view.*
 import kotlinx.android.synthetic.main.dialog_new_mode.view.*
 import javax.inject.Inject
 
@@ -59,6 +59,9 @@ class ModesActivity : BaseActivity() {
                     tvSelectedModesTitle.text = ""
                     mAdapter?.update()
                 }
+                R.id.information -> {
+                    showInfoDialog()
+                }
                 else -> {
                 }
             }
@@ -85,7 +88,7 @@ class ModesActivity : BaseActivity() {
             mAdapter?.let {
                 val modes = it.getItems()
                 var selectedModes = 0
-                modes.forEachIndexed { index, mode ->
+                modes.forEach { mode ->
                     if (mode.isSelected && selectedModes < 5) {
                         mode.color = selectedModes
                         selectedModes++
@@ -224,17 +227,6 @@ class ModesActivity : BaseActivity() {
         }
 
         layout?.let {
-            // Ionosphere and iono-free can't be selected at the same time
-            it.correctionsOption3.isEnabled = !it.correctionsOption1.isChecked
-            it.correctionsOption1.isEnabled = !it.correctionsOption3.isChecked
-
-            it.correctionsOption1.setOnClickListener { l ->
-                it.correctionsOption3.isEnabled = !l.correctionsOption1.isChecked
-            }
-            it.correctionsOption3.setOnClickListener { l ->
-                it.correctionsOption1.isEnabled = !l.correctionsOption3.isChecked
-            }
-
             it.rgGpsBands.isEnabled = it.constOption1.isChecked
             it.rgGalBands.isEnabled = it.constOption2.isChecked
 
@@ -261,11 +253,49 @@ class ModesActivity : BaseActivity() {
                 }
             }
 
+            it.correctionsOption1.setOnCheckedChangeListener { _, isChecked ->
+                if (!isChecked) {
+                    it.tvIonoNecessary.visibility = VISIBLE
+                    it.tvNecessaryInfo.visibility = VISIBLE
+                } else {
+                    it.tvIonoNecessary.visibility = GONE
+                    if (it.correctionsOption2.isChecked) {
+                        it.tvNecessaryInfo.visibility = INVISIBLE
+                    }
+                }
+            }
+
+            it.correctionsOption2.setOnCheckedChangeListener { _, isChecked ->
+                if (!isChecked) {
+                    it.tvTropoNecessary.visibility = VISIBLE
+                    it.tvNecessaryInfo.visibility = VISIBLE
+                } else {
+                    it.tvTropoNecessary.visibility = GONE
+                    if (it.correctionsOption1.isChecked) {
+                        it.tvNecessaryInfo.visibility = INVISIBLE
+                    }
+                }
+            }
+
 
         }
         dialog.show()
 
     }
+
+    private fun showInfoDialog() {
+
+        val dialog = AlertDialog.Builder(this).create()
+        val layout = View.inflate(this, R.layout.dialog_modes_info, null)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setView(layout)
+        layout.ivCloseInfo.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+
+    }
+
 
     private fun createMode(layout: View?, dialog: AlertDialog) {
         var name = ""
@@ -278,10 +308,10 @@ class ModesActivity : BaseActivity() {
             name = it.modeNameTextEdit.text.toString() // set the name
             if (it.constOption1.isChecked) constellations.add(PositionParameters.CONST_GPS) // set selected constellations
             if (it.constOption2.isChecked) constellations.add(PositionParameters.CONST_GAL)
-            if (it.isEnabled && it.rbL1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
-            if (it.isEnabled && it.rbL5.isChecked) bands.add(PositionParameters.BAND_L5)
-            if (it.isEnabled && it.rbE1.isChecked) bands.add(PositionParameters.BAND_E1)
-            if (it.isEnabled && it.rbE5a.isChecked) bands.add(PositionParameters.BAND_E5A)
+            if (it.rbL1.isEnabled && it.rbL1.isChecked) bands.add(PositionParameters.BAND_L1) // set selected bands
+            if (it.rbL5.isEnabled && it.rbL5.isChecked) bands.add(PositionParameters.BAND_L5)
+            if (it.rbE1.isEnabled && it.rbE1.isChecked) bands.add(PositionParameters.BAND_E1)
+            if (it.rbE5a.isEnabled && it.rbE5a.isChecked) bands.add(PositionParameters.BAND_E5A)
             if (it.correctionsOption1.isChecked) corrections.add(PositionParameters.CORR_IONOSPHERE)  // set selected corrections
             if (it.correctionsOption2.isChecked) corrections.add(PositionParameters.CORR_TROPOSPHERE)
             if (it.correctionsOption3.isChecked) corrections.add(PositionParameters.CORR_IONOFREE)

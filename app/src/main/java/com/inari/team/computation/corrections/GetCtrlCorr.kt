@@ -3,16 +3,20 @@ package com.inari.team.computation.corrections
 import com.inari.team.computation.data.EcefLocation
 import com.inari.team.computation.data.Satellite
 import com.inari.team.computation.satPos
+import com.inari.team.computation.utils.Constants
 import com.inari.team.computation.utils.Constants.C
 import com.inari.team.computation.utils.checkTime
 import com.inari.team.computation.utils.earthRotCorr
 import org.ejml.data.DMatrixRMaj
 import org.ejml.dense.row.CommonOps_DDRM
+import kotlin.math.pow
 
 fun getCtrlCorr(
     satellite: Satellite,
     tow: Double,
-    pR: Double
+    pR: Double,
+    constellation: Int,
+    band: Int = -1 //just needed when it is Galileo E5a band
 ): CtrlCorr {
 
     // Compute transmission time
@@ -20,7 +24,9 @@ fun getCtrlCorr(
 
     // Get clock corrections
     var tCorr = satClockErrorCorrection(txRaw, satellite)
-    tCorr -= satellite.tgdS
+
+    tCorr -= if (band == Constants.E5A) satellite.tgdS * (Constants.L1_FREQ / Constants.L5_FREQ).pow(2) else satellite.tgdS
+
     var txGPS = txRaw - tCorr
 
     // Compute again the clock bias
@@ -28,7 +34,7 @@ fun getCtrlCorr(
     tCorr -= satellite.tgdS
 
     // Get the satellite coordinates (corrected) and velocity
-    val satPos = satPos(txRaw, satellite)
+    val satPos = satPos(txGPS, satellite, constellation)
     var x = satPos.x
     val vel = satPos.vel
 

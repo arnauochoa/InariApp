@@ -5,7 +5,9 @@ data class ResponsePvtMultiConst(
     var dop: Dop = Dop(),
     var residue: Double = 0.0,
     var corrections: Corrections = Corrections(),
-    var nSats: Float = 0f
+    var nSats: Float = 0f,
+    var gpsElevIono: ArrayList<Pair<Int, Double>> = arrayListOf(),
+    var galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
 )
 
 data class PvtLatLng(
@@ -19,7 +21,8 @@ data class PvtEcef(
     var x: Double = -1.0,
     var y: Double = -1.0,
     var z: Double = -1.0,
-    var time: Double = 0.0
+    var time: Double = 0.0,
+    var interSystemBias: Double = 0.0
 
 )
 

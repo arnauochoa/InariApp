@@ -13,15 +13,15 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
     val responses = arrayListOf<ResponsePvtMode>()
 
     //Obtain Information
-    val acqInformation = getAcqInfo(gnssData)
+    var acqInformation = getAcqInfo(gnssData)
 
     //CN0 mask
     if (acqInformation.cn0mask != 0) {
-        applyMask(acqInformation, CN0_MASK)
+        acqInformation = applyMask(acqInformation, CN0_MASK)
     }
     //Elevation mask
     if (acqInformation.elevationMask != 0) {
-        applyMask(acqInformation, ELEVATION_MASK)
+        acqInformation = applyMask(acqInformation, ELEVATION_MASK)
     }
 
     acqInformation.modes.forEach {
@@ -35,14 +35,17 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
         if (pvtMultiConst.pvt.lat in -180.0..180.0 && pvtMultiConst.pvt.lng in -180.0..180.0) {
 
             val pvtResponse = ResponsePvtMode(
-                LatLng(
+                refPosition = LatLng(
                     acqInformation.refLocation.refLocationLla.latitude,
                     acqInformation.refLocation.refLocationLla.longitude
                 ),
-                acqInformation.refLocation.refLocationLla.altitude.toFloat(),
-                LatLng(pvtMultiConst.pvt.lat, pvtMultiConst.pvt.lng),
-                it.color,
-                it.name
+                refAltitude = acqInformation.refLocation.refLocationLla.altitude.toFloat(),
+                pvtLatLng = pvtMultiConst.pvt,
+                modeColor = it.color,
+                modeName = it.name,
+                nSatellites = pvtMultiConst.nSats,
+                galElevIono = pvtMultiConst.galElevIono,
+                gpsElevIono = pvtMultiConst.gpsElevIono
             )
 
             responses.add(pvtResponse)

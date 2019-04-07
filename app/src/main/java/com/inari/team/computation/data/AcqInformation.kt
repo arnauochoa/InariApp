@@ -19,7 +19,7 @@ data class AcqInformation(
 data class AcqInformationMeasurements(
     val svList: ArrayList<SvInfo> = arrayListOf(),
     var timeNanosGnss: Double = 0.0,
-    var tow: Double = 0.0,
+    var tow: Double = 0.0, //testear
     var now: Double = 0.0,
     val totalSatNumber: Int = 0,
     var ionoProto: ArrayList<Double> = arrayListOf(),
@@ -32,7 +32,7 @@ data class SvInfo(
 
 data class RefLocationData(
     val refLocationLla: LlaLocation = LlaLocation(),
-    val refLocationEcef: EcefLocation = EcefLocation()
+    var refLocationEcef: EcefLocation = EcefLocation()
 )
 
 data class Satellites(

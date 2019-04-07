@@ -11,24 +11,21 @@ import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.computation.computePvt
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.APP_ROOT
 import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
-import com.inari.team.core.utils.getGnssJson
-import com.inari.team.core.utils.root
+import com.inari.team.core.utils.loggers.GnssMeasLogger
+import com.inari.team.core.utils.loggers.PosLogger
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONException
-import java.io.File
-import java.io.FileWriter
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 @Singleton
@@ -44,9 +41,10 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var refPos: LatLng? = null
 
     private var startedComputingDate = Date()
+    private var lastMeasurementsDate = Date()
 
-    private var fileName = Date().toString()
-    private var fileWriter: FileWriter? = null
+    private var gnssMeasLogger: GnssMeasLogger? = null
+    private var posLogger: PosLogger? = null
 
     private var isComputing = false
     private var isEphErrorShown = false
@@ -72,10 +70,12 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isComputing = true
         isFirstComputedPosition = true
         startedComputingDate = Date()
+        lastMeasurementsDate = Date()
         computedPositions = arrayListOf()
 
         if (mPrefs.isGnssLoggingEnabled()) {
-            openGnssLogFile()
+            gnssMeasLogger = GnssMeasLogger()
+            posLogger = PosLogger()
         }
 
         //init gnss
@@ -90,17 +90,13 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         obtainEphemerisData()
     }
 
-    private fun openGnssLogFile() {
-        fileName = "${Date()}.txt"
-        fileWriter = FileWriter(File(root.absolutePath + APP_ROOT + fileName))
-        fileWriter?.write("[")
-    }
-
     fun stopComputingPosition() {
         isComputing = false
+        gnssMeasLogger?.closeLogger()
+        posLogger?.closeLogger()
+        gnssMeasLogger = null
+        posLogger = null
         ephemeris.updateData("")
-        fileWriter?.write("]")
-        fileWriter?.close()
     }
 
     private fun obtainEphemerisData() {
@@ -143,6 +139,16 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     fun setGnssStatus(status: GnssStatus?) {
         gnssData.lastGnssStatus = status
+
+        if (Date().time - lastMeasurementsDate.time >=
+            TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT) +
+            TimeUnit.SECONDS.toMillis(10)
+        ) {
+            if (gnssData.measurements.isEmpty()) {
+                lastMeasurementsDate = Date()
+                position.showError("Measurements are not being obtained")
+            }
+        }
     }
 
     fun setGnssMeasurementsEvent(gnssMeasurementsEvent: GnssMeasurementsEvent?) {
@@ -151,6 +157,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
         measurements?.let {
             if (it.isNotEmpty() && clock != null && gnssData.lastGnssStatus != null) {
+
+                gnssMeasLogger?.onGnssMeasurementsReceived(gnssMeasurementsEvent)
+
                 val measurementData = MeasurementData(
                     gnssData.lastGnssStatus,
                     it,
@@ -182,6 +191,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             if (Date().time - gnssData.lastEphemerisDate.time >= TimeUnit.MINUTES.toMillis(EPHEMERIS_UPDATE_TIME_MINUTES)) {
                 obtainEphemerisData()
             }
+
         }
     }
 
@@ -190,11 +200,16 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             val coordinates = computePvt(gnssData)
 
             if (coordinates.isNotEmpty()) {
+
+                //add position logs
+                gnssData.modes.forEach { mode ->
+                    coordinates.forEach {
+                        posLogger?.addPositionLine(it.pvtLatLng, it.nSatellites.roundToInt(), mode.constellations)
+                    }
+                }
+
                 position.updateData(coordinates)
                 computedPositions.addAll(coordinates)
-                if (mPrefs.isGnssLoggingEnabled()) {
-                    saveGnssLogs()
-                }
             } else {
                 position.showError("Position could not be obtained.")
             }
@@ -205,28 +220,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     }
 
-    private fun saveGnssLogs() {
-        var pvtInfoString = ""
-        if (isFirstComputedPosition) {
-            isFirstComputedPosition = false
-        } else {
-            pvtInfoString += ","
-        }
-        pvtInfoString += try {
-            val json = getGnssJson(gnssData)
-            json.toString(2)
-        } catch (e: JSONException) {
-            "{}"
-        }
-
-        if (pvtInfoString.isNotBlank()) {
-            try {
-                fileWriter?.write(pvtInfoString)
-            } catch (e: Exception) {
-
-            }
-        }
-    }
 
     companion object {
         const val SUPL_SERVER_HOST = "supl.google.com"

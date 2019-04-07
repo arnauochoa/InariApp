@@ -4,7 +4,7 @@ import com.inari.team.computation.utils.Constants.CN0_MASK
 import com.inari.team.computation.utils.Constants.ELEVATION_MASK
 import com.inari.team.computation.data.AcqInformation
 
-fun applyMask(acqInformation: AcqInformation, maskType: Int) {
+fun applyMask(acqInformation: AcqInformation, maskType: Int): AcqInformation {
 
     acqInformation.acqInformationMeasurements.forEach {
 
@@ -65,5 +65,7 @@ fun applyMask(acqInformation: AcqInformation, maskType: Int) {
         it.satellites.galSatellites.galE5a.addAll(filteredE5a)
 
     }
+
+    return acqInformation
 
 }

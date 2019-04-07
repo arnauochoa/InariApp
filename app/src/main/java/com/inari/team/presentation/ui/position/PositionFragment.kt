@@ -25,7 +25,6 @@ import com.inari.team.R
 import com.inari.team.core.base.BaseFragment
 import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.extensions.checkPermission
 import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.showAlert
@@ -153,11 +152,13 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onMapReady(map: GoogleMap?) {
         mMap = map
 
         mMap?.let {
             with(it) {
+                isMyLocationEnabled = false
                 uiSettings?.isMyLocationButtonEnabled = false
                 uiSettings?.isMapToolbarEnabled = false
                 mapType = mSharedPreferences.getSelectedMapType()
@@ -352,13 +353,13 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
         if (positions.isNotEmpty()) {
             positions.forEach { resp ->
-                addMarker(resp.compPosition, "", resp.modeColor)
+                addMarker(LatLng(resp.pvtLatLng.lat, resp.pvtLatLng.lng), "", resp.modeColor)
             }
             if (isStartedComputing) {
-                moveCameraWithZoom(positions[0].compPosition)
+                moveCameraWithZoom(LatLng(positions[0].pvtLatLng.lat, positions[0].pvtLatLng.lng))
                 isStartedComputing = false
             } else {
-                moveCamera(positions[0].compPosition)
+                moveCamera(LatLng(positions[0].pvtLatLng.lat, positions[0].pvtLatLng.lng))
             }
         }
     }

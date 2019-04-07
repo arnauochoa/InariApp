@@ -1,9 +1,17 @@
 package com.inari.team.computation.utils
 
+import com.inari.team.computation.converters.ecef2lla
+import com.inari.team.computation.converters.lla2ecef
+import com.inari.team.computation.data.EcefLocation
+import com.inari.team.computation.data.LlaLocation
+import com.inari.team.computation.data.PvtEcef
+import com.inari.team.computation.data.PvtLatLng
 import org.ejml.data.DMatrixRMaj
 import org.ejml.dense.row.CommonOps_DDRM
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM
+import org.ejml.simple.SimpleMatrix
 import java.lang.Math.*
+import kotlin.math.pow
 
 /**
  * Repairs over- and underflow of GPS time
@@ -57,21 +65,31 @@ fun nsgpst2gpst(timeNanos: Long): LongArray {
 
 /**
  * Compute Weight Matrix
+ * C/N0 weighting method - Sigma e [Wieser, Andreas, et al. "An extended weight model for GPS phase observations"]
  */
-fun computeCNoWeightMatrix(cnos: List<Double>, isWeight: Boolean): DMatrixRMaj {
-    var wMat = CommonOps_DDRM.identity(cnos.size, cnos.size)
+fun computeCNoWeightMatrix(cnos: List<Double>, isWeight: Boolean): SimpleMatrix {
+    var wMat = SimpleMatrix.identity(cnos.size)
     if (isWeight) {
         val diagonal = arrayListOf<Double>()
-        val tmp = arrayListOf<Double>()
-        cnos.forEach { cno ->
-            tmp.add(pow(10.0, -cno / 10))
-        }
-        val sum = tmp.sum()
-        tmp.forEach {
-            diagonal.add(1 / (it / sum))
-        }
-        wMat = CommonOps_DDRM.diag(*diagonal.toDoubleArray())
-    }
 
+        cnos.forEach { cno ->
+            val w = 0.244 * 10.0.pow(-0.1 * cno)
+            diagonal.add(1/w)
+        }
+
+        wMat = SimpleMatrix.diag(*diagonal.toDoubleArray())
+    }
     return wMat
+}
+
+fun pvtEcef2PvtLla(pvtEcef: PvtEcef): PvtLatLng{
+    val posEcef = EcefLocation(pvtEcef.x, pvtEcef.y, pvtEcef.z)
+    val posLla = ecef2lla(posEcef)
+    return PvtLatLng(posLla.latitude, posLla.longitude, posLla.altitude, pvtEcef.time)
+}
+
+fun pvtLla2PvtEcef(pvtLatLng: PvtLatLng): PvtEcef{
+    val posLatLng = LlaLocation(pvtLatLng.lat, pvtLatLng.lng, pvtLatLng.altitude)
+    val posEcef = lla2ecef(posLatLng)
+    return PvtEcef(posEcef.x, posEcef.y, posEcef.z, pvtLatLng.time)
 }

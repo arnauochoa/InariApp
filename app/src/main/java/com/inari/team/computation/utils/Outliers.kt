@@ -90,7 +90,7 @@ fun outliers(pr: ArrayList<Double>): ArrayList<Int> {
             } else {
                 indices.add(i, idx[olLast - nns])
             }
-            pr[indices[i]] = Double.NaN
+//            pr[indices[i]] = Double.NaN
             i += 1
 
             //Determine the NEW value of S times tau
