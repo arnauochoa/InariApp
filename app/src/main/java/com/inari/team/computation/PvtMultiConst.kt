@@ -1,7 +1,6 @@
 package com.inari.team.computation
 
 import com.inari.team.computation.converters.ecef2lla
-import com.inari.team.computation.converters.lla2ecef
 import com.inari.team.computation.corrections.getCtrlCorr
 import com.inari.team.computation.corrections.getIonoCorrDualFreq
 import com.inari.team.computation.corrections.getPropCorr
@@ -12,7 +11,6 @@ import com.inari.team.computation.utils.Constants.GALILEO
 import com.inari.team.computation.utils.Constants.GPS
 import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.computeCNoWeightMatrix
-import com.inari.team.computation.utils.outliers
 import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.PositionParameters
 import com.inari.team.presentation.model.PositionParameters.ALG_WLS
@@ -34,7 +32,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
     var position = PvtEcef()
     acqInformation.acqInformationMeasurements.forEach { epoch ->
 
-        var iono = arrayListOf<Double>()
+        val gpsIono = arrayListOf<Pair<Int, Double>>()
+        val galIono = arrayListOf<Pair<Int, Double>>()
         var responsePvtMultiConst = ResponsePvtMultiConst()
 
         var nGps = 0
@@ -51,6 +50,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val gpsX = arrayListOf<EcefLocation>()
         val gpsPr = arrayListOf<Double>()
         val gpsSvn = arrayListOf<Int>()
+        val gpsCleanSvn = arrayListOf<Int>()
         val gpsCn0 = arrayListOf<Double>()
         val gpsCleanCn0 = arrayListOf<Double>()
         val gpsSatellites = arrayListOf<Satellite>()
@@ -70,6 +70,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         val galX = ArrayList<EcefLocation>()
         val galPr = arrayListOf<Double>()
         val galSvn = arrayListOf<Int>()
+        val galCleanSvn = arrayListOf<Int>()
         val galCn0 = arrayListOf<Double>()
         val galCleanCn0 = arrayListOf<Double>()
         val galSatellites = arrayListOf<Satellite>()
@@ -80,10 +81,12 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
             gpsA.clear()
             gpsP.clear()
             gpsCleanCn0.clear()
+            gpsIono.clear()
 
             galA.clear()
             galP.clear()
             galCleanCn0.clear()
+            galIono.clear()
 
             if (i == 0) {
                 //Initialize to the ref position
@@ -94,7 +97,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                 )
 
                 //initialize iono
-                iono = epoch.ionoProto
+//                gpsIono = epoch.ionoProto
             }
 
             //LOOP FOR GPS
@@ -105,6 +108,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         epoch.satellites.gpsSatellites.gpsL1.forEach {
                             gpsPr.add(it.pR)
                             gpsSvn.add(it.svid)
+                            gpsCleanSvn.add(it.svid)
                             gpsCn0.add(it.cn0)
                         }
                         nGps = epoch.satellites.gpsSatellites.gpsL1.size
@@ -114,6 +118,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         epoch.satellites.gpsSatellites.gpsL5.forEach {
                             gpsPr.add(it.pR)
                             gpsSvn.add(it.svid)
+                            gpsCleanSvn.add(it.svid)
                             gpsCn0.add(it.cn0)
                         }
                         nGps = epoch.satellites.gpsSatellites.gpsL5.size
@@ -133,38 +138,40 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                     //Propagation corrections
                     val propCorr = getPropCorr(gpsX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
-                    gpsCorr = gpsCorr - propCorr.tropoCorr - propCorr.ionoCorr
-                    gpsPrC = gpsPr[j]
+                    gpsCorr -= propCorr.tropoCorr
 
                     //2freq corrections
                     if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
-                        // todo if there are no measurements with two frequencies, use ephemeris iono corrections
                         var pr1 = 0.0
                         var freq1 = 0.0
                         var pr2 = 0.0
                         var freq2 = 0.0
 
                         epoch.satellites.gpsSatellites.gpsL1.forEach { s ->
-                            if (s.svid == gpsSvn[j]) {
+                            if (s.svid == gpsCleanSvn[j]) {
                                 pr1 = s.pR
                                 freq1 = s.carrierFreq
                             }
                         }
                         epoch.satellites.gpsSatellites.gpsL5.forEach { s ->
-                            if (s.svid == gpsSvn[j]) {
+                            if (s.svid == gpsCleanSvn[j]) {
                                 pr2 = s.pR
                                 freq2 = s.carrierFreq
                             }
                         }
 
                         if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
-                            pr1 += gpsCorr
-                            pr2 += gpsCorr
-                            gpsPrC = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            gpsIono.add(Pair(gpsCleanSvn[j], ionoCorr))
+                            gpsCorr -= ionoCorr
+                        } else { // If the current satellite has not 2 frequencies, correct with eph iono corrections
+                            gpsCorr -= propCorr.ionoCorr
                         }
-                    } else {
-                        gpsPrC = gpsPr[j] + gpsCorr
+                    } else { // If iono-free has not been selected, apply eph iono corrections to all satellites
+                        gpsCorr -= propCorr.ionoCorr
                     }
+
+                    gpsPrC = gpsPr[j] + gpsCorr
 
                     //gps GeometricMatrix
                     if (gpsPrC != 0.0) {
@@ -184,6 +191,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         if (isMultiConst) row.add(0.0)
                         gpsA.add(row)
                         gpsCleanCn0.add(gpsCn0[j])
+                        gpsCleanSvn.add(gpsSvn[j])
                     }
                 }
 
@@ -205,6 +213,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         epoch.satellites.galSatellites.galE1.forEach {
                             galPr.add(it.pR)
                             galSvn.add(it.svid)
+                            galCleanSvn.add(it.svid)
                             galCn0.add(it.cn0)
                         }
                         nGal = epoch.satellites.galSatellites.galE1.size
@@ -214,6 +223,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         epoch.satellites.galSatellites.galE5a.forEach {
                             galPr.add(it.pR)
                             galSvn.add(it.svid)
+                            galCleanSvn.add(it.svid)
                             galCn0.add(it.cn0)
                         }
                         nGal = epoch.satellites.galSatellites.galE5a.size
@@ -236,32 +246,38 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
                     //Propagation corrections
                     val propCorr = getPropCorr(galX[j], position, epoch.ionoProto, epoch.tow, mode.corrections)
-                    galCorr = galCorr - propCorr.tropoCorr - propCorr.ionoCorr
-
+                    galCorr -= propCorr.tropoCorr
 
                     //2freq corrections
-                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+//                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+                    if (true) {
                         var pr1 = 0.0
                         var freq1 = 0.0
                         var pr2 = 0.0
                         var freq2 = 0.0
 
                         epoch.satellites.galSatellites.galE1.forEach { s ->
-                            if (s.svid == gpsSvn[j]) {
+                            if (s.svid == galCleanSvn[j]) {
                                 pr1 = s.pR
                                 freq1 = s.carrierFreq
                             }
                         }
                         epoch.satellites.galSatellites.galE5a.forEach { s ->
-                            if (s.svid == gpsSvn[j]) {
+                            if (s.svid == galCleanSvn[j]) {
                                 pr2 = s.pR
                                 freq2 = s.carrierFreq
                             }
                         }
 
                         if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
-                            galPrC = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            galIono.add(Pair(galCleanSvn[j], ionoCorr))
+                            galCorr -= ionoCorr
+                        } else {
+                            galCorr -= propCorr.ionoCorr
                         }
+                    } else {
+                        galCorr -= propCorr.ionoCorr
                     }
 
                     galPrC = galPr[j] + galCorr
@@ -284,7 +300,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         if (isMultiConst) row.add(1.0)
                         galA.add(row)
                         galCleanCn0.add(galCn0[j])
-
+                        galCleanSvn.add(galSvn[j])
                     }
                 }
 
@@ -312,10 +328,13 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                 } else {
                     when {
                         mode.constellations.contains(GPS) -> {
-                            responsePvtMultiConst = leastSquares(position, gpsP, gpsA, isMultiConst, gpsCleanCn0, isWeight)
+                            responsePvtMultiConst =
+                                leastSquares(position, gpsP, gpsA, isMultiConst, gpsCleanCn0, isWeight)
                         }
                         mode.constellations.contains(GALILEO) -> {
-                            responsePvtMultiConst = leastSquares(position, galP, galA, isMultiConst, galCleanCn0, isWeight)
+                            responsePvtMultiConst =
+                                leastSquares(position, galP, galA, isMultiConst, galCleanCn0, isWeight)
+                            val a = 0
                         }
                     }
                 }
