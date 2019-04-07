@@ -40,16 +40,16 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
             ResponsePvtMultiConst()
         }
 
+        //todo remove after testing
+        try {
+
+            val acq = Gson().toJson(savedAcqInformationLog)
+            saveGnssFile("${Date()}.txt", ResponseBody.create(MediaType.parse("text/plain"), acq))
+        } catch (e: Exception) {
+
+        }
+
         if (pvtMultiConst.pvt.lat in -180.0..180.0 && pvtMultiConst.pvt.lng in -180.0..180.0) {
-
-            //todo remove after testing
-            try {
-
-                val acq = Gson().toJson(savedAcqInformationLog)
-                saveGnssFile("${Date()}.txt", ResponseBody.create(MediaType.parse("text/plain"), acq))
-            } catch (e: Exception){
-
-            }
 
             val pvtResponse = ResponsePvtMode(
                 LatLng(

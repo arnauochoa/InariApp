@@ -138,10 +138,6 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         rlGraph.removeAllViews()
         agcCNoValues = arrayListOf()
         when (graph) {
-            GRAPH_AGC_CNO -> {
-                tabLayout.visibility = View.VISIBLE
-                setAgcCNoGraph()
-            }
             GRAPH_CNO_ELEV -> {
                 tabLayout.visibility = View.VISIBLE
                 setCNoElevGraph()
@@ -149,6 +145,14 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             GRAPH_ERROR -> {
                 tabLayout.visibility = View.GONE
                 setErrorGraph()
+            }
+            GRAP_IONO_ELEV -> {
+                tabLayout.visibility = View.VISIBLE
+                setIonosphereElevationGraph()
+            }
+            GRAPH_AGC_CNO -> {
+                tabLayout.visibility = View.VISIBLE
+                setAgcCNoGraph()
             }
         }
 
@@ -196,6 +200,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             yAxisTitle.text = getString(R.string.northAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
+                chart.legend.isWordWrapEnabled = true
             }
             val limitLine = LimitLine(0.0f, "")
             limitLine.lineColor = ContextCompat.getColor(c, R.color.black)
@@ -208,6 +213,19 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
             plotErrorGraph()
         }
         tvInformationDetail.text = getString(R.string.error_information_detail)
+    }
+
+    private fun setIonosphereElevationGraph() {
+        context?.let { c ->
+            scatterChart = createScatterChart(c, MIN_ELEV, MAX_ELEV, MIN_CNO_L1, MAX_CNO_L1)
+            xAxisTitle.text = getString(R.string.elevAxisTitle)
+            yAxisTitle.text = getString(R.string.cnoAxisTitle)
+            scatterChart?.let { chart ->
+                chart.legend.isEnabled = true
+            }
+            scatterChart?.xAxis?.labelCount = 10
+        }
+        tvInformationDetail.text = getString(R.string.iono_information_detail)
     }
 
     private fun createTab(title: String): TabLayout.Tab {
@@ -385,39 +403,34 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
                 val graphType = mPrefs.getSelectedGraphType()
                 when (graphType) {
-                    GRAPH_AGC_CNO -> {
-                        view.ivNormalTick.visibility = View.VISIBLE
-                        view.ivTerrainTick.visibility = View.GONE
-                        view.ivHybridTick.visibility = View.GONE
-                    }
                     GRAPH_CNO_ELEV -> {
-                        view.ivTerrainTick.visibility = View.VISIBLE
-                        view.ivNormalTick.visibility = View.GONE
-                        view.ivHybridTick.visibility = View.GONE
+                        view.ivCnoElevTick.visibility = View.VISIBLE
+                        view.ivErrorTick.visibility = View.GONE
+                        view.ivIonoTick.visibility = View.GONE
+                        view.ivAgcTick.visibility = View.GONE
                     }
                     GRAPH_ERROR -> {
-                        view.ivHybridTick.visibility = View.VISIBLE
-                        view.ivNormalTick.visibility = View.GONE
-                        view.ivTerrainTick.visibility = View.GONE
+                        view.ivCnoElevTick.visibility = View.GONE
+                        view.ivErrorTick.visibility = View.VISIBLE
+                        view.ivIonoTick.visibility = View.GONE
+                        view.ivAgcTick.visibility = View.GONE
                     }
+                    GRAP_IONO_ELEV -> {
+                        view.ivCnoElevTick.visibility = View.GONE
+                        view.ivErrorTick.visibility = View.GONE
+                        view.ivIonoTick.visibility = View.VISIBLE
+                        view.ivAgcTick.visibility = View.GONE
+                    }
+                    GRAPH_AGC_CNO -> {
+                        view.ivCnoElevTick.visibility = View.GONE
+                        view.ivErrorTick.visibility = View.GONE
+                        view.ivIonoTick.visibility = View.GONE
+                        view.ivAgcTick.visibility = View.VISIBLE
+                    }
+
                 }
 
-                view.clAgc.setOnClickListener {
-                    view.ivNormalTick.visibility = View.VISIBLE
-                    view.ivTerrainTick.visibility = View.GONE
-                    view.ivHybridTick.visibility = View.GONE
-
-                    graph = GRAPH_AGC_CNO
-                    mPrefs.setSelectedGraphType(GRAPH_AGC_CNO)
-                    setGraph()
-
-                    dialog.dismiss()
-                }
-                view.clElev.setOnClickListener {
-                    view.ivTerrainTick.visibility = View.VISIBLE
-                    view.ivNormalTick.visibility = View.GONE
-                    view.ivHybridTick.visibility = View.GONE
-
+                view.clCno.setOnClickListener {
                     graph = GRAPH_CNO_ELEV
                     mPrefs.setSelectedGraphType(GRAPH_CNO_ELEV)
                     setGraph()
@@ -425,12 +438,22 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     dialog.dismiss()
                 }
                 view.clError.setOnClickListener {
-                    view.ivHybridTick.visibility = View.VISIBLE
-                    view.ivNormalTick.visibility = View.GONE
-                    view.ivTerrainTick.visibility = View.GONE
-
                     graph = GRAPH_ERROR
                     mPrefs.setSelectedGraphType(GRAPH_ERROR)
+                    setGraph()
+
+                    dialog.dismiss()
+                }
+                view.clIonosphere.setOnClickListener {
+                    graph = GRAP_IONO_ELEV
+                    mPrefs.setSelectedGraphType(GRAP_IONO_ELEV)
+                    setGraph()
+
+                    dialog.dismiss()
+                }
+                view.clAgc.setOnClickListener {
+                    graph = GRAPH_AGC_CNO
+                    mPrefs.setSelectedGraphType(GRAPH_AGC_CNO)
                     setGraph()
 
                     dialog.dismiss()
@@ -502,9 +525,10 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val L5_E5 = 1
 
         //Graph names
-        const val GRAPH_AGC_CNO = "AGC/CNo"
         const val GRAPH_CNO_ELEV = "CNo/Elevation"
         const val GRAPH_ERROR = "Error plot"
+        const val GRAP_IONO_ELEV = "Iono/Elevation"
+        const val GRAPH_AGC_CNO = "AGC/CNo"
 
         // Maximum number of points
         const val MAX_AGC_CNO_POINTS = 500
@@ -521,8 +545,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MIN_AGC_L1 = 30f // dB-Hz
         const val MAX_AGC_L5 = 15f // dB-Hz
         const val MIN_AGC_L5 = -5f // dB-Hz
-        const val NORTH_LIM = 900f // m
-        const val EAST_LIM = 900f // m
+        const val NORTH_LIM = 90f // m
+        const val EAST_LIM = 90f // m
 
         // AGC-CNO threshold values: y=mx+n
         const val AGC_CNO_M = -0.1f
