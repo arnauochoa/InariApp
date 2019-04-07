@@ -627,5 +627,6 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val AGC_CNO_M = -0.1f
         const val AGC_CNO_N_L1 = 45f
         const val AGC_CNO_N_L5 = 6f
+
     }
 }
