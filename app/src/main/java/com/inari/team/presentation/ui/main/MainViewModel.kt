@@ -11,15 +11,17 @@ import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.computation.computePvt
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.*
+import com.inari.team.core.utils.APP_ROOT
+import com.inari.team.core.utils.AppSharedPreferences
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
+import com.inari.team.core.utils.generateMeasurementsTestingLogs
+import com.inari.team.core.utils.root
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.json.JSONException
 import java.io.File
 import java.io.FileWriter
 import java.util.*
@@ -33,8 +35,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     val position = MutableLiveData<Data<List<ResponsePvtMode>>>()
     val ephemeris = MutableLiveData<Data<String>>()
-    //todo remove when tested
-    val testLogs = MutableLiveData<Data<String>>()
 
     private var gnssData = GnssData()
     private var computedPositions: ArrayList<ResponsePvtMode> = arrayListOf()
@@ -43,6 +43,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var refPos: LatLng? = null
 
     private var startedComputingDate = Date()
+    private var lastMeasurementsDate = Date()
 
     private var fileName = Date().toString()
     private var fileWriter: FileWriter? = null
@@ -71,6 +72,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isComputing = true
         isFirstComputedPosition = true
         startedComputingDate = Date()
+        lastMeasurementsDate = Date()
         computedPositions = arrayListOf()
 
         if (mPrefs.isGnssLoggingEnabled()) {
@@ -153,15 +155,13 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     fun setGnssStatus(status: GnssStatus?) {
         gnssData.lastGnssStatus = status
 
-        //todo test and if it not works remove
-        if (Date().time - startedComputingDate.time >=
-            TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT) + TimeUnit.SECONDS.toMillis(
-                5
-            )
+        if (Date().time - lastMeasurementsDate.time >=
+            TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT) +
+            TimeUnit.SECONDS.toMillis(10)
         ) {
-            if (!isEphErrorShown && gnssData.measurements.isEmpty()) {
-                isEphErrorShown = true
-                ephemeris.showError("Gnss Measurements are not being obtained, try to change position")
+            if (gnssData.measurements.isEmpty()) {
+                lastMeasurementsDate = Date()
+                position.showError("Measurements are not being obtained")
             }
         }
     }
@@ -194,7 +194,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             gnssData.ephemerisResponse != null
         ) {
 
-            ephemeris.updateData("Gnss Measurements obtained")
             if (Date().time - startedComputingDate.time >=
                 TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT)
             ) {
@@ -211,8 +210,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private fun calculatePositionWithGnss() {
         GlobalScope.launch {
             val coordinates = computePvt(gnssData)
-            //todo remove when tested
-            testLogs.updateData(generateMeasurementsTestingLogs(gnssData))
 
             if (coordinates.isNotEmpty()) {
                 position.updateData(coordinates)
@@ -232,17 +229,21 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     private fun saveGnssLogs() {
         var pvtInfoString = ""
-        if (isFirstComputedPosition) {
-            isFirstComputedPosition = false
-        } else {
-            pvtInfoString += ","
-        }
-        pvtInfoString += try {
-            val json = getGnssJson(gnssData)
-            json.toString(2)
-        } catch (e: JSONException) {
-            "{}"
-        }
+
+        //todo change when tested
+//        if (isFirstComputedPosition) {
+//            isFirstComputedPosition = false
+//        } else {
+//            pvtInfoString += ","
+//        }
+//        pvtInfoString += try {
+//            val json = getGnssJson(gnssData)
+//            json.toString(2)
+//        } catch (e: JSONException) {
+//            "{}"
+//        }
+
+        pvtInfoString = generateMeasurementsTestingLogs(gnssData)
 
         if (pvtInfoString.isNotBlank()) {
             try {

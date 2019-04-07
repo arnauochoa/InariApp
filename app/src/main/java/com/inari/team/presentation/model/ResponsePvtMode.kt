@@ -7,5 +7,6 @@ data class ResponsePvtMode(
     val refAltitude: Float,
     val compPosition: LatLng,
     val modeColor: Int,
-    val modeName: String
+    val modeName: String,
+    val nSatellites: Float = 0f
 )

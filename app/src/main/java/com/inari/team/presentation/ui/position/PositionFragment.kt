@@ -152,11 +152,13 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onMapReady(map: GoogleMap?) {
         mMap = map
 
         mMap?.let {
             with(it) {
+                isMyLocationEnabled = true
                 uiSettings?.isMyLocationButtonEnabled = false
                 uiSettings?.isMapToolbarEnabled = false
                 mapType = mSharedPreferences.getSelectedMapType()
@@ -335,28 +337,6 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                         showAlert(
                             ivAlert.context, "Something went wrong",
                             "Ephemeris data could not be obtained, check your connection",
-                            "Stop Computing", {
-                                stopComputing()
-                            }, true
-                        )
-                    }
-                }
-            }
-        } else {
-            ivAlert?.visibility = GONE
-        }
-    }
-
-    //todo remove is tested and not working properly
-    fun showMeasurementsAlert(show: Boolean, message: String) {
-        if (show) {
-            ivAlert?.let {
-                if (ivAlert.visibility != VISIBLE) {
-                    ivAlert.visibility = VISIBLE
-                    ivAlert.setOnClickListener {
-                        showAlert(
-                            ivAlert.context, "Something went wrong",
-                            message,
                             "Stop Computing", {
                                 stopComputing()
                             }, true
