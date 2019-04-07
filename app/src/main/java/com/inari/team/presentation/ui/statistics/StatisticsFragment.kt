@@ -64,6 +64,9 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     private var graph: String = ""
 
+    private val gpsElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
+    private val galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fragmentComponent.inject(this)
@@ -148,7 +151,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                 setErrorGraph()
             }
             GRAP_IONO_ELEV -> {
-                tabLayout.visibility = View.VISIBLE
+                tabLayout.visibility = View.GONE
                 setIonosphereElevationGraph()
             }
             GRAPH_AGC_CNO -> {
@@ -218,9 +221,9 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     private fun setIonosphereElevationGraph() {
         context?.let { c ->
-            scatterChart = createScatterChart(c, MIN_ELEV, MAX_ELEV, MIN_CNO_L1, MAX_CNO_L1)
+            scatterChart = createScatterChart(c, MIN_ELEV, MAX_ELEV, MIN_IONO, MAX_IONO)
             xAxisTitle.text = getString(R.string.elevAxisTitle)
-            yAxisTitle.text = getString(R.string.cnoAxisTitle)
+            yAxisTitle.text = getString(R.string.ionoAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
             }
@@ -352,26 +355,19 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         }
     }
 
-    private fun plotIonoElevGraph(status: GnssStatus) {
+    private fun plotIonoElevGraph() {
         context?.let { c ->
             scatterChart?.let { chart ->
                 if (!hasStopped) {
-                    // Obtain status separately for GPS and GAL
-                    val gpsGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GPS)
-                    val galGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GALILEO)
-
-                    // Obtain desired values of Status: svid, elevation and CNo for given frequency band
-                    val gpsValues = obtainCnoElevValues(selectedBand, gpsGnssStatus)
-                    val galValues = obtainCnoElevValues(selectedBand, galGnssStatus)
-
                     // Generate points
                     val gpsPoints = arrayListOf<Entry>()
                     val galPoints = arrayListOf<Entry>()
-                    gpsValues.forEach {
-                        gpsPoints.add(Entry(it.elevation, it.cNo))
+
+                    galElevIono.forEach {
+                        gpsPoints.add(Entry(it.first.toFloat(), it.second.toFloat()))
                     }
-                    galValues.forEach {
-                        galPoints.add(Entry(it.elevation, it.cNo))
+                    gpsElevIono.forEach {
+                        galPoints.add(Entry(it.first.toFloat(), it.first.toFloat()))
                     }
 
                     // Sort points by elevation to plot them
@@ -526,14 +522,33 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     // Callbacks
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
-        if (graph == GRAPH_ERROR) {
-            positions.forEach { pos ->
-                if (computedPositions.size == MAX_POS_POINTS) {
-                    computedPositions.removeAt(0)
+        when (graph) {
+            GRAPH_ERROR -> {
+                positions.forEach { pos ->
+                    if (computedPositions.size == MAX_POS_POINTS) {
+                        computedPositions.removeAt(0)
+                    }
+                    computedPositions.add(pos)
                 }
-                computedPositions.add(pos)
+                plotErrorGraph()
             }
-            plotErrorGraph()
+            GRAP_IONO_ELEV -> {
+                positions.forEach { pos ->
+                    pos.galElevIono.forEach { p ->
+                        if (galElevIono.size == MAX_IONO_ELEV_POINTS) {
+                            galElevIono.removeAt(0)
+                        }
+                        galElevIono.add(p)
+                    }
+                    pos.gpsElevIono.forEach { p ->
+                        if (gpsElevIono.size == MAX_IONO_ELEV_POINTS) {
+                            gpsElevIono.removeAt(0)
+                        }
+                        gpsElevIono.add(p)
+                    }
+                }
+                plotIonoElevGraph()
+            }
         }
     }
 
@@ -590,6 +605,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         // Maximum number of points
         const val MAX_AGC_CNO_POINTS = 500
         const val MAX_POS_POINTS = 500
+        const val MAX_IONO_ELEV_POINTS = 500
 
         // Limit values for graphs
         const val MIN_ELEV = 0f // º
@@ -602,6 +618,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MIN_AGC_L1 = 30f // dB-Hz
         const val MAX_AGC_L5 = 15f // dB-Hz
         const val MIN_AGC_L5 = -5f // dB-Hz
+        const val MIN_IONO = 0f // m
+        const val MAX_IONO = 50f // m
         const val NORTH_LIM = 90f // m
         const val EAST_LIM = 90f // m
 
