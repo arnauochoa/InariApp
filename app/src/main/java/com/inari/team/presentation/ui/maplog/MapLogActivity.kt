@@ -108,8 +108,8 @@ class MapLogActivity : BaseActivity(), OnMapReadyCallback {
 
         val legendItems = hashMapOf<Int, String>()
         positions.forEach {
-            addMarker(it.compPosition, it.modeName, it.modeColor)
-            builder.include(it.compPosition)
+            addMarker(LatLng(it.pvtLatLng.lat, it.pvtLatLng.lng), it.modeName, it.modeColor)
+            builder.include(LatLng(it.pvtLatLng.lat, it.pvtLatLng.lng))
             if (!legendItems.keys.contains(it.modeColor)) {
                 legendItems[it.modeColor] = it.modeName
             }
@@ -118,13 +118,16 @@ class MapLogActivity : BaseActivity(), OnMapReadyCallback {
 
         addLegendItems(legendItems)
 
-        if (positions.isNotEmpty()) {
-            val bounds = builder.build()
-            val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
-            try {
-                mMap?.animateCamera(cu)
-            } catch (e: Exception) {
+        mapFragmentContainer?.viewTreeObserver?.addOnGlobalLayoutListener {
 
+            if (positions.isNotEmpty()) {
+                val bounds = builder.build()
+                val cu = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+                try {
+                    mMap?.animateCamera(cu)
+                } catch (e: Exception) {
+
+                }
             }
         }
 

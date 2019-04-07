@@ -35,14 +35,17 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
         if (pvtMultiConst.pvt.lat in -180.0..180.0 && pvtMultiConst.pvt.lng in -180.0..180.0) {
 
             val pvtResponse = ResponsePvtMode(
-                LatLng(
+                refPosition = LatLng(
                     acqInformation.refLocation.refLocationLla.latitude,
                     acqInformation.refLocation.refLocationLla.longitude
                 ),
-                acqInformation.refLocation.refLocationLla.altitude.toFloat(),
-                LatLng(pvtMultiConst.pvt.lat, pvtMultiConst.pvt.lng),
-                it.color,
-                it.name
+                refAltitude = acqInformation.refLocation.refLocationLla.altitude.toFloat(),
+                pvtLatLng = pvtMultiConst.pvt,
+                modeColor = it.color,
+                modeName = it.name,
+                nSatellites = pvtMultiConst.nSats,
+                galElevIono = pvtMultiConst.galElevIono,
+                gpsElevIono = pvtMultiConst.gpsElevIono
             )
 
             responses.add(pvtResponse)

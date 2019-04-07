@@ -25,6 +25,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 @Singleton
@@ -203,8 +204,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                 //add position logs
                 gnssData.modes.forEach { mode ->
                     coordinates.forEach {
-                        //todo review and add time
-//                        posLogger?.addPositionLine(it.compPosition, it.refAltitude, "time", mode.constellations)
+                        posLogger?.addPositionLine(it.pvtLatLng, it.nSatellites.roundToInt(), mode.constellations)
                     }
                 }
 
