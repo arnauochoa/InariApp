@@ -13,6 +13,7 @@ import com.inari.team.computation.utils.Constants.PVT_ITER
 import com.inari.team.computation.utils.computeCNoWeightMatrix
 import com.inari.team.computation.utils.pvtLla2PvtEcef
 import com.inari.team.presentation.model.Mode
+import com.inari.team.presentation.model.PositionParameters
 import com.inari.team.presentation.model.PositionParameters.ALG_WLS
 import org.ejml.simple.SimpleMatrix
 import timber.log.Timber
@@ -141,8 +142,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     gpsCorr -= propCorr.tropoCorr
 
                     //2freq corrections
-//                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
-                    if (true) { // Todo remove
+                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
                         var pr1 = 0.0
                         var freq1 = 0.0
                         var pr2 = 0.0
@@ -246,8 +246,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     galCorr -= propCorr.tropoCorr
 
                     //2freq corrections
-//                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
-                    if (true) { //Todo remove
+                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
                         var pr1 = 0.0
                         var freq1 = 0.0
                         var pr2 = 0.0
