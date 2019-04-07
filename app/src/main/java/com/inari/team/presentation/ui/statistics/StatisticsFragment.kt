@@ -626,6 +626,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         // AGC-CNO threshold values: y=mx+n
         const val AGC_CNO_M = -0.1f
         const val AGC_CNO_N_L1 = 45f
-        const val AGC_CNO_N_L5 = 9f
+        const val AGC_CNO_N_L5 = 6f
+
     }
 }
