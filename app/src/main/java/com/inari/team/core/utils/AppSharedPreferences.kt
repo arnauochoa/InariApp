@@ -51,7 +51,7 @@ class AppSharedPreferences {
     }
 
     fun getSelectedGraphType(): String =
-        mPrefs.getString(SELECTED_GRAPH_TYPE, StatisticsFragment.GRAPH_AGC_CNO) ?: StatisticsFragment.GRAPH_AGC_CNO
+        mPrefs.getString(SELECTED_GRAPH_TYPE, StatisticsFragment.GRAPH_AGC_CNO) ?: StatisticsFragment.GRAPH_CNO_ELEV
 
     fun setSelectedGraphType(graphType: String) {
         mPrefs.edit()

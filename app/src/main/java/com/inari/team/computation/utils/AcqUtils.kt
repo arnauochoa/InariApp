@@ -46,17 +46,17 @@ fun getE1CSatellite(meas: GnssMeasurement, acqInformationMeasurements: AcqInform
 
 fun checkTowDecode(state: Int): Boolean {
     // Check if binary state has 3rd bit 1
-    return BigInteger.valueOf(state.toLong()).testBit(3)
+    return (state and GnssMeasurement.STATE_TOW_DECODED) == GnssMeasurement.STATE_TOW_DECODED
 }
 
 fun checkTowKnown(state: Int): Boolean {
     // Check if binary state has 14th bit 1
-    return BigInteger.valueOf(state.toLong()).testBit(14)
+    return (state and GnssMeasurement.STATE_TOW_KNOWN) == GnssMeasurement.STATE_TOW_KNOWN
 }
 
 fun checkGalState(state: Int): Boolean {
     // Check if binary state has 14th bit 1
-    return BigInteger.valueOf(state.toLong()).testBit(11)
+    return (state and GnssMeasurement.STATE_GAL_E1C_2ND_CODE_LOCK) == GnssMeasurement.STATE_GAL_E1C_2ND_CODE_LOCK
 }
 
 fun getTtx(timeOffsetNanos: Double, receivedSvTimeNanos: Long): Double {

@@ -2,6 +2,8 @@ package com.inari.team.presentation.model
 
 import com.inari.team.presentation.model.PositionParameters.ALG_LS
 import com.inari.team.presentation.model.PositionParameters.ALG_WLS
+import com.inari.team.presentation.model.PositionParameters.BAND_E1
+import com.inari.team.presentation.model.PositionParameters.BAND_E5A
 import com.inari.team.presentation.model.PositionParameters.BAND_L1
 import com.inari.team.presentation.model.PositionParameters.BAND_L5
 import com.inari.team.presentation.model.PositionParameters.CONST_GAL
@@ -41,11 +43,20 @@ data class Mode(
         var bandsString = ""
 
         if (bands.contains(BAND_L1)) {
+            if (bandsString.isNotBlank()) bandsString += ", "
             bandsString = "L1"
         }
         if (bands.contains(BAND_L5)) {
             if (bandsString.isNotBlank()) bandsString += ", "
             bandsString += "L5"
+        }
+        if (bands.contains(BAND_E1)) {
+            if (bandsString.isNotBlank()) bandsString += ", "
+            bandsString += "E1"
+        }
+        if (bands.contains(BAND_E5A)) {
+            if (bandsString.isNotBlank()) bandsString += ", "
+            bandsString += "E5a"
         }
         return bandsString
     }
