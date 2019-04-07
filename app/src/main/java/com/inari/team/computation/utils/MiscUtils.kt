@@ -1,5 +1,11 @@
 package com.inari.team.computation.utils
 
+import com.inari.team.computation.converters.ecef2lla
+import com.inari.team.computation.converters.lla2ecef
+import com.inari.team.computation.data.EcefLocation
+import com.inari.team.computation.data.LlaLocation
+import com.inari.team.computation.data.PvtEcef
+import com.inari.team.computation.data.PvtLatLng
 import org.ejml.data.DMatrixRMaj
 import org.ejml.dense.row.CommonOps_DDRM
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM
@@ -74,4 +80,16 @@ fun computeCNoWeightMatrix(cnos: List<Double>, isWeight: Boolean): SimpleMatrix 
         wMat = SimpleMatrix.diag(*diagonal.toDoubleArray())
     }
     return wMat
+}
+
+fun pvtEcef2PvtLla(pvtEcef: PvtEcef): PvtLatLng{
+    val posEcef = EcefLocation(pvtEcef.x, pvtEcef.y, pvtEcef.z)
+    val posLla = ecef2lla(posEcef)
+    return PvtLatLng(posLla.latitude, posLla.longitude, posLla.altitude, pvtEcef.time)
+}
+
+fun pvtLla2PvtEcef(pvtLatLng: PvtLatLng): PvtEcef{
+    val posLatLng = LlaLocation(pvtLatLng.lat, pvtLatLng.lng, pvtLatLng.altitude)
+    val posEcef = lla2ecef(posLatLng)
+    return PvtEcef(posEcef.x, posEcef.y, posEcef.z, pvtLatLng.time)
 }

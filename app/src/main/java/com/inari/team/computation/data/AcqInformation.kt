@@ -32,7 +32,7 @@ data class SvInfo(
 
 data class RefLocationData(
     val refLocationLla: LlaLocation = LlaLocation(),
-    val refLocationEcef: EcefLocation = EcefLocation()
+    var refLocationEcef: EcefLocation = EcefLocation()
 )
 
 data class Satellites(
