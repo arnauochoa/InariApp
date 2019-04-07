@@ -351,6 +351,58 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         }
     }
 
+    private fun plotIonoElevGraph(status: GnssStatus) {
+        context?.let { c ->
+            scatterChart?.let { chart ->
+                if (!hasStopped) {
+                    // Obtain status separately for GPS and GAL
+                    val gpsGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GPS)
+                    val galGnssStatus = filterGnssStatus(status, StatusFragment.Companion.CONSTELLATION.GALILEO)
+
+                    // Obtain desired values of Status: svid, elevation and CNo for given frequency band
+                    val gpsValues = obtainCnoElevValues(selectedBand, gpsGnssStatus)
+                    val galValues = obtainCnoElevValues(selectedBand, galGnssStatus)
+
+                    // Generate points
+                    val gpsPoints = arrayListOf<Entry>()
+                    val galPoints = arrayListOf<Entry>()
+                    gpsValues.forEach {
+                        gpsPoints.add(Entry(it.elevation, it.cNo))
+                    }
+                    galValues.forEach {
+                        galPoints.add(Entry(it.elevation, it.cNo))
+                    }
+
+                    // Sort points by elevation to plot them
+                    gpsPoints.sortBy { point -> point.x }
+                    galPoints.sortBy { point -> point.x }
+
+                    // Define style of sets
+                    val gpsPointsSet = ScatterDataSet(gpsPoints, "GPS")
+                    val galPointsSet = ScatterDataSet(galPoints, "Galileo")
+
+                    gpsPointsSet.color = ContextCompat.getColor(c, com.inari.team.R.color.gpsColor)
+                    gpsPointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+                    galPointsSet.color = ContextCompat.getColor(c, com.inari.team.R.color.galColor)
+                    galPointsSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE)
+
+                    // Join sets and plot them on the graph
+                    val dataSets = arrayListOf<IScatterDataSet>(gpsPointsSet, galPointsSet)
+                    val scatterData = ScatterData(dataSets)
+                    // Do not show labels on each point
+                    scatterData.setDrawValues(false)
+                    scatterData.isHighlightEnabled = false
+                    // Plot points on graph
+                    chart.data = scatterData
+                    // Update chart view
+                    chart.invalidate()
+
+                } // If user has stopped, do nothing
+            }
+        }
+    }
+
+
     private fun plotErrorGraph() {
         context?.let { c ->
             scatterChart?.let { chart ->
