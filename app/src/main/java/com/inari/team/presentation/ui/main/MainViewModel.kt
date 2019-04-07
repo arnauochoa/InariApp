@@ -11,19 +11,15 @@ import com.google.location.suplclient.supl.SuplConnectionRequest
 import com.google.location.suplclient.supl.SuplController
 import com.inari.team.computation.computePvt
 import com.inari.team.core.base.BaseViewModel
-import com.inari.team.core.utils.APP_ROOT
 import com.inari.team.core.utils.AppSharedPreferences
+import com.inari.team.core.utils.GnssMeasurementsFileLogger
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
-import com.inari.team.core.utils.generateMeasurementsTestingLogs
-import com.inari.team.core.utils.root
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileWriter
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -45,8 +41,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var startedComputingDate = Date()
     private var lastMeasurementsDate = Date()
 
-    private var fileName = Date().toString()
-    private var fileWriter: FileWriter? = null
+    private var gnssMeasurementsFileLogger: GnssMeasurementsFileLogger? = null
 
     private var isComputing = false
     private var isEphErrorShown = false
@@ -76,7 +71,8 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         computedPositions = arrayListOf()
 
         if (mPrefs.isGnssLoggingEnabled()) {
-            openGnssLogFile()
+            gnssMeasurementsFileLogger = GnssMeasurementsFileLogger()
+            gnssMeasurementsFileLogger?.startNewLog()
         }
 
         //init gnss
@@ -91,27 +87,10 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         obtainEphemerisData()
     }
 
-    private fun openGnssLogFile() {
-
-        try {
-            val dir =
-                File(root.absolutePath + APP_ROOT)
-            dir.mkdirs()
-            fileName = "${Date()}.txt"
-            fileWriter = FileWriter(File(dir, fileName))
-            fileWriter?.write("[")
-        } catch (e: Exception) {
-            fileWriter = null
-            position.showError("Could not create log file")
-        }
-
-    }
-
     fun stopComputingPosition() {
         isComputing = false
+        gnssMeasurementsFileLogger = null
         ephemeris.updateData("")
-        fileWriter?.write("]")
-        fileWriter?.close()
     }
 
     private fun obtainEphemerisData() {
@@ -172,6 +151,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
         measurements?.let {
             if (it.isNotEmpty() && clock != null && gnssData.lastGnssStatus != null) {
+
+                gnssMeasurementsFileLogger?.onGnssMeasurementsReceived(gnssMeasurementsEvent)
+
                 val measurementData = MeasurementData(
                     gnssData.lastGnssStatus,
                     it,
@@ -214,9 +196,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             if (coordinates.isNotEmpty()) {
                 position.updateData(coordinates)
                 computedPositions.addAll(coordinates)
-                if (mPrefs.isGnssLoggingEnabled()) {
-                    saveGnssLogs()
-                }
             } else {
                 position.showError("Position could not be obtained.")
             }
@@ -227,32 +206,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     }
 
-    private fun saveGnssLogs() {
-        var pvtInfoString = ""
-
-        //todo change when tested
-//        if (isFirstComputedPosition) {
-//            isFirstComputedPosition = false
-//        } else {
-//            pvtInfoString += ","
-//        }
-//        pvtInfoString += try {
-//            val json = getGnssJson(gnssData)
-//            json.toString(2)
-//        } catch (e: JSONException) {
-//            "{}"
-//        }
-
-        pvtInfoString = generateMeasurementsTestingLogs(gnssData)
-
-        if (pvtInfoString.isNotBlank()) {
-            try {
-                fileWriter?.write(pvtInfoString)
-            } catch (e: Exception) {
-
-            }
-        }
-    }
 
     companion object {
         const val SUPL_SERVER_HOST = "supl.google.com"
