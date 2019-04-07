@@ -12,11 +12,12 @@ import com.google.location.suplclient.supl.SuplController
 import com.inari.team.computation.computePvt
 import com.inari.team.core.base.BaseViewModel
 import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.GnssMeasurementsFileLogger
+import com.inari.team.core.utils.loggers.GnssMeasurementsFileLogger
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
+import com.inari.team.core.utils.loggers.PosLogger
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var lastMeasurementsDate = Date()
 
     private var gnssMeasurementsFileLogger: GnssMeasurementsFileLogger? = null
+    private var posLogger: PosLogger? = null
 
     private var isComputing = false
     private var isEphErrorShown = false
@@ -73,6 +75,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         if (mPrefs.isGnssLoggingEnabled()) {
             gnssMeasurementsFileLogger = GnssMeasurementsFileLogger()
             gnssMeasurementsFileLogger?.startNewLog()
+            posLogger = PosLogger()
         }
 
         //init gnss
@@ -90,6 +93,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     fun stopComputingPosition() {
         isComputing = false
         gnssMeasurementsFileLogger = null
+        posLogger = null
         ephemeris.updateData("")
     }
 
@@ -194,6 +198,15 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             val coordinates = computePvt(gnssData)
 
             if (coordinates.isNotEmpty()) {
+
+                //add position logs
+                gnssData.modes.forEach {mode ->
+                    coordinates.forEach{
+                        //todo review and add time
+                        posLogger?.addPositionLine(it.compPosition, it.refAltitude, "time", mode.constellations)
+                    }
+                }
+
                 position.updateData(coordinates)
                 computedPositions.addAll(coordinates)
             } else {
