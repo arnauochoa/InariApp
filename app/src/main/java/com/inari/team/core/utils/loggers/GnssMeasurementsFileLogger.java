@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.inari.team.core.utils;
+package com.inari.team.core.utils.loggers;
 
 import android.location.GnssClock;
 import android.location.GnssMeasurement;
