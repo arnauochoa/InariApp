@@ -58,37 +58,6 @@ fun saveFile(
     }
 }
 
-//fun saveFile() {
-//    try {
-//
-//        file.setReadable(true, false)
-//
-//        var inputStream: InputStream? = null
-//        var outputStream: OutputStream? = null
-//
-//        try {
-//            val fileReader = ByteArray(4096)
-//
-//            inputStream = file.readBytes().inputStream()
-//            outputStream = FileOutputStream(file)
-//
-//            while (true) {
-//                val read = inputStream.read(fileReader)
-//                if (read == -1) {
-//                    break
-//                }
-//                outputStream.write(fileReader, 0, read)
-//            }
-//            outputStream.flush()
-//
-//        } catch (e: IOException) {
-//        } finally {
-//            inputStream?.close()
-//            outputStream?.close()
-//        }
-//    } catch (e: IOException) {
-//    }
-//}
 
 @SuppressLint("SetWorldReadable")
 fun savePositionFile(url: String, responseBody: ResponseBody) {
