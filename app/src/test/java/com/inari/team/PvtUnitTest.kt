@@ -53,12 +53,12 @@ class PvtUnitTest {
             //print the results obtained or error
             if (computedPositions.isNotEmpty()) {
                 computedPositions.forEach {
-                    print("${it.modeName} --> Computed Position:${it.compPosition}")
+                    print("${it.modeName} --> Computed Position:${LatLng(it.pvtLatLng.lat, it.pvtLatLng.lng)}")
                     print(" -- Satellites number: ${it.nSatellites}\n")
                     val error =
                         sqrt(
-                            (acqInfo.refLocation.refLocationLla.latitude - it.compPosition.latitude).pow(2) +
-                                    (acqInfo.refLocation.refLocationLla.longitude - it.compPosition.longitude).pow(2)
+                            (acqInfo.refLocation.refLocationLla.latitude - it.pvtLatLng.lat).pow(2) +
+                                    (acqInfo.refLocation.refLocationLla.longitude - it.pvtLatLng.lng).pow(2)
                         )
                     print("Error: ------------> $error degrees\n")
                 }
@@ -101,17 +101,18 @@ class PvtUnitTest {
             if (pvtMultiConst.pvt.lat in -180.0..180.0 && pvtMultiConst.pvt.lng in -180.0..180.0) {
 
                 val pvtResponse = ResponsePvtMode(
-                    LatLng(
+                    refPosition = LatLng(
                         acqInformation.refLocation.refLocationLla.latitude,
                         acqInformation.refLocation.refLocationLla.longitude
                     ),
-                    acqInformation.refLocation.refLocationLla.altitude.toFloat(),
-                    LatLng(pvtMultiConst.pvt.lat, pvtMultiConst.pvt.lng),
-                    it.color,
-                    it.name,
-                    pvtMultiConst.nSats
+                    refAltitude = acqInformation.refLocation.refLocationLla.altitude.toFloat(),
+                    pvtLatLng = pvtMultiConst.pvt,
+                    modeColor = it.color,
+                    modeName = it.name,
+                    nSatellites = pvtMultiConst.nSats,
+                    galElevIono = pvtMultiConst.galElevIono,
+                    gpsElevIono = pvtMultiConst.gpsElevIono
                 )
-
                 responses.add(pvtResponse)
             }
         }
