@@ -2,8 +2,9 @@ package com.inari.team.core.utils.loggers
 
 import android.location.GnssStatus
 import android.os.Environment
-import com.google.android.gms.maps.model.LatLng
+import com.inari.team.computation.data.PvtLatLng
 import java.io.File
+import java.io.FileFilter
 import java.io.FileWriter
 import java.io.IOException
 import java.text.DecimalFormat
@@ -14,20 +15,19 @@ import kotlin.math.roundToInt
 
 class PosLogger {
 
-    private val FILE_PREFIX = "gnss_log"
-    private val COMMENT_START = "# "
-    private val VERSION_TAG = "Version: "
-
-    private val MAX_FILES_STORED = 100
-    private val MINIMUM_USABLE_FILE_SIZE_BYTES = 1000
 
     private var mFileWriter: FileWriter? = null
 
     companion object {
-        const val POS_ROOT = "/Inari/Positions/"
+        const val POS_ROOT = "/Inari/Nmea/Positions/"
+        const val FILE_PREFIX = "pos_log"
+        const val MAX_FILES_STORED = 100
+        const val MINIMUM_USABLE_FILE_SIZE_BYTES = 1000
+
     }
 
     init {
+
         val baseDirectory = File(Environment.getExternalStorageDirectory(), POS_ROOT)
         baseDirectory.mkdirs()
 
@@ -41,9 +41,26 @@ class PosLogger {
 
         }
 
+        // To make sure that files do not fill up the external storage:
+        // - Remove all empty files
+        val filter = FileToDeleteFilter(currentFile)
+        for (existingFile in baseDirectory.listFiles(filter)!!) {
+            existingFile.delete()
+        }
+        // - Trim the number of files with data
+        val existingFiles = baseDirectory.listFiles()
+        val filesToDeleteCount = existingFiles!!.size - MAX_FILES_STORED
+        if (filesToDeleteCount > 0) {
+            Arrays.sort(existingFiles)
+            for (i in 0 until filesToDeleteCount) {
+                existingFiles[i].delete()
+            }
+        }
+
+
     }
 
-    fun addPositionLine(position: LatLng, altitude: Float, time: String, constellations: ArrayList<Int>) {
+    fun addPositionLine(position: PvtLatLng, nSats: Int, constellations: ArrayList<Int>) {
         val constType =
             if (constellations.contains(GnssStatus.CONSTELLATION_GPS) && constellations.contains(GnssStatus.CONSTELLATION_GALILEO)) {
                 //multi constellation
@@ -59,24 +76,24 @@ class PosLogger {
         if (constType.isNotBlank()) {
             var NS = 'N'
             var EW = 'E'
-            if (position.latitude < 0.0)
+            if (position.lat < 0.0)
                 NS = 'S'
-            if (position.longitude < 0.0)
+            if (position.lng < 0.0)
                 EW = 'W'
 
             val locationStream = String.format(
                 Locale.ENGLISH,
                 "$%sGGA,%s,%s,%c,%s,%c,,%02d,,%s,%c,,%c,,*%s",
                 constType,
-                time,
-                convertToNmeaFormat(position.latitude),
+                position.time,
+                convertToNmeaFormat(position.lat),
                 NS,
-                convertToNmeaFormat(position.longitude),
+                convertToNmeaFormat(position.lng),
                 EW,
-                1,//todo put size
-                if (altitude.roundToInt() < 100000) String.format(
+                nSats,//todo put size
+                if (position.altitude.roundToInt() < 100000) String.format(
                     "%05d",
-                    altitude.roundToInt()
+                    position.altitude.roundToInt()
                 ) else "100000",
                 'M',
                 'M', ""
@@ -106,6 +123,33 @@ class PosLogger {
         mneaFormatCoordinate.append(decimalFormatSec.format(geodeticCoordinateSeconds / 100))
 
         return mneaFormatCoordinate.toString();
+    }
+
+    fun closeLogger() {
+        mFileWriter?.close()
+    }
+
+    /**
+     * Implements a [FileFilter] to delete files that are not in the
+     * [FileToDeleteFilter.mRetainedFiles].
+     */
+    private class FileToDeleteFilter(vararg retainedFiles: File) : FileFilter {
+        private val mRetainedFiles: List<File> = Arrays.asList(*retainedFiles)
+
+        /**
+         * Returns `true` to delete the file, and `false` to keep the file.
+         *
+         *
+         * Files are deleted if they are not in the [FileToDeleteFilter.mRetainedFiles] list.
+         */
+        override fun accept(pathname: File?): Boolean {
+            if (pathname == null || !pathname.exists()) {
+                return false
+            }
+            return if (mRetainedFiles.contains(pathname)) {
+                false
+            } else pathname.length() < MINIMUM_USABLE_FILE_SIZE_BYTES
+        }
     }
 
 }

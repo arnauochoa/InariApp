@@ -12,11 +12,11 @@ import com.google.location.suplclient.supl.SuplController
 import com.inari.team.computation.computePvt
 import com.inari.team.core.base.BaseViewModel
 import com.inari.team.core.utils.AppSharedPreferences
-import com.inari.team.core.utils.loggers.GnssMeasurementsFileLogger
 import com.inari.team.core.utils.extensions.Data
 import com.inari.team.core.utils.extensions.showError
 import com.inari.team.core.utils.extensions.showLoading
 import com.inari.team.core.utils.extensions.updateData
+import com.inari.team.core.utils.loggers.GnssMeasLogger
 import com.inari.team.core.utils.loggers.PosLogger
 import com.inari.team.presentation.model.*
 import kotlinx.coroutines.GlobalScope
@@ -42,7 +42,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var startedComputingDate = Date()
     private var lastMeasurementsDate = Date()
 
-    private var gnssMeasurementsFileLogger: GnssMeasurementsFileLogger? = null
+    private var gnssMeasLogger: GnssMeasLogger? = null
     private var posLogger: PosLogger? = null
 
     private var isComputing = false
@@ -73,8 +73,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         computedPositions = arrayListOf()
 
         if (mPrefs.isGnssLoggingEnabled()) {
-            gnssMeasurementsFileLogger = GnssMeasurementsFileLogger()
-            gnssMeasurementsFileLogger?.startNewLog()
+            gnssMeasLogger = GnssMeasLogger()
             posLogger = PosLogger()
         }
 
@@ -92,7 +91,9 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     fun stopComputingPosition() {
         isComputing = false
-        gnssMeasurementsFileLogger = null
+        gnssMeasLogger?.closeLogger()
+        posLogger?.closeLogger()
+        gnssMeasLogger = null
         posLogger = null
         ephemeris.updateData("")
     }
@@ -156,7 +157,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         measurements?.let {
             if (it.isNotEmpty() && clock != null && gnssData.lastGnssStatus != null) {
 
-                gnssMeasurementsFileLogger?.onGnssMeasurementsReceived(gnssMeasurementsEvent)
+                gnssMeasLogger?.onGnssMeasurementsReceived(gnssMeasurementsEvent)
 
                 val measurementData = MeasurementData(
                     gnssData.lastGnssStatus,
@@ -200,10 +201,10 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             if (coordinates.isNotEmpty()) {
 
                 //add position logs
-                gnssData.modes.forEach {mode ->
-                    coordinates.forEach{
+                gnssData.modes.forEach { mode ->
+                    coordinates.forEach {
                         //todo review and add time
-                        posLogger?.addPositionLine(it.compPosition, it.refAltitude, "time", mode.constellations)
+//                        posLogger?.addPositionLine(it.compPosition, it.refAltitude, "time", mode.constellations)
                     }
                 }
 
