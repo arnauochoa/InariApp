@@ -158,7 +158,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
         mMap?.let {
             with(it) {
-                isMyLocationEnabled = true
+                isMyLocationEnabled = false
                 uiSettings?.isMyLocationButtonEnabled = false
                 uiSettings?.isMapToolbarEnabled = false
                 mapType = mSharedPreferences.getSelectedMapType()
@@ -353,13 +353,13 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     fun onPositionsCalculated(positions: List<ResponsePvtMode>) {
         if (positions.isNotEmpty()) {
             positions.forEach { resp ->
-                addMarker(resp.compPosition, "", resp.modeColor)
+                addMarker(LatLng(resp.pvtLatLng.lat, resp.pvtLatLng.lng), "", resp.modeColor)
             }
             if (isStartedComputing) {
-                moveCameraWithZoom(positions[0].compPosition)
+                moveCameraWithZoom(LatLng(positions[0].pvtLatLng.lat, positions[0].pvtLatLng.lng))
                 isStartedComputing = false
             } else {
-                moveCamera(positions[0].compPosition)
+                moveCamera(LatLng(positions[0].pvtLatLng.lat, positions[0].pvtLatLng.lng))
             }
         }
     }

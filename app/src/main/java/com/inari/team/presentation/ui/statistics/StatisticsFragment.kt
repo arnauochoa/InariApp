@@ -25,6 +25,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.ScatterData
 import com.github.mikephil.charting.data.ScatterDataSet
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.google.android.gms.maps.model.LatLng
 import com.inari.team.R
 import com.inari.team.R.drawable
 import com.inari.team.R.layout
@@ -416,7 +417,11 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                     val color = positionsByMode[it]?.get(0)?.modeColor ?: 0
                     // For every position, get point as error between computed and reference position
                     positionsByMode[it]?.forEach { pos ->
-                        val error = computeErrorNE(pos.refPosition, pos.refAltitude, pos.compPosition)
+                        val error = computeErrorNE(
+                            pos.refPosition,
+                            pos.refAltitude,
+                            LatLng(pos.pvtLatLng.lat, pos.pvtLatLng.lng)
+                        )
                         modePositions.add(Entry(error[1].toFloat(), error[0].toFloat())) //x: East, y: North
                     }
 
