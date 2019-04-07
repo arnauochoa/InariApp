@@ -81,13 +81,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
             gpsA.clear()
             gpsP.clear()
             gpsCleanCn0.clear()
-            gpsCleanSvn.clear()
             gpsIono.clear()
 
             galA.clear()
             galP.clear()
             galCleanCn0.clear()
-            galCleanSvn.clear()
             galIono.clear()
 
             if (i == 0) {
@@ -251,7 +249,8 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                     galCorr -= propCorr.tropoCorr
 
                     //2freq corrections
-                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+//                    if (mode.corrections.contains(PositionParameters.CORR_IONOFREE)) {
+                    if (true) {
                         var pr1 = 0.0
                         var freq1 = 0.0
                         var pr2 = 0.0
