@@ -5,6 +5,7 @@ import org.ejml.dense.row.CommonOps_DDRM
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM
 import org.ejml.simple.SimpleMatrix
 import java.lang.Math.*
+import kotlin.math.pow
 
 /**
  * Repairs over- and underflow of GPS time
@@ -58,21 +59,19 @@ fun nsgpst2gpst(timeNanos: Long): LongArray {
 
 /**
  * Compute Weight Matrix
+ * C/N0 weighting method - Sigma e [Wieser, Andreas, et al. "An extended weight model for GPS phase observations"]
  */
 fun computeCNoWeightMatrix(cnos: List<Double>, isWeight: Boolean): SimpleMatrix {
     var wMat = SimpleMatrix.identity(cnos.size)
     if (isWeight) {
         val diagonal = arrayListOf<Double>()
-        val tmp = arrayListOf<Double>()
+
         cnos.forEach { cno ->
-            tmp.add(pow(10.0, -cno / 10))
+            val w = 0.244 * 10.0.pow(-0.1 * cno)
+            diagonal.add(1/w)
         }
-        val sum = tmp.sum()
-        tmp.forEach {
-            diagonal.add(1 / (it / sum))
-        }
+
         wMat = SimpleMatrix.diag(*diagonal.toDoubleArray())
     }
-
     return wMat
 }

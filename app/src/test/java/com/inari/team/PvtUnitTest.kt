@@ -21,8 +21,9 @@ class PvtUnitTest {
 
         //list of files that we want to compute
         val filesList = arrayListOf<String>()
-        repeat(12){
-            filesList.add("gps/not_obtained/not_obtained_${it+1}.txt")
+//        filesList.add("galileo/E1/GAL_E1_1.txt")
+        repeat(14){
+            filesList.add("tests_jardi_1/jardi_1_${it+1}.txt")
         }
 
 
@@ -51,7 +52,7 @@ class PvtUnitTest {
             if (computedPositions.isNotEmpty()) {
                 computedPositions.forEach {
                     print("${it.modeName} --> Computed Position:${it.compPosition}")
-                    print("satellites number: ${it.nSatellites}")
+                    print(" -- Satellites number: ${it.nSatellites}\n")
                 }
             } else {
                 print("Could not compute any positions")
