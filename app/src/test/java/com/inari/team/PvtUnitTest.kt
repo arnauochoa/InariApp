@@ -10,6 +10,8 @@ import com.inari.team.computation.pvtMultiConst
 import com.inari.team.computation.utils.Constants
 import com.inari.team.presentation.model.ResponsePvtMode
 import org.junit.Test
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * Testing of the Pvt Algorithm
@@ -22,8 +24,8 @@ class PvtUnitTest {
         //list of files that we want to compute
         val filesList = arrayListOf<String>()
 //        filesList.add("galileo/E1/GAL_E1_1.txt")
-        repeat(14){
-            filesList.add("tests_jardi_1/jardi_1_${it+1}.txt")
+        repeat(14) {
+            filesList.add("tests_jardi_1/jardi_1_${it + 1}.txt")
         }
 
 
@@ -53,6 +55,12 @@ class PvtUnitTest {
                 computedPositions.forEach {
                     print("${it.modeName} --> Computed Position:${it.compPosition}")
                     print(" -- Satellites number: ${it.nSatellites}\n")
+                    val error =
+                        sqrt(
+                            (acqInfo.refLocation.refLocationLla.latitude - it.compPosition.latitude).pow(2) +
+                                    (acqInfo.refLocation.refLocationLla.longitude - it.compPosition.longitude).pow(2)
+                        )
+                    print("Error: ------------> $error degrees\n")
                 }
             } else {
                 print("Could not compute any positions")
