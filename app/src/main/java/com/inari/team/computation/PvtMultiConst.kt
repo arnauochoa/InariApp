@@ -166,7 +166,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         }
 
                         gpsCorr -= if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
-                            val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            val ionoCorr = if (mode.bands.contains(Constants.L1)) {
+                                getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            } else {
+                                getIonoCorrDualFreq(arrayListOf(freq2, freq1), arrayListOf(pr2, pr1))
+                            }
                             gpsElevIono.add(Pair(elev, ionoCorr))
                             ionoCorr
                         } else { // If the current satellite has not 2 frequencies, correct with eph iono corrections
@@ -270,7 +274,11 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
                         }
 
                         galCorr -= if (pr1 != 0.0 && pr2 != 0.00 && freq1 != 0.0 && freq2 != 0.00) {
-                            val ionoCorr = getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            val ionoCorr = if (mode.bands.contains(Constants.L1)) {
+                                getIonoCorrDualFreq(arrayListOf(freq1, freq2), arrayListOf(pr1, pr2))
+                            } else {
+                                getIonoCorrDualFreq(arrayListOf(freq2, freq1), arrayListOf(pr2, pr1))
+                            }
                             galElevIono.add(Pair(elev, ionoCorr))
                             ionoCorr
                         } else {
