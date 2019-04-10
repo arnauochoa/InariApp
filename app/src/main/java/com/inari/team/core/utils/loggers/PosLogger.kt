@@ -4,7 +4,6 @@ import android.location.GnssStatus
 import android.os.Environment
 import com.inari.team.computation.data.PvtLatLng
 import java.io.File
-import java.io.FileFilter
 import java.io.FileWriter
 import java.io.IOException
 import java.text.DecimalFormat
@@ -41,23 +40,6 @@ class PosLogger {
 
         }
 
-        // To make sure that files do not fill up the external storage:
-        // - Remove all empty files
-        val filter = FileToDeleteFilter(currentFile)
-        for (existingFile in baseDirectory.listFiles(filter)!!) {
-            existingFile.delete()
-        }
-        // - Trim the number of files with data
-        val existingFiles = baseDirectory.listFiles()
-        val filesToDeleteCount = existingFiles!!.size - MAX_FILES_STORED
-        if (filesToDeleteCount > 0) {
-            Arrays.sort(existingFiles)
-            for (i in 0 until filesToDeleteCount) {
-                existingFiles[i].delete()
-            }
-        }
-
-
     }
 
     fun addPositionLine(position: PvtLatLng, nSats: Int, constellations: ArrayList<Int>) {
@@ -73,36 +55,34 @@ class PosLogger {
                 }
             }
 
-        if (constType.isNotBlank()) {
-            var NS = 'N'
-            var EW = 'E'
-            if (position.lat < 0.0)
-                NS = 'S'
-            if (position.lng < 0.0)
-                EW = 'W'
+        var NS = 'N'
+        var EW = 'E'
+        if (position.lat < 0.0)
+            NS = 'S'
+        if (position.lng < 0.0)
+            EW = 'W'
 
-            val locationStream = String.format(
-                Locale.ENGLISH,
-                "$%sGGA,%s,%s,%c,%s,%c,,%02d,,%s,%c,,%c,,*%s",
-                constType,
-                position.time,
-                convertToNmeaFormat(position.lat),
-                NS,
-                convertToNmeaFormat(position.lng),
-                EW,
-                nSats,//todo put size
-                if (position.altitude.roundToInt() < 100000) String.format(
-                    "%05d",
-                    position.altitude.roundToInt()
-                ) else "100000",
-                'M',
-                'M', ""
-            )
-            try {
-                mFileWriter?.write(locationStream)
-                mFileWriter?.write("\n")
-            } catch (e: IOException) {
-            }
+        val locationStream = String.format(
+            Locale.ENGLISH,
+            "$%sGGA,%s,%s,%c,%s,%c,,%02d,,%s,%c,,%c,,*%s",
+            constType,
+            position.time,
+            convertToNmeaFormat(position.lat),
+            NS,
+            convertToNmeaFormat(position.lng),
+            EW,
+            nSats,//todo put size
+            if (position.altitude.roundToInt() < 100000) String.format(
+                "%05d",
+                position.altitude.roundToInt()
+            ) else "100000",
+            'M',
+            'M', ""
+        )
+        try {
+            mFileWriter?.write(locationStream)
+            mFileWriter?.write("\n")
+        } catch (e: IOException) {
         }
 
     }
@@ -127,29 +107,6 @@ class PosLogger {
 
     fun closeLogger() {
         mFileWriter?.close()
-    }
-
-    /**
-     * Implements a [FileFilter] to delete files that are not in the
-     * [FileToDeleteFilter.mRetainedFiles].
-     */
-    private class FileToDeleteFilter(vararg retainedFiles: File) : FileFilter {
-        private val mRetainedFiles: List<File> = Arrays.asList(*retainedFiles)
-
-        /**
-         * Returns `true` to delete the file, and `false` to keep the file.
-         *
-         *
-         * Files are deleted if they are not in the [FileToDeleteFilter.mRetainedFiles] list.
-         */
-        override fun accept(pathname: File?): Boolean {
-            if (pathname == null || !pathname.exists()) {
-                return false
-            }
-            return if (mRetainedFiles.contains(pathname)) {
-                false
-            } else pathname.length() < MINIMUM_USABLE_FILE_SIZE_BYTES
-        }
     }
 
 }
