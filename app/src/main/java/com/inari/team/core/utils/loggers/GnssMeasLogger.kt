@@ -105,22 +105,6 @@ class GnssMeasLogger {
             return
         }
 
-
-        // To make sure that files do not fill up the external storage:
-        // - Remove all empty files
-        val filter = FileToDeleteFilter(currentFile)
-        for (existingFile in baseDirectory.listFiles(filter)!!) {
-            existingFile.delete()
-        }
-        // - Trim the number of files with data
-        val existingFiles = baseDirectory.listFiles()
-        val filesToDeleteCount = existingFiles!!.size - MAX_FILES_STORED
-        if (filesToDeleteCount > 0) {
-            Arrays.sort(existingFiles)
-            for (i in 0 until filesToDeleteCount) {
-                existingFiles[i].delete()
-            }
-        }
     }
 
 
@@ -193,30 +177,6 @@ class GnssMeasLogger {
 
     fun closeLogger() {
         mFileWriter?.close()
-    }
-
-
-    /**
-     * Implements a [FileFilter] to delete files that are not in the
-     * [FileToDeleteFilter.mRetainedFiles].
-     */
-    private class FileToDeleteFilter(vararg retainedFiles: File) : FileFilter {
-        private val mRetainedFiles: List<File> = Arrays.asList(*retainedFiles)
-
-        /**
-         * Returns `true` to delete the file, and `false` to keep the file.
-         *
-         *
-         * Files are deleted if they are not in the [FileToDeleteFilter.mRetainedFiles] list.
-         */
-        override fun accept(pathname: File?): Boolean {
-            if (pathname == null || !pathname.exists()) {
-                return false
-            }
-            return if (mRetainedFiles.contains(pathname)) {
-                false
-            } else pathname.length() < PosLogger.MINIMUM_USABLE_FILE_SIZE_BYTES
-        }
     }
 
 }
