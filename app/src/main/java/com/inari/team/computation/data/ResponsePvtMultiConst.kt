@@ -1,5 +1,7 @@
 package com.inari.team.computation.data
 
+import com.inari.team.computation.utils.GpsTime
+
 data class ResponsePvtMultiConst(
     var pvt: PvtLatLng = PvtLatLng(),
     var dop: Dop = Dop(),
@@ -7,21 +9,22 @@ data class ResponsePvtMultiConst(
     var corrections: Corrections = Corrections(),
     var nSats: Float = 0f,
     var gpsElevIono: ArrayList<Pair<Int, Double>> = arrayListOf(),
-    var galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
+    var galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf(),
+    var gpsTime: GpsTime = GpsTime(0)
 )
 
 data class PvtLatLng(
     var lat: Double = 360.0,
     var lng: Double = 360.0,
     var altitude: Double = 360.0,
-    var time: Double = -10.0
+    var clockBias: Double = -10.0
 )
 
 data class PvtEcef(
     var x: Double = -1.0,
     var y: Double = -1.0,
     var z: Double = -1.0,
-    var time: Double = 0.0,
+    var clockBias: Double = 0.0,
     var interSystemBias: Double = 0.0
 
 )

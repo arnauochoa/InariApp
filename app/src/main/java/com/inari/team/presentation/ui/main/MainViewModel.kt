@@ -204,7 +204,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                 //add position logs
                 gnssData.modes.forEach { mode ->
                     coordinates.forEach {
-                        posLogger?.addPositionLine(it.pvtLatLng, it.nSatellites.roundToInt(), mode.constellations)
+                        posLogger?.addPositionLine(it.pvtLatLng, it.nSatellites.roundToInt(), mode.constellations, it.gpsTime)
                     }
                 }
 

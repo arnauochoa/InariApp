@@ -10,6 +10,7 @@ import com.inari.team.computation.utils.Constants.C
 import com.inari.team.computation.utils.Constants.GALILEO
 import com.inari.team.computation.utils.Constants.GPS
 import com.inari.team.computation.utils.Constants.PVT_ITER
+import com.inari.team.computation.utils.GpsTime
 import com.inari.team.computation.utils.computeCNoWeightMatrix
 import com.inari.team.computation.utils.pvtLla2PvtEcef
 import com.inari.team.presentation.model.Mode
@@ -343,6 +344,10 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
 
 
         if (responsePvtMultiConst.pvt.lat != 360.0) {
+            // Assign position fix timestamp
+            val gpsTime = GpsTime((epoch.timeNanosGnss + responsePvtMultiConst.pvt.clockBias).toLong())
+            responsePvtMultiConst.gpsTime = gpsTime
+
             responseList.add(responsePvtMultiConst)
         }
     }
@@ -359,7 +364,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
             pvtLatLng.lat += it.pvt.lat
             pvtLatLng.lng += it.pvt.lng
             pvtLatLng.altitude += it.pvt.altitude
-            pvtLatLng.time += it.pvt.time
+            pvtLatLng.clockBias += it.pvt.clockBias
 
             dop.gDop += it.dop.gDop
             dop.pDop += it.dop.pDop
@@ -372,7 +377,9 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         pvtLatLng.lat = pvtLatLng.lat / nEpoch
         pvtLatLng.lng = pvtLatLng.lng / nEpoch
         pvtLatLng.altitude = pvtLatLng.altitude / nEpoch
-        pvtLatLng.time = pvtLatLng.time / nEpoch
+        pvtLatLng.clockBias = pvtLatLng.clockBias / nEpoch
+
+        val gpsTime = responseList.last().gpsTime
 
         dop.gDop = dop.gDop / nEpoch
         dop.pDop = dop.pDop / nEpoch
@@ -383,7 +390,7 @@ fun pvtMultiConst(acqInformation: AcqInformation, mode: Mode): ResponsePvtMultiC
         nSats /= nEpoch
 
         pvtResponsePvtMultiConst =
-            ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats, gpsElevIono, galElevIono)
+            ResponsePvtMultiConst(pvtLatLng, dop, residue, corrections, nSats, gpsElevIono, galElevIono, gpsTime)
         // Update next reference position
         acqInformation.refLocation.refLocationEcef = EcefLocation(position.x, position.y, position.z)
     }
@@ -453,12 +460,12 @@ fun leastSquares(
         position.x += dHatVector[0, 0]
         position.y += dHatVector[1, 0]
         position.z += dHatVector[2, 0]
-        position.time = dHatVector[3, 0]
+        position.clockBias = dHatVector[3, 0]
         if (nUnknowns == 5) position.interSystemBias = dHatVector[4, 0]
 
         val pvtEecf = EcefLocation(position.x, position.y, position.z)
         val llaLocation = ecef2lla(pvtEecf)
-        val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.time)
+        val pvtLatLng = PvtLatLng(llaLocation.latitude, llaLocation.longitude, llaLocation.altitude, position.clockBias)
 
         response = ResponsePvtMultiConst(pvtLatLng, dop, residue, Corrections(), nSatellites.toFloat())
 

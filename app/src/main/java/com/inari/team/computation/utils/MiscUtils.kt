@@ -7,14 +7,13 @@ import com.inari.team.computation.data.LlaLocation
 import com.inari.team.computation.data.PvtEcef
 import com.inari.team.computation.data.PvtLatLng
 import org.ejml.data.DMatrixRMaj
-import org.ejml.dense.row.CommonOps_DDRM
 import org.ejml.dense.row.mult.MatrixVectorMult_DDRM
 import org.ejml.simple.SimpleMatrix
 import java.lang.Math.*
 import kotlin.math.pow
 
 /**
- * Repairs over- and underflow of GPS time
+ * Repairs over- and underflow of GPS clockBias
  */
 fun checkTime(time: Double): Double {
     val halfWeek = 302400.0
@@ -27,7 +26,7 @@ fun checkTime(time: Double): Double {
 }
 
 /**
- * Returns rotated satellite ECEF coordinates due to Earth rotation during signal travel time
+ * Returns rotated satellite ECEF coordinates due to Earth rotation during signal travel clockBias
  */
 fun earthRotCorr(travelTime: Double, xSat: DoubleArray): DoubleArray {
     val omegaeDot = 7.2921159e-5
@@ -50,7 +49,7 @@ fun earthRotCorr(travelTime: Double, xSat: DoubleArray): DoubleArray {
 }
 
 /**
- * Transforms time in nanos to GPST
+ * Transforms clockBias in nanos to GPST
  */
 fun nsgpst2gpst(timeNanos: Long): LongArray {
     val weekSeconds = 7L * 24L * 60L * 60L
@@ -85,11 +84,11 @@ fun computeCNoWeightMatrix(cnos: List<Double>, isWeight: Boolean): SimpleMatrix 
 fun pvtEcef2PvtLla(pvtEcef: PvtEcef): PvtLatLng{
     val posEcef = EcefLocation(pvtEcef.x, pvtEcef.y, pvtEcef.z)
     val posLla = ecef2lla(posEcef)
-    return PvtLatLng(posLla.latitude, posLla.longitude, posLla.altitude, pvtEcef.time)
+    return PvtLatLng(posLla.latitude, posLla.longitude, posLla.altitude, pvtEcef.clockBias)
 }
 
 fun pvtLla2PvtEcef(pvtLatLng: PvtLatLng): PvtEcef{
     val posLatLng = LlaLocation(pvtLatLng.lat, pvtLatLng.lng, pvtLatLng.altitude)
     val posEcef = lla2ecef(posLatLng)
-    return PvtEcef(posEcef.x, posEcef.y, posEcef.z, pvtLatLng.time)
+    return PvtEcef(posEcef.x, posEcef.y, posEcef.z, pvtLatLng.clockBias)
 }

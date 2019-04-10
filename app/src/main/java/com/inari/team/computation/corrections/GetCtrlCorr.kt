@@ -19,7 +19,7 @@ fun getCtrlCorr(
     band: Int = -1 //just needed when it is Galileo E5a band
 ): CtrlCorr {
 
-    // Compute transmission time
+    // Compute transmission clockBias
     val txRaw = tow - pR / C
 
     // Get clock corrections
@@ -44,11 +44,11 @@ fun getCtrlCorr(
     // Get the satellite relativistic clock correction
     val tRel: Double = -2 * (CommonOps_DDRM.dot(xVec, velVec) / (C * C))
 
-    // Account for the relativistic effect on the satellite clock bias and the time of transmission
+    // Account for the relativistic effect on the satellite clock bias and the clockBias of transmission
     tCorr += tRel
     txGPS = txRaw - tCorr
 
-    // Recompute the satellite coordinates with the corrected time and some additional
+    // Recompute the satellite coordinates with the corrected clockBias and some additional
     // correction (i.e. Sagnac effect / rotation correction)
     val travelTime = tow - txGPS
     x = earthRotCorr(travelTime, x)

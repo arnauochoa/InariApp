@@ -45,7 +45,8 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
                 modeName = it.name,
                 nSatellites = pvtMultiConst.nSats,
                 galElevIono = pvtMultiConst.galElevIono,
-                gpsElevIono = pvtMultiConst.gpsElevIono
+                gpsElevIono = pvtMultiConst.gpsElevIono,
+                gpsTime = pvtMultiConst.gpsTime
             )
 
             responses.add(pvtResponse)
