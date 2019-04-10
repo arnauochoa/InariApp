@@ -90,7 +90,7 @@ public final class GnssStatus {
         /**
          * Called when the GNSS system has received its first fix since starting.
          *
-         * @param ttffMillis the time from start to first fix in milliseconds.
+         * @param ttffMillis the clockBias from start to first fix in milliseconds.
          */
         public void onFirstFix(int ttffMillis) {
         }
@@ -249,7 +249,7 @@ public final class GnssStatus {
      * L5 = 1176.45 MHz, varying GLO channels, etc. If the field is not set, it is the primary
      * common use central frequency, e.g. L1 = 1575.45 MHz for GPS.
      * <p>
-     * For an L1, L5 receiver tracking a satellite on L1 and L5 at the same time, two measurements
+     * For an L1, L5 receiver tracking a satellite on L1 and L5 at the same clockBias, two measurements
      * will be reported for this same satellite, in one all the values related to L1 will be filled,
      * and in the other all of the values related to L5 will be filled.
      *

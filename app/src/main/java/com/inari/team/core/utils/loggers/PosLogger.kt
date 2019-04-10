@@ -3,6 +3,7 @@ package com.inari.team.core.utils.loggers
 import android.location.GnssStatus
 import android.os.Environment
 import com.inari.team.computation.data.PvtLatLng
+import com.inari.team.computation.utils.GpsTime
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -22,10 +23,13 @@ class PosLogger {
         const val FILE_PREFIX = "pos_log"
         const val MAX_FILES_STORED = 100
         const val MINIMUM_USABLE_FILE_SIZE_BYTES = 1000
-
     }
 
+    private val formatter = SimpleDateFormat("HHmmss.SSS", Locale.ENGLISH)
+
     init {
+
+        formatter.timeZone = TimeZone.getTimeZone("UTC")
 
         val baseDirectory = File(Environment.getExternalStorageDirectory(), POS_ROOT)
         baseDirectory.mkdirs()
@@ -42,7 +46,7 @@ class PosLogger {
 
     }
 
-    fun addPositionLine(position: PvtLatLng, nSats: Int, constellations: ArrayList<Int>) {
+    fun addPositionLine(position: PvtLatLng, nSats: Int, constellations: ArrayList<Int>, gpsTime: GpsTime) {
         val constType =
             if (constellations.contains(GnssStatus.CONSTELLATION_GPS) && constellations.contains(GnssStatus.CONSTELLATION_GALILEO)) {
                 //multi constellation
@@ -66,12 +70,16 @@ class PosLogger {
             Locale.ENGLISH,
             "$%sGGA,%s,%s,%c,%s,%c,,%02d,,%s,%c,,%c,,*%s",
             constType,
-            position.time,
+            try {
+                formatter.format(gpsTime.getUtcDateTime())
+            } catch (e: Exception) {
+                "000000.000"
+            },
             convertToNmeaFormat(position.lat),
             NS,
             convertToNmeaFormat(position.lng),
             EW,
-            nSats,//todo put size
+            nSats,
             if (position.altitude.roundToInt() < 100000) String.format(
                 "%05d",
                 position.altitude.roundToInt()

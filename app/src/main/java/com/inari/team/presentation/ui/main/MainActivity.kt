@@ -401,7 +401,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                         // On some Samsung devices, an exception is thrown if this vector > 4 (see #39)
                         // Truncate the array, since we can deal with only the first four values
                         mTruncateVector = true
-                        // Do the truncation here the first time the exception occurs
+                        // Do the truncation here the first clockBias the exception occurs
                         getRotationMatrixFromTruncatedVector(event.values)
                     }
 
