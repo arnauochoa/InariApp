@@ -1,7 +1,6 @@
 package com.inari.team.presentation.ui.main
 
 import android.annotation.TargetApi
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -383,8 +382,9 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         return viewModel?.getComputedPositions()
     }
 
-    override fun clearPositions() {
+    override fun onModesChanged() {
         viewModel?.clearPositions()
+        viewModel?.startComputingPosition(mPrefs.getSelectedModesList())
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -503,11 +503,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 navigator.navigateToMainActivity()
                 mPrefs.setTutorialShown()
             }
-            SETTINGS_CODE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    positionFragment
-                }
-            }
         }
     }
 
@@ -547,5 +542,5 @@ interface MainListener {
     fun startComputing(selectedModes: List<Mode>)
     fun stopComputing()
     fun getComputedPositions(): List<ResponsePvtMode>?
-    fun clearPositions()
+    fun onModesChanged()
 }

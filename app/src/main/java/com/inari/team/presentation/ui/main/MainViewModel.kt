@@ -41,7 +41,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var refPos: LatLng? = null
 
     private var startedComputingDate = Date()
-    private var lastMeasurementsDate = Date()
 
     private var gnssMeasLogger: GnssMeasLogger? = null
     private var posLogger: PosLogger? = null
@@ -70,7 +69,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isComputing = true
         isFirstComputedPosition = true
         startedComputingDate = Date()
-        lastMeasurementsDate = Date()
         computedPositions = arrayListOf()
 
         if (mPrefs.isGnssLoggingEnabled()) {
@@ -101,7 +99,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     fun clearPositions() {
         computedPositions.clear()
-        position.updateData(arrayListOf())
     }
 
     private fun obtainEphemerisData() {
@@ -144,16 +141,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     fun setGnssStatus(status: GnssStatus?) {
         gnssData.lastGnssStatus = status
-
-        if (Date().time - lastMeasurementsDate.time >=
-            TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT) +
-            TimeUnit.SECONDS.toMillis(10)
-        ) {
-            if (gnssData.measurements.isEmpty()) {
-                lastMeasurementsDate = Date()
-                position.showError("Measurements are not being obtained")
-            }
-        }
     }
 
     fun setGnssMeasurementsEvent(gnssMeasurementsEvent: GnssMeasurementsEvent?) {
