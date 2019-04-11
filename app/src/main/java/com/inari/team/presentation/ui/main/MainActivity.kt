@@ -1,6 +1,7 @@
 package com.inari.team.presentation.ui.main
 
 import android.annotation.TargetApi
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -45,14 +46,6 @@ import okhttp3.ResponseBody
 import javax.inject.Inject
 
 class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEventListener {
-
-    companion object {
-        private const val MIN_TIME = 1L
-        private const val MIN_DISTANCE = 0.0F
-        const val TUTORIAL_CODE = 88
-
-        private var mActivity: MainActivity? = null
-    }
 
     @Inject
     lateinit var mPrefs: AppSharedPreferences
@@ -107,16 +100,12 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
             navigator.navigateToTutorialActivtiy()
         }
 
-        mActivity = this
-
         setViewPager()
         setupBottomNavigation()
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
         addOrientationSensorListener()
-
         startGnss()
     }
 
@@ -245,7 +234,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
             locationManager?.registerGnssStatusCallback(gnssStatusListener)
             locationManager?.registerGnssMeasurementsCallback(gnssMeasurementsEventListener)
             locationManager?.addNmeaListener(gnssNmeaMessageListener)
-
         } else {
             requestPermissionss(
                 arrayOf(
@@ -254,6 +242,14 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 ), SplashActivity.PERMISSIONS_CODE
             )
         }
+    }
+
+    private fun stopGnss() {
+        locationManager?.unregisterGnssStatusCallback(gnssStatusListener)
+        locationManager?.unregisterGnssMeasurementsCallback(gnssMeasurementsEventListener)
+        locationManager?.removeNmeaListener(gnssNmeaMessageListener)
+
+        locationManager?.removeUpdates(this)
     }
 
     private fun addOrientationSensorListener() {
@@ -367,11 +363,13 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     }
 
     override fun startComputing(selectedModes: List<Mode>) {
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         viewModel?.startComputingPosition(selectedModes)
         isComputing = true
     }
 
     override fun stopComputing() {
+        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         viewModel?.stopComputingPosition()
         isComputing = false
         val computedPositions = viewModel?.getComputedPositions() ?: arrayListOf()
@@ -383,6 +381,10 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 
     override fun getComputedPositions(): List<ResponsePvtMode>? {
         return viewModel?.getComputedPositions()
+    }
+
+    override fun clearPositions() {
+        viewModel?.clearPositions()
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -501,6 +503,11 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 navigator.navigateToMainActivity()
                 mPrefs.setTutorialShown()
             }
+            SETTINGS_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    positionFragment
+                }
+            }
         }
     }
 
@@ -511,7 +518,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 startGnss()
             } else {
                 toast(
-                    "Location permissions are compulsory, please go to settings to enable.",
+                    "Location permissions are compulsory, please go to settings to enable them.",
                     Toast.LENGTH_LONG
                 )
                 finish()
@@ -522,9 +529,17 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        locationManager?.removeUpdates(this)
+        stopGnss()
         gnssListeners.clear()
+        stopComputing()
+        super.onDestroy()
+    }
+
+    companion object {
+        private const val MIN_TIME = 1L
+        private const val MIN_DISTANCE = 0.0F
+        const val TUTORIAL_CODE = 88
+        const val SETTINGS_CODE = 77
     }
 }
 
@@ -532,4 +547,5 @@ interface MainListener {
     fun startComputing(selectedModes: List<Mode>)
     fun stopComputing()
     fun getComputedPositions(): List<ResponsePvtMode>?
+    fun clearPositions()
 }

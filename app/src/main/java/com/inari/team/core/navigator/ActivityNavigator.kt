@@ -35,7 +35,7 @@ class ActivityNavigator @Inject constructor(private var activity: Activity) : Na
 
     override fun navigateToModesActivity() {
         with(activity) {
-            startActivity(intentFor<ModesActivity>())
+            startActivityForResult(intentFor<ModesActivity>(), MainActivity.SETTINGS_CODE)
         }
     }
 

@@ -35,7 +35,7 @@ class FragmentNavigator @Inject constructor(private val fragment: Fragment) : Na
 
     override fun navigateToModesActivity() {
         with(fragment) {
-            startActivity(Intent(context, ModesActivity::class.java))
+            startActivityForResult(Intent(context, ModesActivity::class.java), MainActivity.SETTINGS_CODE)
         }
     }
 
