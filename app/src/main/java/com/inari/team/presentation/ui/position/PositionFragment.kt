@@ -1,8 +1,10 @@
 package com.inari.team.presentation.ui.position
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -27,6 +29,7 @@ import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.showAlert
 import com.inari.team.presentation.model.ResponsePvtMode
+import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.main.MainListener
 import kotlinx.android.synthetic.main.dialog_map_terrain.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
@@ -378,6 +381,18 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                 isStartedComputing = false
             } else {
                 moveCamera(LatLng(positions[0].pvtLatLng.lat, positions[0].pvtLatLng.lng))
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            MainActivity.SETTINGS_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    mMap?.clear()
+                    mainListener?.onModesChanged()
+                }
             }
         }
     }
