@@ -99,6 +99,11 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         ephemeris.updateData("")
     }
 
+    fun clearPositions() {
+        computedPositions.clear()
+        position.updateData(arrayListOf())
+    }
+
     private fun obtainEphemerisData() {
         GlobalScope.launch {
             var ephResponse: EphemerisResponse? = null
@@ -204,7 +209,12 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
                 //add position logs
                 gnssData.modes.forEach { mode ->
                     coordinates.forEach {
-                        posLogger?.addPositionLine(it.pvtLatLng, it.nSatellites.roundToInt(), mode.constellations, it.gpsTime)
+                        posLogger?.addPositionLine(
+                            it.pvtLatLng,
+                            it.nSatellites.roundToInt(),
+                            mode.constellations,
+                            it.gpsTime
+                        )
                     }
                 }
 

@@ -1,5 +1,6 @@
 package com.inari.team.presentation.ui.modes
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -101,6 +102,7 @@ class ModesActivity : BaseActivity() {
             mPrefs.setAverage(avg)
             mPrefs.setSelectedMask(mask)
             mPrefs.setSelectedCnoMask(cnoMask)
+            setResult(Activity.RESULT_OK)
             finish()
         }
 
@@ -361,8 +363,13 @@ class ModesActivity : BaseActivity() {
                 toast("This name already exists")
             }
         } else {//if name is blank
-            toast("Name can not be blank")
+            toast("please, enter a file name.")
         }
         return canBeAdded
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        super.onBackPressed()
     }
 }
