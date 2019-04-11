@@ -72,8 +72,9 @@
     <string name="logs_bottom">Logs</string>
     <string name="positioning_settings">Positioning Settings</string>
     <string name="clear_button">Clear</string>
-    <string name="cnoAxisTitle">CNo [dB-Hz]</string>
-    <string name="agcAxisTitle">AGC [dB]</string>
+    <string name="cnoAxisTitle">CN0 [dB-Hz]</string>
+    <string name="avgCnoAxisTitle">Average CN0 [dB-Hz]</string>
+    <string name="agcAxisTitle">Average AGC [dB]</string>
     <string name="elevAxisTitle">Elevation [º]</string>
     <string name="app_version_title">App version:</string>
     <string name="app_version_number">1.0.0</string>
@@ -93,7 +94,7 @@
     <string name="reset_default_modes">Reset default modes</string>
     <string name="finish">finish</string>
 
-    <string name="agc_cno_information_detail">Whilst Carrier to Noise Ratio (CNO) depends specifically on the received satellite signal strength, the Automatic Gain control (AGC) defines the gain applied to received signals so that the power in the AC/DC converser is relatively constant. Therefore, if AGC and CNO levels are low, an external and stronger source of interference may be present. </string>
+    <string name="agc_cno_information_detail">Whilst Carrier to Noise Ratio (CN0) depends specifically on the received satellite signal strength, the Automatic Gain control (AGC) defines the gain applied to received signals so that the power in the AC/DC converser is relatively constant. Therefore, if AGC and CNO levels are low, an external and stronger source of interference may be present. </string>
     <string name="elev_cno_information_detail">This plot informs the user of Satellite contributions in terms of Carrier to Noise Ratio and geometry. Satellites with poor CNO or low elevations may introduce severe errors in user’s position. Thus, masks based on this metrics are applied to avoid their contribution in the Positioning algorithm. </string>
     <string name="error_information_detail">The error plot displays the relative error between the Position derived from the App’s algorithm with the selected configuration and the Position provided by Google’s API. In this case, there is not a reference position as both algorithms perform differently depending on the user’s scenario. </string>
     <string name="graph_information">Graph Information</string>
