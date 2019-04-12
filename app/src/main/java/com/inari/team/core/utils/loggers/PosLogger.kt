@@ -1,9 +1,9 @@
 package com.inari.team.core.utils.loggers
 
-import android.location.GnssStatus
 import android.os.Environment
 import com.inari.team.computation.data.PvtLatLng
 import com.inari.team.computation.utils.GpsTime
+import com.inari.team.presentation.model.PositionParameters
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -48,13 +48,13 @@ class PosLogger {
 
     fun addPositionLine(position: PvtLatLng, nSats: Int, constellations: ArrayList<Int>, gpsTime: GpsTime) {
         val constType =
-            if (constellations.contains(GnssStatus.CONSTELLATION_GPS) && constellations.contains(GnssStatus.CONSTELLATION_GALILEO)) {
+            if (constellations.contains(PositionParameters.CONST_GPS) && constellations.contains(PositionParameters.CONST_GAL)) {
                 //multi constellation
                 "GN"
             } else {
                 when {
-                    constellations.contains(GnssStatus.CONSTELLATION_GPS) -> "GP"
-                    constellations.contains(GnssStatus.CONSTELLATION_GALILEO) -> "GA"
+                    constellations.contains(PositionParameters.CONST_GPS) -> "GP"
+                    constellations.contains(PositionParameters.CONST_GAL) -> "GA"
                     else -> ""
                 }
             }
@@ -98,19 +98,20 @@ class PosLogger {
     private fun convertToNmeaFormat(coordinate: Double): String {
 
         val geodeticCoordinateDegrees = Math.floor(coordinate)
-        val geodeticCoordinateMinutes = Math.floor(60 * (coordinate - geodeticCoordinateDegrees))
-        val geodeticCoordinateSeconds = 60 * (60 * (coordinate - geodeticCoordinateDegrees) - geodeticCoordinateMinutes)
+        val geodeticCoordinateMinutes = 60 * (coordinate - geodeticCoordinateDegrees)
+        val geodeticCoordinateMinutesInteger = Math.floor(geodeticCoordinateMinutes)
+        val geodeticCoordinateMinutesDecimals = geodeticCoordinateMinutes - geodeticCoordinateMinutesInteger
 
         val mneaFormatCoordinate = StringBuilder()
         val decimalFormat = DecimalFormat("00")
         decimalFormat.decimalFormatSymbols = DecimalFormatSymbols(Locale.ENGLISH)
         mneaFormatCoordinate.append(decimalFormat.format(geodeticCoordinateDegrees))
-        mneaFormatCoordinate.append(decimalFormat.format(geodeticCoordinateMinutes))
+        mneaFormatCoordinate.append(decimalFormat.format(geodeticCoordinateMinutesInteger))
         val decimalFormatSec = DecimalFormat(".######")
         decimalFormatSec.decimalFormatSymbols = DecimalFormatSymbols(Locale.ENGLISH)
-        mneaFormatCoordinate.append(decimalFormatSec.format(geodeticCoordinateSeconds / 100))
+        mneaFormatCoordinate.append(decimalFormatSec.format(geodeticCoordinateMinutesDecimals))
 
-        return mneaFormatCoordinate.toString();
+        return mneaFormatCoordinate.toString()
     }
 
     fun closeLogger() {
