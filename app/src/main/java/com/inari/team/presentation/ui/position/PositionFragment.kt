@@ -112,7 +112,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
         btComputeAction.setOnClickListener {
             if (btComputeAction.text == getString(R.string.start_computing)) {
-                startComputing(it)
+                startComputing()
             } else {
                 showAlert(
                     view.context, "Stop Computing",
@@ -199,29 +199,54 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     }
 
+    private fun startComputing() {
+        if (mSharedPreferences.getSelectedModesList().isEmpty()) { // If no constellation or band has been selected
+            context?.let {
+                showAlert(
+                    it,
+                    "Select Parameters",
+                    "At least one Positioning Mode must be selected",
+                    "go to settings",
+                    positiveAction = {
+                        navigator.navigateToModesActivity()
 
-    @SuppressLint("MissingPermission")
-    private fun startComputing(it: View) {
-        val selectedModes = mSharedPreferences.getSelectedModesList()
-        if (selectedModes.isEmpty()) { // If no constellation or band has been selected
-            showAlert(
-                it.context,
-                "Select Parameters",
-                "At least one Positioning Mode must be selected",
-                "go to settings",
-                positiveAction = {
-                    navigator.navigateToModesActivity()
-
-                },
-                isCancelable = true
-            )
+                    },
+                    isCancelable = true
+                )
+            }
         } else {
             mMap?.clear()
             isStartedComputing = true
+            mainListener?.startComputing()
             btComputeAction.text = getString(R.string.stop_computing)
-            mainListener?.startComputing(selectedModes)
         }
+    }
 
+    private fun resumeComputing() {
+        if (mSharedPreferences.getSelectedModesList().isEmpty()) { // If no constellation or band has been selected
+            context?.let {
+                showAlert(
+                    it,
+                    "Select Parameters",
+                    "At least one Positioning Mode must be selected",
+                    "go to settings",
+                    positiveAction = {
+                        navigator.navigateToModesActivity()
+
+                    },
+                    isCancelable = false,
+                    textNegative = "Cancel",
+                    negativeAction = {
+                        stopComputing()
+                    }
+                )
+            }
+        } else {
+            mMap?.clear()
+            isStartedComputing = true
+            mainListener?.onModesChanged()
+            btComputeAction.text = getString(R.string.stop_computing)
+        }
     }
 
     private fun stopComputing() {
@@ -390,8 +415,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         when (requestCode) {
             MainActivity.SETTINGS_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    mMap?.clear()
-                    mainListener?.onModesChanged()
+                    resumeComputing()
                 }
             }
         }

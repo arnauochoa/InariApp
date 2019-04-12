@@ -29,7 +29,6 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
 import com.inari.team.core.utils.view.CustomAHBottomNavigationItem
-import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.about.AboutFragment
 import com.inari.team.presentation.ui.logs.LogsFragment
@@ -361,9 +360,9 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         }
     }
 
-    override fun startComputing(selectedModes: List<Mode>) {
+    override fun startComputing() {
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        viewModel?.startComputingPosition(selectedModes)
+        viewModel?.startComputingPosition(mPrefs.getSelectedModesList())
         isComputing = true
     }
 
@@ -539,7 +538,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 }
 
 interface MainListener {
-    fun startComputing(selectedModes: List<Mode>)
+    fun startComputing()
     fun stopComputing()
     fun getComputedPositions(): List<ResponsePvtMode>?
     fun onModesChanged()
