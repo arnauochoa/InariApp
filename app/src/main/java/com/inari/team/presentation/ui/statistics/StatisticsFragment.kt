@@ -596,7 +596,6 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         // Maximum number of points
         const val MAX_AGC_CNO_POINTS = 500
         const val MAX_POS_POINTS = 500
-        const val MAX_IONO_ELEV_POINTS = 500
 
         // Limit values for graphs
         const val MIN_ELEV = 0f // º
@@ -610,7 +609,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         const val MAX_AGC_L5 = 20f // dB-Hz
         const val MIN_AGC_L5 = -10f // dB-Hz
         const val MIN_IONO = 0f // m
-        const val MAX_IONO = 500f // m
+        const val MAX_IONO = 240f // m
         const val NORTH_LIM = 90f // m
         const val EAST_LIM = 90f // m
 
