@@ -73,7 +73,7 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
         if (mPrefs.isGnssLoggingEnabled()) {
             gnssMeasLogger = GnssMeasLogger()
-            posLogger = PosLogger()
+            posLogger = PosLogger(selectedModes)
         }
 
         //init gnss
@@ -194,15 +194,14 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             if (coordinates.isNotEmpty()) {
 
                 //add position logs
-                gnssData.modes.forEach { mode ->
-                    coordinates.forEach {
-                        posLogger?.addPositionLine(
-                            it.pvtLatLng,
-                            it.nSatellites.roundToInt(),
-                            mode.constellations,
-                            it.gpsTime
-                        )
-                    }
+                coordinates.forEach {
+                    posLogger?.addPositionLine(
+                        it.modeName,
+                        it.pvtLatLng,
+                        it.nSatellites.roundToInt(),
+                        it.constellations,
+                        it.gpsTime
+                    )
                 }
 
                 position.updateData(coordinates)

@@ -10,6 +10,7 @@ data class ResponsePvtMode(
     val pvtLatLng: PvtLatLng,
     val modeColor: Int,
     val modeName: String,
+    val constellations: ArrayList<Int>,
     val nSatellites: Float = 0f,
     var gpsElevIono: ArrayList<Pair<Int, Double>> = arrayListOf(),
     var galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf(),

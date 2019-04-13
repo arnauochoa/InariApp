@@ -43,6 +43,7 @@ fun computePvt(gnssData: GnssData): List<ResponsePvtMode> {
                 pvtLatLng = pvtMultiConst.pvt,
                 modeColor = it.color,
                 modeName = it.name,
+                constellations = it.constellations,
                 nSatellites = pvtMultiConst.nSats,
                 galElevIono = pvtMultiConst.galElevIono,
                 gpsElevIono = pvtMultiConst.gpsElevIono,
