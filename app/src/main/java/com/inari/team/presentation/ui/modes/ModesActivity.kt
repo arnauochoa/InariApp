@@ -338,7 +338,7 @@ class ModesActivity : BaseActivity() {
                 isSelected = false
             )
             AppSharedPreferences.getInstance().saveMode(mode)
-            toast("Mode created")
+            toast(getString(R.string.mode_created_toast))
             dialog.dismiss()
             mAdapter?.update()
         }
@@ -359,16 +359,16 @@ class ModesActivity : BaseActivity() {
                     if (bands.isNotEmpty()) { //if one band is selected
                         canBeAdded = true
                     } else { //if no band is selected
-                        toast("At least one band must be selected")
+                        toast(getString(R.string.no_band_toast))
                     }
                 } else { //if no constellation is selected
-                    toast("At least one constellattion must be selected")
+                    toast(getString(R.string.no_constellation_toast))
                 }
             } else { //if name already exists
-                toast("This name already exists")
+                toast(getString(R.string.name_exists_toast))
             }
         } else {//if name is blank
-            toast("please, enter a file name.")
+            toast(getString(R.string.no_name_toast))
         }
         return canBeAdded
     }
