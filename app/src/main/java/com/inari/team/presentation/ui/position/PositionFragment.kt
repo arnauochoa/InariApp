@@ -205,7 +205,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                 showAlert(
                     it,
                     "Select Parameters",
-                    "At least one Positioning Mode must be selected",
+                    getString(R.string.minimum_one_mode_selected_message),
                     "go to settings",
                     positiveAction = {
                         navigator.navigateToModesActivity()
@@ -223,30 +223,10 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun resumeComputing() {
-        if (mSharedPreferences.getSelectedModesList().isEmpty()) { // If no constellation or band has been selected
-            context?.let {
-                showAlert(
-                    it,
-                    "Select Parameters",
-                    "At least one Positioning Mode must be selected",
-                    "go to settings",
-                    positiveAction = {
-                        navigator.navigateToModesActivity()
-
-                    },
-                    isCancelable = false,
-                    textNegative = "Cancel",
-                    negativeAction = {
-                        stopComputing()
-                    }
-                )
-            }
-        } else {
-            mMap?.clear()
-            isStartedComputing = true
-            mainListener?.onModesChanged()
-            btComputeAction.text = getString(R.string.stop_computing)
-        }
+        mMap?.clear()
+        isStartedComputing = true
+        mainListener?.onModesChanged()
+        btComputeAction.text = getString(R.string.stop_computing)
     }
 
     private fun stopComputing() {

@@ -286,7 +286,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 saveLastLogs(fileName)
                 dialog.dismiss()
                 positionsList.clear()
-            } else showError("File name can not be empty")
+            } else showError("Please, enter a file name.")
         }
         layout.tvDiscard.setOnClickListener {
             dialog.dismiss()
