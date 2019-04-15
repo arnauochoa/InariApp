@@ -106,15 +106,15 @@
 
     <!-- Modes information -->
     <string name="elevation_info_title">· Elevation Mask:</string>
-    <string name="elevation_info_detail">The elevation mask option stablishes a threshold from which satellites will be discarded from the Positioning algorithm.</string>
+    <string name="elevation_info_detail">The satellites under the selected elevation threshold will not be used on the computation.</string>
     <string name="gnss_logs_info_title">· Enable/Disable GNSS Logs:</string>
-    <string name="gnss_logs_info_detail">If this option is enabled, a file containing raw measurements will be created every time the user starts a new computation.</string>
+    <string name="gnss_logs_info_detail">If this option is enabled, two files will be created when a new computation is started. These files contain the measurements and the position logs and can be found on /Inari/Nmea/.</string>
     <string name="cn0_info_title">· CNO mask:</string>
-    <string name="cno_info_detail">As before, the CNO mask establishes another threshold.</string>
+    <string name="cno_info_detail">The satellites which signal has a CN0 lower than the selected threshold will not be used on the computation.</string>
     <string name="avg_info_title">· Average</string>
     <string name="avg_info_detail">This option allows the user to enable or disable averaging and to select its duration.</string>
     <string name="position_info_title">· Positioning modes:</string>
-    <string name="position_info_detail">Here the user can choose the constellations which will participate in the Positioning computation to compare their results if desired. The available options are GPS Least squares, Galileo Weighted least squares and Multi-constellation with Iono-Free implemented.</string>
+    <string name="position_info_detail">Up to 5 modes can be selected at the same time to compute the position. The positions computed with the selected modes can be identified on the map by the different colors of the pins. A new mode can be created with the desired parameters.</string>
 
     <string name="enable_recommendation">* It is highly recommended to enable this option.</string>
     <string name="create">create</string>
