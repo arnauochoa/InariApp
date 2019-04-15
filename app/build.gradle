@@ -15,8 +15,8 @@ android {
         applicationId "com.inari.team"
         minSdkVersion 26
         targetSdkVersion 28
-        versionCode 9 //13th April 2019
-        versionName "0.9" //13th April 2019
+        versionCode 9 //15th April 2019
+        versionName "0.9" //15th April 2019
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
