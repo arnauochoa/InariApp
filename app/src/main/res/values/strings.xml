@@ -137,7 +137,7 @@
     <string name="minimum_one_mode_selected_message">Please, select at least one positioning mode to compute the position</string>
     <string name="mode_created_toast">Mode created</string>
     <string name="no_band_toast">Please, select a band to create a new mode</string>
-    <string name="no_constellation_toast">Please, select at least one constellation to create a new mode<</string>
+    <string name="no_constellation_toast">Please, select at least one constellation to create a new mode"</string>
     <string name="name_exists_toast">This name already exists</string>
     <string name="no_name_toast">A new mode needs a new name!</string>
 
