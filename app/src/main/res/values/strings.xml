@@ -94,14 +94,17 @@
     <string name="reset_default_modes">Reset default modes</string>
     <string name="finish">finish</string>
 
-    <string name="agc_cno_information_detail">Whilst Carrier to Noise Ratio (CN0) depends specifically on the received satellite signal strength, the Automatic Gain control (AGC) defines the gain applied to received signals so that the power in the AC/DC converser is relatively constant. Therefore, if AGC and CNO levels are low, an external and stronger source of interference may be present. </string>
-    <string name="elev_cno_information_detail">This plot informs the user of Satellite contributions in terms of Carrier to Noise Ratio and geometry. Satellites with poor CNO or low elevations may introduce severe errors in user’s position. Thus, masks based on this metrics are applied to avoid their contribution in the Positioning algorithm. </string>
-    <string name="error_information_detail">The error plot displays the relative error between the Position derived from the App’s algorithm with the selected configuration and the Position provided by Google’s API. In this case, there is not a reference position as both algorithms perform differently depending on the user’s scenario. </string>
+    <!-- Statistics -->
+    <string name="agc_cno_information_detail">The relation of AGC and CN0 is relatively constant and known and when there is some abnormal situation, this relation will change. This relation can be seen on the chart so that the points appear on another place of the graphic. For example, if there is some RF interference the AGC and CN0 will decrease with respect to the values on nominal conditions. This chart shows points representing the average values of AGC and CN0 of all the satellites in view and every new point represents a new set of measurements. </string>
+    <string name="elev_cno_information_detail">CN0 depends on the elevation of the satellite so that a higher elevation usually involves a higher CN0. When that relation is not kept, some abnormal situation may be happening, such as multi-path or No-Line-Of-Sight. </string>
+    <string name="error_information_detail">This chart shows the error on the obtained positions of the modes that are selected, using the position obtained from Google as a reference. The computation of the position has to be started to see the information on this graph.</string>
+    <string name="iono_information_detail">The ionosphere error depends on the elevation of the satellite, becoming smaller when the elevation gets bigger. In order to see the information on this graph, the positioning has to be started with some method that uses Iono-Free corrections.</string>
     <string name="graph_information">Graph Information</string>
     <string name="enable_gnss_logs">Enable GNSS logs</string>
     <string name="average_time_title">Average Time:</string>
     <string name="information">Information</string>
 
+    <!-- Modes information -->
     <string name="elevation_info_title">· Elevation Mask:</string>
     <string name="elevation_info_detail">The elevation mask option stablishes a threshold from which satellites will be discarded from the Positioning algorithm.</string>
     <string name="gnss_logs_info_title">· Enable/Disable GNSS Logs:</string>
@@ -113,7 +116,7 @@
     <string name="position_info_title">· Positioning modes:</string>
     <string name="position_info_detail">Here the user can choose the constellations which will participate in the Positioning computation to compare their results if desired. The available options are GPS Least squares, Galileo Weighted least squares and Multi-constellation with Iono-Free implemented.</string>
 
-    <string name="enable_recommendation">* This setting is highly recommended to be enabled</string>
+    <string name="enable_recommendation">* It is highly recommended to enable this option.</string>
     <string name="create">create</string>
     <string name="wls">WLS</string>
     <string name="ls">LS</string>
@@ -130,8 +133,12 @@
     <string name="graph_type">Graph Type</string>
     <string name="error_plot">Error plot</string>
     <string name="ionosphere_elevation">Ionosphere/Elevation</string>
-    <string name="iono_information_detail">The ionosphere error depends on the elevation of the satellite, becoming smaller when the elevation gets bigger. This graph shows this dependence in a visual way. In order to see the information on this graph, the positioning has to be started  with some method using Iono-Free corrections.</string>
     <string name="ionoAxisTitle">Ionosphere error [m]</string>
-    <string name="minimum_one_mode_selected_message">At least one Positioning Mode must be selected</string>
+    <string name="minimum_one_mode_selected_message">Please, select at least one positioning mode to compute the position</string>
+    <string name="mode_created_toast">Mode created</string>
+    <string name="no_band_toast">Please, select a band to create a new mode</string>
+    <string name="no_constellation_toast">Please, select at least one constellation to create a new mode<</string>
+    <string name="name_exists_toast">This name already exists</string>
+    <string name="no_name_toast">A new mode needs a new name!</string>
 
 </resources>
