@@ -134,10 +134,10 @@
     <string name="error_plot">Error plot</string>
     <string name="ionosphere_elevation">Ionosphere/Elevation</string>
     <string name="ionoAxisTitle">Ionosphere error [m]</string>
-    <string name="minimum_one_mode_selected_message">At least one Positioning Mode must be selected</string>
+    <string name="minimum_one_mode_selected_message">Please, select at least one positioning mode to compute the position</string>
     <string name="mode_created_toast">Mode created</string>
-    <string name="no_band_toast">At least one band must be selected</string>
-    <string name="no_constellation_toast">At least one constellation must be selected</string>
+    <string name="no_band_toast">Please, select a band to create a new mode</string>
+    <string name="no_constellation_toast">Please, select at least one constellation to create a new mode<</string>
     <string name="name_exists_toast">This name already exists</string>
     <string name="no_name_toast">A new mode needs a new name!</string>
 
