@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.*
 import android.widget.SeekBar
+import android.widget.Toast
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
@@ -95,15 +96,19 @@ class ModesActivity : BaseActivity() {
                         selectedModes++
                     }
                 }
-                mPrefs.saveModes(modes)
+                if (selectedModes > 0) {
+                    mPrefs.setGnssLoggingEnabled(switchGnssLogs.isChecked)
+                    mPrefs.setAverageEnabled(switchAvg.isChecked)
+                    mPrefs.setAverage(avg)
+                    mPrefs.setSelectedMask(mask)
+                    mPrefs.setSelectedCnoMask(cnoMask)
+                    mPrefs.saveModes(modes)
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                } else {
+                    toast(getString(R.string.minimum_one_mode_selected_message), Toast.LENGTH_LONG)
+                }
             }
-            mPrefs.setGnssLoggingEnabled(switchGnssLogs.isChecked)
-            mPrefs.setAverageEnabled(switchAvg.isChecked)
-            mPrefs.setAverage(avg)
-            mPrefs.setSelectedMask(mask)
-            mPrefs.setSelectedCnoMask(cnoMask)
-            setResult(Activity.RESULT_OK)
-            finish()
         }
 
         avg = mPrefs.getAverage()

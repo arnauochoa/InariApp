@@ -79,7 +79,7 @@
     <string name="app_version_title">App version:</string>
     <string name="app_version_number">1.0.0</string>
     <string name="contact_title">Contact:</string>
-    <string name="contact_email">inariteam@gmail.com</string>
+    <string name="contact_email">inariteamapp@gmail.com</string>
     <string name="developed_by_title">Developed by:</string>
     <string name="inari_team">inari team</string>
     <string name="composed_by_title">Composed by:</string>
@@ -132,5 +132,6 @@
     <string name="ionosphere_elevation">Ionosphere/Elevation</string>
     <string name="iono_information_detail">The ionosphere error depends on the elevation of the satellite, becoming smaller when the elevation gets bigger. This graph shows this dependence in a visual way. In order to see the information on this graph, the positioning has to be started  with some method using Iono-Free corrections.</string>
     <string name="ionoAxisTitle">Ionosphere error [m]</string>
+    <string name="minimum_one_mode_selected_message">At least one Positioning Mode must be selected</string>
 
 </resources>
