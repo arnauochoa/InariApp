@@ -24,16 +24,19 @@ class PvtUnitTest {
         //list of files that we want to compute
         val filesList = arrayListOf<String>()
 //        filesList.add("galileo/E1/GAL_E1_1.txt")
-        repeat(14) {
-            filesList.add("tests_jardi_1/jardi_1_${it + 1}.txt")
+//        repeat(14) {
+//            filesList.add("tests_jardi_1/jardi_1_${it + 1}.txt")
+        repeat(40){
+//            filesList.add("gps/not_obtained/not_obtained_${it+1}.txt")
+            filesList.add("inari/inari_${it+1}.txt")
         }
-
 
         //for each file added in the list, compute the position
         filesList.forEach { fileName ->
 
             //Getting the file
             val fileInput = this.javaClass.classLoader?.getResourceAsStream(fileName)
+
             val acqInfoString = fileInput?.bufferedReader().use { it?.readText() }
             val type = object : TypeToken<AcqInformation>() {}.type
 
@@ -109,9 +112,11 @@ class PvtUnitTest {
                     pvtLatLng = pvtMultiConst.pvt,
                     modeColor = it.color,
                     modeName = it.name,
+                    constellations = it.constellations,
                     nSatellites = pvtMultiConst.nSats,
                     galElevIono = pvtMultiConst.galElevIono,
-                    gpsElevIono = pvtMultiConst.gpsElevIono
+                    gpsElevIono = pvtMultiConst.gpsElevIono,
+                    gpsTime = pvtMultiConst.gpsTime
                 )
                 responses.add(pvtResponse)
             }
