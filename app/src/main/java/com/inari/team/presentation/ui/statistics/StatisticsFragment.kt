@@ -34,10 +34,12 @@ import com.inari.team.core.navigator.Navigator
 import com.inari.team.core.utils.*
 import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.presentation.model.ResponsePvtMode
+import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.main.MainListener
 import com.inari.team.presentation.ui.status.StatusFragment
 import kotlinx.android.synthetic.main.dialog_change_graph.view.*
 import kotlinx.android.synthetic.main.fragment_statistics.*
+import org.nield.kotlinstatistics.averageBy
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -64,8 +66,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     private var graph: String = ""
 
-    private val gpsElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
-    private val galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
+    private var gpsElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
+    private var galElevIono: ArrayList<Pair<Int, Double>> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,7 +173,7 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                 L1_E1 -> scatterChart = createScatterChart(c, MIN_CNO_L1, MAX_CNO_L1, MIN_AGC_L1, MAX_AGC_L1)
                 L5_E5 -> scatterChart = createScatterChart(c, MIN_CNO_L5, MAX_CNO_L5, MIN_AGC_L5, MAX_AGC_L5)
             }
-            xAxisTitle.text = getString(R.string.cnoAxisTitle)
+            xAxisTitle.text = getString(R.string.avgCnoAxisTitle)
             yAxisTitle.text = getString(R.string.agcAxisTitle)
             scatterChart?.let { chart ->
                 chart.legend.isEnabled = true
@@ -240,26 +242,29 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
     // Specific plots
     private fun plotAgcCNoGraph(measurements: Collection<GnssMeasurement>?) {
-
         context?.let { c ->
-
             scatterChart?.let { chart ->
-
                 measurements?.let {
-
                     // Obtain measurements for desired frequency band
+                    val cnos = arrayListOf<Double>()
+                    val agcs = arrayListOf<Double>()
                     it.forEach { meas ->
                         if (meas.hasAutomaticGainControlLevelDb()) {
                             if (meas.hasCarrierFrequencyHz() && isSelectedBand(selectedBand, meas.carrierFrequencyHz)) {
                                 if (agcCNoValues.size == MAX_AGC_CNO_POINTS) {
                                     agcCNoValues.removeAt(0)
                                 }
-                                agcCNoValues.add(Pair(meas.cn0DbHz, meas.automaticGainControlLevelDb))
+                                cnos.add(meas.cn0DbHz)
+                                agcs.add(meas.automaticGainControlLevelDb)
                             }
                         }
                     }
 
-                    // Gnenerate points with obtained and previous measurements
+                    val avgCno = cnos.average()
+                    val avgAgc = agcs.average()
+                    agcCNoValues.add(Pair(avgCno, avgAgc))
+
+                    // Generate points with obtained and previous measurements
                     val points = arrayListOf<Entry>()
                     agcCNoValues.forEach { point ->
                         points.add(Entry(point.first.toFloat(), point.second.toFloat())) // x: CNo, y: AGC
@@ -511,8 +516,6 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
 
                     dialog.dismiss()
                 }
-
-
             }
             dialog.show()
         }
@@ -533,20 +536,8 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
                 plotErrorGraph()
             }
             GRAP_IONO_ELEV -> {
-                positions.forEach { pos ->
-                    pos.galElevIono.forEach { p ->
-                        if (galElevIono.size == MAX_IONO_ELEV_POINTS) {
-                            galElevIono.removeAt(0)
-                        }
-                        galElevIono.add(p)
-                    }
-                    pos.gpsElevIono.forEach { p ->
-                        if (gpsElevIono.size == MAX_IONO_ELEV_POINTS) {
-                            gpsElevIono.removeAt(0)
-                        }
-                        gpsElevIono.add(p)
-                    }
-                }
+                if (positions.last().galElevIono.size > 0) galElevIono = positions.last().galElevIono
+                if (positions.last().gpsElevIono.size > 0) gpsElevIono = positions.last().gpsElevIono
                 plotIonoElevGraph()
             }
         }
@@ -605,21 +596,20 @@ class StatisticsFragment : BaseFragment(), GnssEventsListener {
         // Maximum number of points
         const val MAX_AGC_CNO_POINTS = 500
         const val MAX_POS_POINTS = 500
-        const val MAX_IONO_ELEV_POINTS = 500
 
         // Limit values for graphs
         const val MIN_ELEV = 0f // º
         const val MAX_ELEV = 90f // º
-        const val MAX_CNO_L1 = 45f // dB
+        const val MAX_CNO_L1 = 50f // dB
         const val MIN_CNO_L1 = 0f // dB
-        const val MAX_CNO_L5 = 30f // dB
-        const val MIN_CNO_L5 = -5f // dB
-        const val MAX_AGC_L1 = 50f // dB-Hz
+        const val MAX_CNO_L5 = 40f // dB
+        const val MIN_CNO_L5 = -10f // dB
+        const val MAX_AGC_L1 = 60f // dB-Hz
         const val MIN_AGC_L1 = 30f // dB-Hz
-        const val MAX_AGC_L5 = 15f // dB-Hz
-        const val MIN_AGC_L5 = -5f // dB-Hz
+        const val MAX_AGC_L5 = 20f // dB-Hz
+        const val MIN_AGC_L5 = -10f // dB-Hz
         const val MIN_IONO = 0f // m
-        const val MAX_IONO = 500f // m
+        const val MAX_IONO = 240f // m
         const val NORTH_LIM = 90f // m
         const val EAST_LIM = 90f // m
 

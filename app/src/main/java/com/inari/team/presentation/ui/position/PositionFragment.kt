@@ -1,17 +1,17 @@
 package com.inari.team.presentation.ui.position
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewGroup
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
@@ -29,6 +29,7 @@ import com.inari.team.core.utils.extensions.withViewModel
 import com.inari.team.core.utils.getModeIcon
 import com.inari.team.core.utils.showAlert
 import com.inari.team.presentation.model.ResponsePvtMode
+import com.inari.team.presentation.ui.main.MainActivity
 import com.inari.team.presentation.ui.main.MainListener
 import kotlinx.android.synthetic.main.dialog_map_terrain.view.*
 import kotlinx.android.synthetic.main.fragment_position.*
@@ -60,6 +61,8 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         fragmentComponent.inject(this)
 
+        setHasOptionsMenu(true)
+
         viewModel = withViewModel(viewModelFactory) {
         }
     }
@@ -72,6 +75,24 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
 
         setViews(view)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.menu_position, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        item?.let {
+            when (it.itemId) {
+                R.id.clear -> {
+                    mMap?.clear()
+                }
+                else -> {
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onAttach(context: Context?) {
@@ -91,7 +112,7 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
         btComputeAction.setOnClickListener {
             if (btComputeAction.text == getString(R.string.start_computing)) {
-                startComputing(it)
+                startComputing()
             } else {
                 showAlert(
                     view.context, "Stop Computing",
@@ -178,29 +199,34 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
 
     }
 
+    private fun startComputing() {
+        if (mSharedPreferences.getSelectedModesList().isEmpty()) { // If no constellation or band has been selected
+            context?.let {
+                showAlert(
+                    it,
+                    "Select Parameters",
+                    getString(R.string.minimum_one_mode_selected_message),
+                    "go to settings",
+                    positiveAction = {
+                        navigator.navigateToModesActivity()
 
-    @SuppressLint("MissingPermission")
-    private fun startComputing(it: View) {
-        val selectedModes = mSharedPreferences.getSelectedModesList()
-        if (selectedModes.isEmpty()) { // If no constellation or band has been selected
-            showAlert(
-                it.context,
-                "Select Parameters",
-                "At least one Positioning Mode must be selected",
-                "go to settings",
-                positiveAction = {
-                    navigator.navigateToModesActivity()
-
-                },
-                isCancelable = true
-            )
+                    },
+                    isCancelable = true
+                )
+            }
         } else {
             mMap?.clear()
             isStartedComputing = true
+            mainListener?.startComputing()
             btComputeAction.text = getString(R.string.stop_computing)
-            mainListener?.startComputing(selectedModes)
         }
+    }
 
+    private fun resumeComputing() {
+        mMap?.clear()
+        isStartedComputing = true
+        mainListener?.onModesChanged()
+        btComputeAction.text = getString(R.string.stop_computing)
     }
 
     private fun stopComputing() {
@@ -360,6 +386,17 @@ class PositionFragment : BaseFragment(), OnMapReadyCallback {
                 isStartedComputing = false
             } else {
                 moveCamera(LatLng(positions[0].pvtLatLng.lat, positions[0].pvtLatLng.lng))
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            MainActivity.SETTINGS_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    resumeComputing()
+                }
             }
         }
     }

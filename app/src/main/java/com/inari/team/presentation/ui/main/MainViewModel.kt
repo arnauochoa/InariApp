@@ -41,7 +41,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
     private var refPos: LatLng? = null
 
     private var startedComputingDate = Date()
-    private var lastMeasurementsDate = Date()
 
     private var gnssMeasLogger: GnssMeasLogger? = null
     private var posLogger: PosLogger? = null
@@ -70,12 +69,11 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         isComputing = true
         isFirstComputedPosition = true
         startedComputingDate = Date()
-        lastMeasurementsDate = Date()
         computedPositions = arrayListOf()
 
         if (mPrefs.isGnssLoggingEnabled()) {
             gnssMeasLogger = GnssMeasLogger()
-            posLogger = PosLogger()
+            posLogger = PosLogger(selectedModes)
         }
 
         //init gnss
@@ -97,6 +95,10 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
         gnssMeasLogger = null
         posLogger = null
         ephemeris.updateData("")
+    }
+
+    fun clearPositions() {
+        computedPositions.clear()
     }
 
     private fun obtainEphemerisData() {
@@ -139,16 +141,6 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
 
     fun setGnssStatus(status: GnssStatus?) {
         gnssData.lastGnssStatus = status
-
-        if (Date().time - lastMeasurementsDate.time >=
-            TimeUnit.SECONDS.toMillis(if (gnssData.avgEnabled) mPrefs.getAverage().toLong() else AVG_RATING_DEFAULT) +
-            TimeUnit.SECONDS.toMillis(10)
-        ) {
-            if (gnssData.measurements.isEmpty()) {
-                lastMeasurementsDate = Date()
-                position.showError("Measurements are not being obtained")
-            }
-        }
     }
 
     fun setGnssMeasurementsEvent(gnssMeasurementsEvent: GnssMeasurementsEvent?) {
@@ -202,10 +194,14 @@ class MainViewModel @Inject constructor(private val mPrefs: AppSharedPreferences
             if (coordinates.isNotEmpty()) {
 
                 //add position logs
-                gnssData.modes.forEach { mode ->
-                    coordinates.forEach {
-                        posLogger?.addPositionLine(it.pvtLatLng, it.nSatellites.roundToInt(), mode.constellations)
-                    }
+                coordinates.forEach {
+                    posLogger?.addPositionLine(
+                        it.modeName,
+                        it.pvtLatLng,
+                        it.nSatellites.roundToInt(),
+                        it.constellations,
+                        it.gpsTime
+                    )
                 }
 
                 position.updateData(coordinates)

@@ -82,10 +82,10 @@ public class UIUtils {
     }
 
     /**
-     * Returns a human-readable description of the time-to-first-fix, such as "38 sec"
+     * Returns a human-readable description of the clockBias-to-first-fix, such as "38 sec"
      *
-     * @param ttff time-to-first fix, in milliseconds
-     * @return a human-readable description of the time-to-first-fix, such as "38 sec"
+     * @param ttff clockBias-to-first fix, in milliseconds
+     * @return a human-readable description of the clockBias-to-first-fix, such as "38 sec"
      */
     public static String getTtffString(int ttff) {
         if (ttff == 0) {

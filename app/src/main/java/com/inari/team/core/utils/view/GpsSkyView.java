@@ -139,7 +139,7 @@ public class GpsSkyView extends View implements GnssEventsListener {
         mSatelliteUsedStrokePaint = new Paint();
         mSatelliteUsedStrokePaint.setColor(Color.BLACK);
         mSatelliteUsedStrokePaint.setStyle(Paint.Style.STROKE);
-        mSatelliteUsedStrokePaint.setStrokeWidth(8.0f);
+        mSatelliteUsedStrokePaint.setStrokeWidth(2.0f);
         mSatelliteUsedStrokePaint.setAntiAlias(true);
 
         mSnrThresholds = new float[]{MIN_VALUE_SNR, 10.0f, 20.0f, MAX_VALUE_SNR};

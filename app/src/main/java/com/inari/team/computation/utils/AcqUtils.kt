@@ -38,7 +38,7 @@ fun getE1CSatellite(meas: GnssMeasurement, acqInformationMeasurements: AcqInform
             tTx = tTx,
             tRx = tRx,
             cn0 = cn0DbHz,
-            pR = getPseudoRange(applyMod(tTx, GAL_E1C), applyMod(tRx, GAL_E1C))
+            pR = getPseudoRange(tTx, applyMod(tRx, GAL_E1C))
         )
     }
 }

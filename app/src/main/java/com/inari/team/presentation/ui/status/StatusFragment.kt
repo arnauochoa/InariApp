@@ -132,6 +132,7 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
             seekBar?.setProgress(cno.toInt(), true)
         } else {
             tvCnoAvg?.text = "$cno"
+            avgCnoContent?.text = "$cno"
         }
 
         seekBar?.isEnabled = false
@@ -140,6 +141,7 @@ class StatusFragment : BaseFragment(), GnssEventsListener {
             override fun onProgressChanged(seekBar: SeekBar?, p: Int, fromUser: Boolean) {
                 seekBar?.let {
                     tvCnoAvg?.text = "$cno"
+                    avgCnoContent?.text = "$cno"
                     clIndicator?.x = it.thumb.bounds.exactCenterX()
                 }
 

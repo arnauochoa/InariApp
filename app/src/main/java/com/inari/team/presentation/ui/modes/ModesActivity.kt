@@ -1,5 +1,6 @@
 package com.inari.team.presentation.ui.modes
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -10,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.*
 import android.widget.SeekBar
+import android.widget.Toast
 import com.inari.team.R
 import com.inari.team.core.base.BaseActivity
 import com.inari.team.core.navigator.Navigator
@@ -94,14 +96,19 @@ class ModesActivity : BaseActivity() {
                         selectedModes++
                     }
                 }
-                mPrefs.saveModes(modes)
+                if (selectedModes > 0) {
+                    mPrefs.setGnssLoggingEnabled(switchGnssLogs.isChecked)
+                    mPrefs.setAverageEnabled(switchAvg.isChecked)
+                    mPrefs.setAverage(avg)
+                    mPrefs.setSelectedMask(mask)
+                    mPrefs.setSelectedCnoMask(cnoMask)
+                    mPrefs.saveModes(modes)
+                    setResult(Activity.RESULT_OK)
+                    finish()
+                } else {
+                    toast(getString(R.string.minimum_one_mode_selected_message), Toast.LENGTH_LONG)
+                }
             }
-            mPrefs.setGnssLoggingEnabled(switchGnssLogs.isChecked)
-            mPrefs.setAverageEnabled(switchAvg.isChecked)
-            mPrefs.setAverage(avg)
-            mPrefs.setSelectedMask(mask)
-            mPrefs.setSelectedCnoMask(cnoMask)
-            finish()
         }
 
         avg = mPrefs.getAverage()
@@ -331,7 +338,7 @@ class ModesActivity : BaseActivity() {
                 isSelected = false
             )
             AppSharedPreferences.getInstance().saveMode(mode)
-            toast("Mode created")
+            toast(getString(R.string.mode_created_toast))
             dialog.dismiss()
             mAdapter?.update()
         }
@@ -352,17 +359,22 @@ class ModesActivity : BaseActivity() {
                     if (bands.isNotEmpty()) { //if one band is selected
                         canBeAdded = true
                     } else { //if no band is selected
-                        toast("At least one band must be selected")
+                        toast(getString(R.string.no_band_toast))
                     }
                 } else { //if no constellation is selected
-                    toast("At least one constellattion must be selected")
+                    toast(getString(R.string.no_constellation_toast))
                 }
             } else { //if name already exists
-                toast("This name already exists")
+                toast(getString(R.string.name_exists_toast))
             }
         } else {//if name is blank
-            toast("Name can not be blank")
+            toast(getString(R.string.no_name_toast))
         }
         return canBeAdded
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        super.onBackPressed()
     }
 }

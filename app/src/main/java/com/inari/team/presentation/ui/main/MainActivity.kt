@@ -29,7 +29,6 @@ import com.inari.team.core.utils.skyplot.GnssEventsListener
 import com.inari.team.core.utils.skyplot.GpsTestUtil
 import com.inari.team.core.utils.skyplot.MathUtils
 import com.inari.team.core.utils.view.CustomAHBottomNavigationItem
-import com.inari.team.presentation.model.Mode
 import com.inari.team.presentation.model.ResponsePvtMode
 import com.inari.team.presentation.ui.about.AboutFragment
 import com.inari.team.presentation.ui.logs.LogsFragment
@@ -45,14 +44,6 @@ import okhttp3.ResponseBody
 import javax.inject.Inject
 
 class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEventListener {
-
-    companion object {
-        private const val MIN_TIME = 1L
-        private const val MIN_DISTANCE = 0.0F
-        const val TUTORIAL_CODE = 88
-
-        private var mActivity: MainActivity? = null
-    }
 
     @Inject
     lateinit var mPrefs: AppSharedPreferences
@@ -107,16 +98,12 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
             navigator.navigateToTutorialActivtiy()
         }
 
-        mActivity = this
-
         setViewPager()
         setupBottomNavigation()
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
         addOrientationSensorListener()
-
         startGnss()
     }
 
@@ -245,7 +232,6 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
             locationManager?.registerGnssStatusCallback(gnssStatusListener)
             locationManager?.registerGnssMeasurementsCallback(gnssMeasurementsEventListener)
             locationManager?.addNmeaListener(gnssNmeaMessageListener)
-
         } else {
             requestPermissionss(
                 arrayOf(
@@ -254,6 +240,14 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 ), SplashActivity.PERMISSIONS_CODE
             )
         }
+    }
+
+    private fun stopGnss() {
+        locationManager?.unregisterGnssStatusCallback(gnssStatusListener)
+        locationManager?.unregisterGnssMeasurementsCallback(gnssMeasurementsEventListener)
+        locationManager?.removeNmeaListener(gnssNmeaMessageListener)
+
+        locationManager?.removeUpdates(this)
     }
 
     private fun addOrientationSensorListener() {
@@ -292,7 +286,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 saveLastLogs(fileName)
                 dialog.dismiss()
                 positionsList.clear()
-            } else showError("File name can not be empty")
+            } else showError("Please, enter a file name.")
         }
         layout.tvDiscard.setOnClickListener {
             dialog.dismiss()
@@ -366,12 +360,14 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
         }
     }
 
-    override fun startComputing(selectedModes: List<Mode>) {
-        viewModel?.startComputingPosition(selectedModes)
+    override fun startComputing() {
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        viewModel?.startComputingPosition(mPrefs.getSelectedModesList())
         isComputing = true
     }
 
     override fun stopComputing() {
+        window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         viewModel?.stopComputingPosition()
         isComputing = false
         val computedPositions = viewModel?.getComputedPositions() ?: arrayListOf()
@@ -383,6 +379,11 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
 
     override fun getComputedPositions(): List<ResponsePvtMode>? {
         return viewModel?.getComputedPositions()
+    }
+
+    override fun onModesChanged() {
+        viewModel?.clearPositions()
+        viewModel?.startComputingPosition(mPrefs.getSelectedModesList())
     }
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
@@ -401,7 +402,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                         // On some Samsung devices, an exception is thrown if this vector > 4 (see #39)
                         // Truncate the array, since we can deal with only the first four values
                         mTruncateVector = true
-                        // Do the truncation here the first time the exception occurs
+                        // Do the truncation here the first clockBias the exception occurs
                         getRotationMatrixFromTruncatedVector(event.values)
                     }
 
@@ -511,7 +512,7 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
                 startGnss()
             } else {
                 toast(
-                    "Location permissions are compulsory, please go to settings to enable.",
+                    "Location permissions are compulsory, please go to settings to enable them.",
                     Toast.LENGTH_LONG
                 )
                 finish()
@@ -522,14 +523,23 @@ class MainActivity : BaseActivity(), MainListener, LocationListener, SensorEvent
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        locationManager?.removeUpdates(this)
+        stopGnss()
         gnssListeners.clear()
+        stopComputing()
+        super.onDestroy()
+    }
+
+    companion object {
+        private const val MIN_TIME = 1L
+        private const val MIN_DISTANCE = 0.0F
+        const val TUTORIAL_CODE = 88
+        const val SETTINGS_CODE = 77
     }
 }
 
 interface MainListener {
-    fun startComputing(selectedModes: List<Mode>)
+    fun startComputing()
     fun stopComputing()
     fun getComputedPositions(): List<ResponsePvtMode>?
+    fun onModesChanged()
 }

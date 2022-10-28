@@ -106,7 +106,7 @@ fun gnssClockAsJson(gnssClock: GnssClock?): JSONObject {
 
 
         gnssClock?.let { clock ->
-            clockJson.put("timeNanos", clock.timeNanos)         // Time nanos
+            clockJson.put("gpsNanos", clock.timeNanos)         // Time nanos
             clockJson.put("hasBiasNanos", clock.hasBiasNanos()) // Boolean flags
             clockJson.put("hasFullBiasNanos", clock.hasFullBiasNanos())
             clockJson.put("hasBiasUncertaintyNanos", clock.hasBiasUncertaintyNanos())
